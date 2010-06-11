@@ -111,6 +111,7 @@ glogisfit.default <- function(x, weights = NULL,
     vcov = vc,
     loglik = -opt$value,
     df = 3,
+    n = length(x),
     weights = if(isTRUE(all.equal(as.vector(w), rep.int(1L, length(x))))) NULL else w,
     optim = opt,
     method = method,
@@ -149,6 +150,9 @@ estfun.glogisfit <- function(x, ...) {
   rval <- t(t(sglogis(x$x, x$par[1], x$par[2], x$par[3])) * c(1, x$par[2], x$par[3]))[, is.na(x$fixed)]
   colnames(rval) <- names(coef(x))
   return(rval)
+}
+bread.glogisfit <- function(x, log = TRUE, ...) {
+  vcov(x, log = log) * x$n
 }
 
 ## printing and summary

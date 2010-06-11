@@ -1,0 +1,38 @@
+import("graphics", "stats")
+
+importFrom("sandwich", "estfun")
+importFrom("sandwich", "bread")
+
+export(
+  "dglogis",
+  "pglogis",
+  "qglogis",
+  "rglogis",
+  "sglogis",
+  "glogisfit",
+  "glogisfit.default",
+  "breakpoints.glogisfit",
+  "refit.breakpoints.glogisfit"
+)
+
+S3method("glogisfit", "formula")
+
+S3method("bread", "glogisfit")
+S3method("coef", "glogisfit")
+S3method("estfun", "glogisfit")
+S3method("hist", "glogisfit")
+S3method("lines", "glogisfit")
+S3method("logLik", "glogisfit")
+S3method("plot", "glogisfit")
+S3method("print", "glogisfit")
+S3method("summary", "glogisfit")
+S3method("print", "summary.glogisfit")
+S3method("vcov", "glogisfit")
+
+S3method("coef", "breakpoints.glogisfit")
+S3method("fitted", "breakpoints.glogisfit")
+
+# S3method("model.frame", "glogisfit")
+# S3method("model.matrix", "glogisfit")
+# S3method("terms", "glogisfit")
+# S3method("update", "glogisfit")
