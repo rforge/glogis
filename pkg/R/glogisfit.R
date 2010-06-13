@@ -149,11 +149,14 @@ logLik.glogisfit <- function(object, ...) structure(object$loglik, df = object$d
 estfun.glogisfit <- function(x, ...) {
   rval <- t(t(sglogis(x$x, x$parameters[1], x$parameters[2], x$parameters[3])) * c(1, x$parameters[2], x$parameters[3]))[, is.na(x$fixed)]
   colnames(rval) <- names(coef(x))
+  if(inherits(x$x, "zoo")) rval <- zoo(rval, time(x$x))
+  if(inherits(x$x, "ts")) rval <- ts(rval, start = start(x$x), frequency = frequency(x$x))
   return(rval)
 }
 bread.glogisfit <- function(x, log = TRUE, ...) {
   vcov(x, log = log) * x$n
 }
+residuals.glogisfit <- function(object, ...) object$x - object$moments[1]
 
 ## printing and summary
 print.glogisfit <- function(x, digits = max(3, getOption("digits") - 3), ...) 

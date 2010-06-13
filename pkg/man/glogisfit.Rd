@@ -12,6 +12,7 @@
 \alias{plot.glogisfit}
 \alias{print.glogisfit}
 \alias{print.summary.glogisfit}
+\alias{residuals.glogisfit}
 \alias{summary.glogisfit}
 \alias{vcov.glogisfit}
 
@@ -76,7 +77,8 @@ glogisfit(x, \dots)
   with the fitted objects, including methods to the generic functions
   \code{\link[base]{print}}, \code{\link[base]{summary}}, \code{\link[graphics]{plot}}
   (reusing \code{\link[graphics]{hist}} and \code{\link[graphics]{lines}}), \code{\link[stats]{coef}}, 
-  \code{\link[stats]{vcov}}, \code{\link[stats]{logLik}},  and \code{\link[sandwich]{estfun}} and
+  \code{\link[stats]{vcov}}, \code{\link[stats]{logLik}},  \code{\link[stats]{residuals}},
+  and \code{\link[sandwich]{estfun}} and
   \code{\link[sandwich]{bread}} (from the \pkg{sandwich} package).  
 
   The methods for \code{coef}, \code{vcov}, \code{summary}, and \code{bread} report computations
