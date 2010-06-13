@@ -19,7 +19,7 @@ dglogis(x, location = 0, scale = 1, shape = 1, log = FALSE)
 pglogis(q, location = 0, scale = 1, shape = 1, lower.tail = TRUE, log.p = FALSE)
 qglogis(p, location = 0, scale = 1, shape = 1, lower.tail = TRUE, log.p = FALSE)
 rglogis(n, location = 0, scale = 1, shape = 1)
-sglogis(n, location = 0, scale = 1, shape = 1)
+sglogis(x, location = 0, scale = 1, shape = 1)
 }
 
 \arguments{
@@ -52,6 +52,10 @@ sglogis(n, location = 0, scale = 1, shape = 1)
     F(x) = \frac{1}{(1 + e^{-(x-\mu)/\sigma})^\gamma)}%
   }{F(x) = 1 / (1 + exp(-(x-m)/s))^g}.
 
+  The mean is given by \code{location + (digamma(shape) - digamma(1)) * scale}, the variance by
+  \code{(psigamma(shape, deriv = 1) + psigamma(1, deriv = 1)) * scale^2)} and the skewness by
+  \code{(psigamma(shape, deriv = 2) - psigamma(1, deriv = 2)) / (psigamma(shape, deriv = 1) + psigamma(1, deriv = 1))^(3/2))}.
+
   \code{[dpq]glogis} are calculated by leveraging the \code{[dpq]logis}
   and adding the shape parameter. \code{rglogis} uses inversion.
 }
@@ -63,6 +67,20 @@ sglogis(n, location = 0, scale = 1, shape = 1)
 }
 
 \examples{
+## PDF and CDF
+par(mfrow = c(1, 2))
+x <- -100:100/10
+plot(x, dglogis(x, shape = 2), type = "l", col = 4, main = "PDF", ylab = "f(x)")
+lines(x, dglogis(x, shape = 1))
+lines(x, dglogis(x, shape = 0.5), col = 2)
+legend("topleft", c("generalized (0, 1, 2)", "standard (0, 1, 1)",
+  "generalized (0, 1, 0.5)"), lty = 1, col = c(4, 1, 2), bty = "n")
+plot(x, pglogis(x, shape = 2), type = "l", col = 4, main = "CDF", ylab = "F(x)")
+lines(x, pglogis(x, shape = 1))
+lines(x, pglogis(x, shape = 0.5), col = 2)
+
+## artifical empirical example
+set.seed(2)
 x <- rglogis(1000, -1, scale = 0.5, shape = 3)
 gf <- glogisfit(x)
 plot(gf)

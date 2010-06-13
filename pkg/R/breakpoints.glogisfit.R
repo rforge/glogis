@@ -22,17 +22,20 @@ refit.breakpoints.glogisfit <- function(object, ...) {
   return(rval)
 }
 
-coef.breakpoints.glogisfit <- function(object, ...) {
+coef.breakpoints.glogisfit <- function(object, log = TRUE, ...) {
   rf <- refit(object, ...)
-  t(sapply(rf, coef))
+  t(sapply(rf, coef, log = log))
 }
 
 fitted.breakpoints.glogisfit <- function(object,
-  type = c("mean", "variance", "skewness"), ...) {
+  type = c("mean", "variance", "skewness"), ...)
+{
+  type <- as.vector(sapply(type, match.arg, choices = c("mean", "variance", "skewness")))
   rf <- refit(object, ...)
   mom <- t(sapply(rf, "[[", "moments"))
-  rval <- mom[breakfactor(object, ...),]
-  rval <- zoo(as.matrix(rval), time(object$null$x))
-  rval
+  rval <- mom[breakfactor(object, ...), type]
+  if(inherits(object$null$x, "zoo")) rval <- zoo(rval, time(object$null$x))
+  if(inherits(object$null$x, "ts")) rval <- ts(rval, start = start(object$null$x), frequency = frequency(object$null$x))
+  return(rval)
 }
 

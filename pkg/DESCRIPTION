@@ -10,6 +10,6 @@ Description: Tools for the generalized logistic distribution (Type I,
 	     likelihood estimation, and structural change methods.
 LazyLoad: yes
 Depends: R (>= 2.10.0), stats, zoo
-Suggests: strucchange, fxregime
+Suggests: strucchange, fxregime, lattice
 Imports: graphics, stats, sandwich
 License: GPL-2

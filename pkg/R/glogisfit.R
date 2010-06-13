@@ -60,16 +60,16 @@ glogisfit.default <- function(x, weights = NULL,
   ## negative log-likelihood function
   llfun <- function(par) {
     p1 <- if(is.na(fixed[1])) par[1] else fixed[1]
-    p2 <- if(is.na(fixed[2])) par[is.na(fixed[1]) + 1] else log(fixed[2])
-    p3 <- if(is.na(fixed[3])) par[sum(is.na(fixed[1:2])) + 1] else log(fixed[3])
+    p2 <- if(is.na(fixed[2])) par[is.na(fixed[1]) + 1] else fixed[2]
+    p3 <- if(is.na(fixed[3])) par[sum(is.na(fixed[1:2])) + 1] else fixed[3]
     -sum(w * dglogis(x, location = par[1], scale = exp(p2), shape = exp(p3), log = TRUE))
   }
   
   ## neagtive gradient function
   gradfun <- function(par) {
     p1 <- if(is.na(fixed[1])) par[1] else fixed[1]
-    p2 <- if(is.na(fixed[2])) par[is.na(fixed[1]) + 1] else log(fixed[2])
-    p3 <- if(is.na(fixed[3])) par[sum(is.na(fixed[1:2])) + 1] else log(fixed[3])
+    p2 <- if(is.na(fixed[2])) par[is.na(fixed[1]) + 1] else fixed[2]
+    p3 <- if(is.na(fixed[3])) par[sum(is.na(fixed[1:2])) + 1] else fixed[3]
     -colSums(w * t(t(sglogis(x, location = p1, scale = exp(p2), shape = exp(p3))) * c(1, exp(p2), exp(p3)))[, is.na(fixed)])
   }
 
@@ -110,12 +110,12 @@ glogisfit.default <- function(x, weights = NULL,
     coefficients = cf,
     vcov = vc,
     loglik = -opt$value,
-    df = 3,
+    df = length(cf),
     n = length(x),
     weights = if(isTRUE(all.equal(as.vector(w), rep.int(1L, length(x))))) NULL else w,
     optim = opt,
     method = method,
-    par = par,
+    parameters = par,
     moments = mom,
     start = start,
     fixed = fixed,
@@ -131,7 +131,7 @@ glogisfit.default <- function(x, weights = NULL,
 coef.glogisfit <- function(object, log = TRUE, ...) {
   cf <- object$coefficients
   if(!log & any(c("log(scale)", "log(shape)") %in% names(cf))) {
-    cf <- object$par[is.na(object$fixed)]
+    cf <- object$parameters[is.na(object$fixed)]
   }
   return(cf)
 }
@@ -139,15 +139,15 @@ vcov.glogisfit <- function(object, log = TRUE, ...) {
   cf <- object$coefficients
   vc <- object$vcov
   if(!log & any(c("log(scale)", "log(shape)") %in% names(cf))) {
-    D <- diag(c(1, object$par[2:3])[is.na(object$fixed)])    
+    D <- diag(c(1, object$parameters[2:3])[is.na(object$fixed)])    
     vc <- D %*% vc %*% t(D)
-    colnames(vc) <- rownames(vc) <- names(object$par)[!is.na(object$fixed)]
+    colnames(vc) <- rownames(vc) <- names(object$parameters)[!is.na(object$fixed)]
   }
   return(vc)
 }
-logLik.glogisfit <- function(object, ...) structure(object$loglik, df = object$df, class = "logLik")
+logLik.glogisfit <- function(object, ...) structure(object$loglik, df = object$df, nobs = object$n, class = "logLik")
 estfun.glogisfit <- function(x, ...) {
-  rval <- t(t(sglogis(x$x, x$par[1], x$par[2], x$par[3])) * c(1, x$par[2], x$par[3]))[, is.na(x$fixed)]
+  rval <- t(t(sglogis(x$x, x$parameters[1], x$parameters[2], x$parameters[3])) * c(1, x$parameters[2], x$parameters[3]))[, is.na(x$fixed)]
   colnames(rval) <- names(coef(x))
   return(rval)
 }
@@ -166,9 +166,11 @@ print.glogisfit <- function(x, digits = max(3, getOption("digits") - 3), ...)
     if(length(coef(x))) {
       cat(paste("Coefficients:\n", sep = ""))
       print.default(format(x$coefficients, digits = digits), print.gap = 2, quote = FALSE)
-    } else cat("No coefficients\n\n")
-      cat(paste("Distribution parameters:\n", sep = ""))
-      print.default(format(x$par, digits = digits), print.gap = 2, quote = FALSE)
+    } else {
+      cat("No coefficients\n\n")
+    }
+    cat(paste("\nDistribution parameters:\n", sep = ""))
+    print.default(format(x$parameters, digits = digits), print.gap = 2, quote = FALSE)
   }
   
   invisible(x)
@@ -214,16 +216,17 @@ print.summary.glogisfit <- function(x, digits = max(3, getOption("digits") - 3),
 plot.glogisfit <- function(x, main = "", xlab = deparse(x$call), fill = "lightgray",
   col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", ...)
 {
+  if(is.null(x$x)) stop("Data not stored in 'glogisfit' object.")
   if(is.null(ylim)) {
-    aux1 <- seq(min(x$x) - 3 * x$par[2], max(x$x) + 3 * x$par[2], length = 100)
+    aux1 <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
     aux2 <- hist(x$x, plot = FALSE)$density
-    ylim <- range(c(dglogis(aux1, x$par[1], x$par[2], x$par[3]), aux2))
+    ylim <- range(c(dglogis(aux1, x$parameters[1], x$parameters[2], x$parameters[3]), aux2))
   }
   rval <- hist(x, main = main, xlab = xlab, col = fill, ylim = ylim, ...)
   lines(x, col = col, lwd = lwd, lty = lty)
   if(identical(legend, TRUE)) legend <- "topleft"
   if(!identical(legend, FALSE)) legend(legend,
-    paste(c("location", "scale", "shape"), ": ", format(round(x$par, pmax(getOption("digits") - 4, 1))),
+    paste(c("location", "scale", "shape"), ": ", format(round(x$parameters, pmax(getOption("digits") - 4, 1))),
       ifelse(is.na(x$fixed), "", " (fixed)"), sep = ""),
     bty = "n")
 
@@ -233,12 +236,13 @@ plot.glogisfit <- function(x, main = "", xlab = deparse(x$call), fill = "lightgr
 hist.glogisfit <- function(x, main = "", xlab = deparse(x$call),
   col = "lightgray", freq = FALSE, ...)
 {
+  if(is.null(x$x)) stop("Data not stored in 'glogisfit' object.")
   hist(x$x, main = main, xlab = xlab, col = col, freq = freq, ...)
 }
 
 
 lines.glogisfit <- function(x, ...)
 {
-  aux <- seq(min(x$x) - 3 * x$par[2], max(x$x) + 3 * x$par[2], length = 100)
-  lines(aux, dglogis(aux, x$par[1], x$par[2], x$par[3]), ...)
+  aux <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
+  lines(aux, dglogis(aux, x$parameters[1], x$parameters[2], x$parameters[3]), ...)
 }
