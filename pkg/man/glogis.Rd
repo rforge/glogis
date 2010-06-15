@@ -1,5 +1,4 @@
 \name{glogis}
-\alias{gglogis}
 \alias{dglogis}
 \alias{pglogis}
 \alias{qglogis}
