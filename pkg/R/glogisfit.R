@@ -92,7 +92,6 @@ glogisfit.default <- function(x, weights = NULL,
 
   ## full parameter vector
   par <- fixed
-  par[2:3] <- log(par[2:3])
   par[is.na(fixed)] <- cf
   par[2:3] <- exp(par[2:3])
   names(par) <- c("location", "scale", "shape")
