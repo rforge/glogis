@@ -4,11 +4,11 @@
 
 ## This is somewhat experimental...
 ## glue code for gbreakpoints() in fxregime
-breakpoints.glogisfit <- function(obj, ...) {
+breakpoints.glogisfit <- function(obj, hpc = "none", ...) {
   stopifnot(require("fxregime"))
   dat <- data.frame(x = as.vector(obj$x))
   myfit <- function(formula, data, ...) glogisfit.formula(formula, data, fixed = obj$fixed, x = FALSE, ...)
-  rval <- fxregime:::gbreakpoints(x ~ 1, data = dat, order.by = time(obj$x), fit = myfit)
+  rval <- fxregime:::gbreakpoints(x ~ 1, data = dat, order.by = time(obj$x), fit = myfit, hpc = hpc)
   rval$null <- obj
   class(rval) <- c("breakpoints.glogisfit", class(rval))
   return(rval)
