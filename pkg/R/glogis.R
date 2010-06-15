@@ -52,15 +52,17 @@ dglogis <- function(x, location = 0, scale = 1, shape = 1, log = FALSE)
 ## associated score function, i.e., gradient of dglogis(..., log = TRUE)
 sglogis <- function(x, location = 0, scale = 1, shape = 1)
 {
+  ## scale observations
+  x <- (x - location)/scale
+
   # derivatives of location
-  rval1 <- (1 -(exp(location/scale) * (1 + shape))/(exp(location/scale) +  exp(x/scale)))/scale
+  rval1 <- 1/scale - (shape + 1) * (1/scale * exp(-x))/(1 + exp(-x))
 
   # derivatives of scale
-  rval2 <- (-location - scale + (exp(location/scale) * (1 + shape) *
-    (location - x))/(exp(location/scale) + exp(x/scale)) + x)/scale^2
+  rval2 <- -1/scale + x/scale - (shape + 1) * ((x/scale) * exp(-x))/(1 + exp(-x))
 
   # derivatives of shape
-  rval3 <- 1/shape - log(1 + exp((location - x)/scale))
+  rval3 <- 1/shape - log(1 + exp(-x))
 
   rvalue <- cbind(rval1, rval2, rval3)
   colnames(rvalue) <- c("location", "scale", "shape")
