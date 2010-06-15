@@ -39,7 +39,7 @@ glogisfit.formula <- function(formula, data, subset, na.action, weights,
 ## workhorse default method
 glogisfit.default <- function(x, weights = NULL,
   start = NULL, fixed = c(NA, NA, NA),
-  method = "BFGS", ...)
+  method = "BFGS", hessian = TRUE, ...)
 {
   ## call
   cl <- match.call()
@@ -87,7 +87,7 @@ glogisfit.default <- function(x, weights = NULL,
   
   ## post-process optim result
   cf <- opt$par
-  vc <- solve(opt$hessian)
+  vc <- if(hessian) solve(opt$hessian) else matrix(NA, ncol = length(cf), nrow = length(cf))
   names(cf) <- colnames(vc) <- rownames(vc) <- c("location", "log(scale)", "log(shape)")[is.na(fixed)]  
 
   ## full parameter vector

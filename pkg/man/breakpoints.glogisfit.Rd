@@ -12,7 +12,8 @@
 }
 
 \usage{
-\method{breakpoints}{glogisfit}(obj, \dots)
+\method{breakpoints}{glogisfit}(obj, h = 0.15, breaks = NULL, ic = "LWZ",
+  hpc = "none", \dots)
 
 \method{refit}{breakpoints.glogisfit}(object, \dots)
 
@@ -23,6 +24,17 @@
 
 \arguments{
   \item{obj}{an object of class \code{\link{glogisfit}}.}
+  \item{h}{numeric. Minimal segment size either given as fraction relative to the
+    sample size or as an integer giving the minimal number of observations
+    in each segment.}
+  \item{breaks}{integer specifying the maximal number of breaks to be calculated.
+    By default the maximal number allowed by \code{h} is used.}
+  \item{ic}{character specifying the default information criterion that should
+    be employed for selecting the number of breakpoints. Default is \code{"LWZ"}
+    (Liu-Wu-Zidek criterion, a modified BIC). Instead the classic \code{"BIC"}
+    can be used.}  
+  \item{hpc}{a character specifying the high performance computing support.
+    Default is \code{"none"}, can be set to \code{"foreach"}.}
   \item{object}{an object of class \code{breakpoints.glogisfit} as returned by
     the \code{\link[strucchange]{breakpoints}} method.}
   \item{log}{logical option in \code{coef} method indicating whether scale and
@@ -46,6 +58,11 @@
   from the \pkg{fxregime} packages. They employ the (unexported) workhorse function
   \code{gbreakpoints} which is modeled after \code{\link[strucchange]{breakpoints}} 
   from the \pkg{strucchange} package but employing user-defined estimation methods.
+
+  Optional support for high performance computing is available in the \code{breakpoints}
+  method, currently using \code{\link[foreach]{foreach}} for the dynamic programming algorithm.
+  If \code{hpc = "foreach"} is to be used, a parallel backend should be registered
+  before. See \code{\link[foreach]{foreach}} for more information.
 }
 
 \value{

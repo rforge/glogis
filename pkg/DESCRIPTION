@@ -1,6 +1,6 @@
 Package: glogis
-Version: 0.0-1
-Date: 2010-06-11
+Version: 0.0-2
+Date: 2010-06-15
 Title: Fitting and Testing Generalized Logistic Distributions
 Author: Achim Zeileis, Thomas Windberger
 Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>

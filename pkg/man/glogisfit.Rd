@@ -26,7 +26,7 @@
 \usage{
 glogisfit(x, \dots)
 \method{glogisfit}{default}(x, weights = NULL, start = NULL, fixed = c(NA, NA, NA),
-  method = "BFGS", \dots)
+  method = "BFGS", hessian = TRUE, \dots)
 \method{glogisfit}{formula}(formula, data, subset, na.action, weights, x = TRUE, \dots)
 
 \method{plot}{glogisfit}(x, main = "", xlab = deparse(x$call), fill = "lightgray",
@@ -51,6 +51,9 @@ glogisfit(x, \dots)
   \item{method}{character string specifying optimization method, see \code{\link[stats]{optim}}
     for the available options. Further options can be passed to \code{optim} through
     \code{...}.}
+  \item{hessian}{logical. Should the Hessian be used to compute the variance/covariance
+    matrix? If \code{FALSE}, no covariances or standard errors will be available in
+    subsequent computations.}
   \item{formula}{symbolic description of the model, currently only \code{x ~ 1} is
     supported.}
   \item{data, subset, na.action}{arguments controlling formula processing
