@@ -74,15 +74,28 @@ glogisfit.default <- function(x, weights = NULL,
   }
 
   ## choose starting values
-  if(is.null(start)) start <- c(mean(x), log(sd(x)), 0)[is.na(fixed)]
+  if(is.null(start)) start <- c(0, 0, 0)[is.na(fixed)]
   
   ## call optim
-  opt <- if(method == "L-BFGS-B") {
-    optim(par = start, fn = llfun, gr = gradfun, hessian = TRUE,
-      lower = c(-Inf, 0, 0), upper = rep(Inf, 3), method = method, control = list(...))
-  } else {
-    optim(par = start, fn = llfun, gr = gradfun, hessian = TRUE,
-      method = method, control = list(...))  
+  opt <- optim(par = start, fn = llfun, gr = gradfun, hessian = hessian, method = method, control = list(...))
+
+  ## if first attempt fails, try to get better starting values
+  ## (employing simple Nelder-Mead on original parameter scale)
+  if(opt$convergence > 0 | sum(abs(gradfun(opt$par))) > 1) {
+    llfun2 <- function(par) {
+      p1 <- if(is.na(fixed[1])) par[1] else fixed[1]
+      p2 <- if(is.na(fixed[2])) par[is.na(fixed[1]) + 1] else exp(fixed[2])
+      p3 <- if(is.na(fixed[3])) par[sum(is.na(fixed[1:2])) + 1] else exp(fixed[3])
+      if(p2 < 0) return(Inf)
+      if(p3 < 0) return(Inf)
+      -sum(w * dglogis(x, location = par[1], scale = p2, shape = p3, log = TRUE))
+    }
+    start2 <- start
+    start2[which(is.na(fixed)) %in% 2:3] <- exp(start2[which(is.na(fixed)) %in% 2:3])
+    opt2 <- optim(par = start2, fn = llfun2)
+    start <- opt2$par
+    start[2:3] <- log(start[2:3])
+    opt <- optim(par = start, fn = llfun, gr = gradfun, hessian = hessian, method = method, control = list(...))
   }
   
   ## post-process optim result

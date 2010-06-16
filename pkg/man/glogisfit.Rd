@@ -73,8 +73,11 @@ glogisfit(x, \dots)
 \details{
   \code{glogisfit} estimates the generalized logistic distribution (Type I: skew-logistic)
   as given by \code{\link{dglogis}}. Optimization is performed by numerically by
-  \code{\link[stats]{optim}} using analytical gradients. For obtaining numericall more
-  stable results the scale and shape parameters are specified in logs. 
+  \code{\link[stats]{optim}} using analytical gradients. For obtaining numerically more
+  stable results the scale and shape parameters are specified in logs. Starting values
+  are chosen as \code{c(0, 0, 0)}, i.e., corresponding to a standard (symmetric) logistic
+  distribution. If these fail, better starting values are obtained by running a Nelder-Mead
+  optimization on the original problem (without logs) first.  
   
   A large list of standard extractor methods is supplied to conveniently compute
   with the fitted objects, including methods to the generic functions

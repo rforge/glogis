@@ -8,8 +8,8 @@ breakpoints.glogisfit <- function(obj, h = 0.15, breaks = NULL, ic = "LWZ", hpc 
 {
   stopifnot(require("fxregime"))
   dat <- data.frame(x = as.vector(obj$x))
-  myfit <- function(formula, data, ...) glogisfit.default(data$x, fixed = obj$fixed, hessian = FALSE, ...)
-  rval <- fxregime:::gbreakpoints(x ~ 1, data = dat, order.by = time(obj$x), fit = myfit,
+  glogisfit0 <- function(formula, data, ...) glogisfit.default(data$x, fixed = obj$fixed, hessian = FALSE, ...)
+  rval <- fxregime:::gbreakpoints(x ~ 1, data = dat, order.by = time(obj$x), fit = glogisfit0,
     h = h, breaks = breaks, ic = ic, hpc = hpc)
   rval$null <- obj
   class(rval) <- c("breakpoints.glogisfit", class(rval))
