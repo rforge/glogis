@@ -125,6 +125,49 @@ The countries can be divided into three different groups: the EMU countries (Por
 
 \subsection{Using a generalized logistic distribution (GL)}
 
+% something more about the reason to use GL
+
+% Book Johnson 95 on logistic distribution
+
+- income distributions, otherwise often used as growth models, or rainfall models
+- definition of the distribution Abberger uses here is a generalization of 23.7 in Johnson 95 (shape ist halt hier zustätzlich noch dabei)
+- longer tails than normal distribution, nonsymmetric (which is a clear net gain)
+- more peaked in the center (net gain)
+- the things above apply to the logistic distribution, not implicitely the GL
+
+
+% searchterm for these ``generalized logistic distribution''
+% found via Google Scholars
+- in 2005-kjm-olp-gl2 it is shown, that the distribution used here is; cdf is given by: $1-\frac{\exp{-bx}}{(1+\exp{-x})^b}$ (given in this paper)
+- 2005-spl-won-parametersarmitgld: here the GL is used (they find for Autoregressions that mostly data simply is not normal or student, so they use the GL-distribution (which is only somewhat slightly differently specified)
+- 2000-ael-har-stockreturns: with almost the same reasoning as above used to model stock exchange data (not exactly gl as here but can be simplified to GL)
+- 1999-cis-won-asyminnogl: almost the same as the 2005 paper (won.. is also the author :)
+- 2007-tejof-kon-vatriskgstock: same use
+- 2001-joae-wa-garchgl: similar (not exactly using gl but very similar)
+
+
+% Econ Papers
+- often in financial return data (which has high peakes)
+- in gene expression data (since gl hast longer tails)
+
+% eu database
+% ideas
+% citeceer
+% econometric society
+% questia
+% ecb
+% jstor
+% springerlink
+% ebsco
+% wiley
+% sciencedirect
+% informaworld
+
+
+% Abberger Publikation: Abberger, K., Heiler, S. 	Simultaneous estimation of parameters for a generalized logistic distribution and application to time series models 	2000 	84 	041-049 	A Allgemeines Statistisches Archiv/Journal of the German Statistical Society
+
+- in 1987-eco-bat-inflationexpectation: the expected inflation is modelled as coming from a logistic distribution
+
 
 As allready stated, we now apply the general framework, as developed in \cite{z08} to a more specific model, in this case by means of a GL distribution.Prior to that, we would like to give a short justification for our using of the GL distribution. Regarding the data at hand, it was not possible to use the already existing method developed in \cite{z07}, since allmost all inflation rates, with the noteable exception of Greece, are not normally distributed and clearly exhibit asymmetric properties. Therefore, a somewhat more flexibel distribution had to be used. We needed a distribution exhibiting rather strong kurtosis and the property to be both left and right skewed. To this end we use a generalization of the logistic distribution as defined in \cite{johnson}. Its probability density is given by:
 
@@ -315,6 +358,77 @@ If we compare the density of a whole and the denisties of the subsets of the dat
 
 As we can see regarding the moments of the subsamples, we see a clear increase in variance (0.04, 0.01, 0.32), some smaller increase in the mean (0.41, 0.16, 0.18)  and a interesting increas in decrease in skewness (0.96, 0.71, $-$0.26), which means that lower values of the inflation rate are quickly becoming less probable. 
 
+
+
+Some History for easier interpretation:
+
+% this one from history-emu.pdf
+
+eleven countries had met the Maastricht Criteria by 1997, allowing the
+European monetary union to be launched in 1999. Greece was further behind in
+meeting the criteria and only joined the monetary union in 2001.
+First, entry into the euro was a much bigger structural shock for "peripheral"
+member countries such as Greece, Ireland, Portugal, and Spain than for "core"
+member countries like Germany and France. In particular, while all euro member
+countries have enjoyed lower real interest rates under monetary union, the relative
+decline was much greater for the countries on the periphery.
+Second, membership in a monetary union can amplify the asymmetric impact
+of certain shocks. A common nominal interest rate implies that persistent differences
+in national inflation rates translate into differences in real interest rates across member countries: countries with relatively higher medium-term inflation
+enjoy lower real interest rates than those with below-average inflation-stimulating
+demand, credit growth, and housing markets in the former group
+The Netherlands has lived though a
+boom-bust cycle since the euro started, with a credit boom and high inflation in
+1999-2001 followed by a contraction in economic activity that has reversed some of
+the country's real appreciation against partner countries.
+Of course, the destabilizing features of European monetary union for the
+member countries do not mean that currency union has led to a net increase in
+macroeconomic instability. The European Central Bank has been successful in
+anchoring medium-term inflation expectations across the euro area at an annual
+rate around 2 percent. At least for some countries, the attainment of such stability
+outside the euro framework may have been a more costly process.
+
+
+\section{Results}
+
+
+% in money-growth regime switchin:
+Germany: early 90ies: low inflation/ mid-end 90ies: high / and afterwards low
+UK: low regime
+
+
+just as a help
+
+ wenn ma was siat dass as co-movement git: \cite{vandi} "`euro area countries move from essentially idiosyncratic inflation to co-movement in the mid-1980s"' (p. 2); "`price shocks in one country not transmitted to another"'; "`correlations remain stable until 1999 but then jumps sharpely"'; (2009-mwp-dijk-internationalinfl)
+
+wenn was passiert: zitieren von Carporale: in their estimate \cite{cap} find that each country has at least one of the parameters of their variance estimates significantly different from zero, which is a clear indication of change in volatility as well.
+
+falls Volatilität erhöht wird, verweise auf die Debatte in: $2004-wp-minford-ukjoiningemu$, die von einer Erhöhung der britischen Inflationsrate sprechen, sollte UK der EMU beitreten.
+
+falls kleine Länder auffälliges Verhalten zeigen: $2008-wp-arnold-inflationuncertainty$, "`This suggests that within EMU, inflation uncertainty may increase in countries that have a smaller influence on ECB policy."' Ihre Begründung: "`For economic agents in small regions which are hit by positive inflation shocks, it will be uncertain how and when the increase
+in inflation will be reversed. This results from imperfect information on the macroeconomic adjustment mechanism combined with the absence of a central bank dedicated to stabilizing their regional inflation rate. This does not hold true for the larger regions in the union, who have a largerweight in aggregate inflation and may therefore count on the price stability objective of the union’s central bank."'
+vergleichen mit den Ergebnissen auf S.343 (country size and inflation uncertainty).
+
+berücksichtige die DM Zone (Deutschland, Österreich, Luxemburg, Belgien und Holland), eventuell ähnlich
+
+Caporale (ausgedruckt im Diss-Aktuell Ordner) finds that in the post-Euro area there are still significant inflation differentials across countries. 
+
+Wenns grosse Unterschiede zwischen den EMU Ländern gibt: ba Caporale stoht: "`the ECb itself admits that monetary policy can only affect price developements in the Euro area as a whole and cannot influence inflation differentials across regions (The Monetary Policy of the ECB, 2004)."' Und dort findet sich auch: "`some short-term volatility is inevitable given the fact that monetary policy can only affect prices wiht long and uncertain lags, hence the focus of the ECB on medium-term price stabilisation."'
+
+Um den Anstieg in der Volatilität zu verteidigen: Caporale finds that steady state uncertainty has increased in eight out of twelve countries (p.966) (ie. Germany, France, Italy, Spain, Ireland, Finland, Luxembourg and Austria).
+
+Zum Abgleich für Break dates: Caporale Table 5.
+
+
+Wenn Ergebnisse da sind: abgleichen bei Caporale mit seiner Fig. 2, Fig. 3
+
+falls Österreich und Spanien komisch: Wilfing findet, dass Schilling und Peseta nicht zu ihrer fixen Parität konvergiert sind
+
+falls man grosse Unterschiede in der Volatilität sehen würde: $2008-wp-campolmi-laborinflvol$ point out that this can be explained by country specific labor market institutions.
+
+ morana paper: S.10 untersucht convergence, je nachdem, was sich findet herausfinden, was wie ähnlich ist
+
+ bei grossen Unterschieden: Busetti S.6: 3 Clustergruppen: Ger, Fra, Bel, Aut, Fin; Spa, Gre, Por, Ireland; Ned und It
 
 
 %\section{Ideas, Suggestions, Questions}
