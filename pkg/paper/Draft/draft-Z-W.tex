@@ -253,245 +253,300 @@ To give an idea what we would expect, we give a short overview over the history 
 
 \section{Results-very preliminary}
 
-
-
 \begin{longtable}{|l|p{4cm}|p{3cm}|}
 \hline
-{\bf Country} & {\bf glogist Breaks (dating unsure)} & {\bf fxregimes Breaks}   \\
+{\bf Country} & {\bf Breakpoints}    \\
 \hline
-Austria & 1999,2008 & no break \\
+Austria & 9.2007\\
 \hline
-Belgium & 2000 & December 2000 \\
+Belgium & 12.1999  \\
 \hline
-Czech Republic & 1998,2002 & no break \\
+Czech Republic &  7.1998  \\
 \hline
-Denmark & 2001 & no break \\
+Denmark & 6.2000 \\
 \hline
-Finland & 2000 & no break \\
+Finland & no \\
 \hline
-France & 2005 & no break \\
+France & 12.2004  \\
 \hline
-Germany & 2000, 2005 & no break \\
+Germany & 5.2000 \\
 \hline
-Greece & 2005 & no break \\
+Greece & no \\
 \hline
-Hungary & 1998,2000,2003 (not very clear) & April 1998 \\
+Hungary & 5.1998 \\
 \hline
-Ireland & 2005 & no break \\
+Ireland & 3.2008 \\
 \hline
-Italy & 1996,2001 & April 1996, December 2000 \\
+Italy & 5.1996; 12.2000  \\
 \hline
-Luxembourg & 1999 & December 1998 \\
+Luxembourg & 12.1998 \\
 \hline
-Netherlands & no break & no break\\
+Netherlands & no \\
 \hline
-Poland & 2001 & April 2001 \\
+Poland & 5.2001  \\
 \hline
-Portugal & 1995 & March 1994 \\
+Portugal & 7.1992 \\
 \hline
-Slovenia & 2003,2005 & no break \\
+Slovenia & 7.2003\\
 \hline
-Spain & 2000 & December 2000 \\
+Spain & 12.2000  \\
 \hline
-Sweden & 1994 & no break \\
+Sweden & 1.1993 \\
 \hline
-United Kingdom & 1994 & no break 
+United Kingdom & 4.1992 \\
 \hline
 \end{longtable}
 
-We find some similarity of a group of countries, Group I (Belgium, Spain and Italy), Group II (France, Greece and Ireland), Group III (Hungary and the Czech Republic) and Group IV (UK and Sweden). The other countries seem to be a group of their own. 
 
-
-\subsection{Austria}
-
-The Double max test for Austria is insignificant, but the Cramér-von Mises test and the Supremum of LM statistcs test are both significant. This can be interpreted as a sign, that there was some change in the series as a whole, but that we are unsure wheter this happend with respect to location, scale or shape.
-
-\begin{figure}[h!tp]
-\includegraphics[width=80mm]{aut-meanL2BB.png}
-\caption{Cramér-von Mises test for Austria}
-\end{figure}
-
-Regarding the figure, we have two clear breaks, one in 1999 and another in 2008. [dating very unsure] The fxregimes procedure gives no breakdate. To give at least some intuition about the changes in variance [actually this is just scale, but can be adapted quickly] we forced 5 breaks into the Austrian inflation rates. 
-
-\begin{figure}[h!tp]
-\includegraphics[width=80mm]{aut-morebreak.png}
-\caption{Variance Estimation in Austrian Inflation Rates with 5 Breaks}
-\end{figure}
-
-Only with some phantasy we can se some slight V shape (a decline in inflation volatility up to 2000, then an increase). 
-
-
-
-
-\subsection{Belgium}
-
-Regarding the belgian inflation rates, all tests clearly indicate a break. 
-
-\begin{figure}[h!tp]
-\includegraphics[width=80mm]{bel-meanL2BB.png}
-\caption{Cramér-von Mises test for Belgium}
-\end{figure}
-
-The fxregimes procedure indicates a breakpoint in December 2000.
-
-%The impact of skewness: negative skew (rechtssteil), ie. higher values of y are more probable; positive skew (linkssteil): lower values of y are more probable
-%so if it is the case like 6-2-1 we can say that the distribution gets less of a positive skew meaning a lower inflation on average (abklären, sobald das mit den Momenten hinhaut)
 %
+%\subsection{Austria}
+%
+%The Double max test for Austria is insignificant, but the Cramér-von Mises test and the Supremum of LM statistcs test are both significant. This can be interpreted as a sign, that there was some change in the series as a whole, but that we are unsure wheter this happend with respect to location, scale or shape.
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{aut-meanL2BB.png}
+%\caption{Cramér-von Mises test for Austria}
+%\end{figure}
+%
+%Regarding the figure, we have two clear breaks, one in 1999 and another in 2008. [dating very unsure] The fxregimes procedure gives no breakdate. To give at least some intuition about the changes in variance [actually this is just scale, but can be adapted quickly] we forced 5 breaks into the Austrian inflation rates. 
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{aut-morebreak.png}
+%\caption{Variance Estimation in Austrian Inflation Rates with 5 Breaks}
+%\end{figure}
+%
+%Only with some phantasy we can se some slight V shape (a decline in inflation volatility up to 2000, then an increase). 
+%
+%
+%
+%
+%\subsection{Belgium}
+%
+%Regarding the belgian inflation rates, all tests clearly indicate a break. 
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{bel-meanL2BB.png}
+%\caption{Cramér-von Mises test for Belgium}
+%\end{figure}
+%
+%The fxregimes procedure indicates a breakpoint in December 2000.
+%
+%%The impact of skewness: negative skew (rechtssteil), ie. higher values of y are more probable; positive skew/right skew (linkssteil): lower values of y are more probable
+%%so if it is the case like 6-2-1 we can say that the distribution gets less of a positive skew meaning a lower inflation on average (abklären, sobald das mit den Momenten hinhaut)
+%%
+%
+%\subsection{Italy}
+%
+%In the italian case, there is clear evidence for two breaks. 
+%
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{ita-meanL2BB.png}
+%\caption{Cramér-von Mises test for Italy}
+%\end{figure}
+%
+%If we compare the density of a whole and the denisties of the subsets of the data, we see a clear picture:
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{ita-split.png}
+%\caption{Parameters and Densities for subsamples}
+%\end{figure}
+%
+%
+%As we can see regarding the moments of the subsamples, we see a clear increase in variance (0.04, 0.01, 0.32), some smaller increase in the mean (0.41, 0.16, 0.18)  and a interesting increas in decrease in skewness (0.96, 0.71, $-$0.26), which means that lower values of the inflation rate are quickly becoming less probable. 
+%
+%
+%
+%Some History for easier interpretation:
+%
+%% this one from history-emu.pdf
+%
+%eleven countries had met the Maastricht Criteria by 1997, allowing the
+%European monetary union to be launched in 1999. Greece was further behind in
+%meeting the criteria and only joined the monetary union in 2001.
+%First, entry into the euro was a much bigger structural shock for "peripheral"
+%member countries such as Greece, Ireland, Portugal, and Spain than for "core"
+%member countries like Germany and France. In particular, while all euro member
+%countries have enjoyed lower real interest rates under monetary union, the relative
+%decline was much greater for the countries on the periphery.
+%Second, membership in a monetary union can amplify the asymmetric impact
+%of certain shocks. A common nominal interest rate implies that persistent differences
+%in national inflation rates translate into differences in real interest rates across member countries: countries with relatively higher medium-term inflation
+%enjoy lower real interest rates than those with below-average inflation-stimulating
+%demand, credit growth, and housing markets in the former group
+%The Netherlands has lived though a
+%boom-bust cycle since the euro started, with a credit boom and high inflation in
+%1999-2001 followed by a contraction in economic activity that has reversed some of
+%the country's real appreciation against partner countries.
+%Of course, the destabilizing features of European monetary union for the
+%member countries do not mean that currency union has led to a net increase in
+%macroeconomic instability. The European Central Bank has been successful in
+%anchoring medium-term inflation expectations across the euro area at an annual
+%rate around 2 percent. At least for some countries, the attainment of such stability
+%outside the euro framework may have been a more costly process.
+%
+%
+%\section{Results}
+%
+%
+%% in money-growth regime switchin:
+%Germany: early 90ies: low inflation/ mid-end 90ies: high / and afterwards low
+%UK: low regime
+%
+%
+%just as a help
+%
+% wenn ma was siat dass as co-movement git: \cite{vandi} "`euro area countries move from essentially idiosyncratic inflation to co-movement in the mid-1980s"' (p. 2); "`price shocks in one country not transmitted to another"'; "`correlations remain stable until 1999 but then jumps sharpely"'; (2009-mwp-dijk-internationalinfl)
+%
+%wenn was passiert: zitieren von Carporale: in their estimate \cite{cap} find that each country has at least one of the parameters of their variance estimates significantly different from zero, which is a clear indication of change in volatility as well.
+%
+%falls Volatilität erhöht wird, verweise auf die Debatte in: $2004-wp-minford-ukjoiningemu$, die von einer Erhöhung der britischen Inflationsrate sprechen, sollte UK der EMU beitreten.
+%
+%falls kleine Länder auffälliges Verhalten zeigen: $2008-wp-arnold-inflationuncertainty$, "`This suggests that within EMU, inflation uncertainty may increase in countries that have a smaller influence on ECB policy."' Ihre Begründung: "`For economic agents in small regions which are hit by positive inflation shocks, it will be uncertain how and when the increase
+%in inflation will be reversed. This results from imperfect information on the macroeconomic adjustment mechanism combined with the absence of a central bank dedicated to stabilizing their regional inflation rate. This does not hold true for the larger regions in the union, who have a largerweight in aggregate inflation and may therefore count on the price stability objective of the union’s central bank."'
+%vergleichen mit den Ergebnissen auf S.343 (country size and inflation uncertainty).
+%
+%berücksichtige die DM Zone (Deutschland, Österreich, Luxemburg, Belgien und Holland), eventuell ähnlich
+%
+%Caporale (ausgedruckt im Diss-Aktuell Ordner) finds that in the post-Euro area there are still significant inflation differentials across countries. 
+%
+%Wenns grosse Unterschiede zwischen den EMU Ländern gibt: ba Caporale stoht: "`the ECb itself admits that monetary policy can only affect price developements in the Euro area as a whole and cannot influence inflation differentials across regions (The Monetary Policy of the ECB, 2004)."' Und dort findet sich auch: "`some short-term volatility is inevitable given the fact that monetary policy can only affect prices wiht long and uncertain lags, hence the focus of the ECB on medium-term price stabilisation."'
+%
+%Um den Anstieg in der Volatilität zu verteidigen: Caporale finds that steady state uncertainty has increased in eight out of twelve countries (p.966) (ie. Germany, France, Italy, Spain, Ireland, Finland, Luxembourg and Austria).
+%
+%Zum Abgleich für Break dates: Caporale Table 5.
+%
+%
+%Wenn Ergebnisse da sind: abgleichen bei Caporale mit seiner Fig. 2, Fig. 3
+%
+%falls Österreich und Spanien komisch: Wilfing findet, dass Schilling und Peseta nicht zu ihrer fixen Parität konvergiert sind
+%
+%falls man grosse Unterschiede in der Volatilität sehen würde: $2008-wp-campolmi-laborinflvol$ point out that this can be explained by country specific labor market institutions.
+%
+% morana paper: S.10 untersucht convergence, je nachdem, was sich findet herausfinden, was wie ähnlich ist
+%
+% bei grossen Unterschieden: Busetti S.6: 3 Clustergruppen: Ger, Fra, Bel, Aut, Fin; Spa, Gre, Por, Ireland; Ned und It
+%
+%
+%%%%% still some thought necessary for that
+%
+%% OIL: peaked in 4.7.2008 at 144, fell until 25.12.2008 to 38, afterwards increases again but at slower rate
+%% http://markets.ftd.de/commodities/factsheet_overview.html?ID_NOTATION=4062566
+%
+%% the information is saved in a folder called "`Erläuterungen"' which has the country name
+%% http://www.statistik.at/web_de/statistiken/preise/verbraucherpreisindex_vpi_hvpi/index.html
+%% 1 Austria:
+%Sept. 2007: after Sept. 2007 we see a sharp rise in the yearly inflation rate (from 2 to almost 3.5\% in December 2007); 
+%economic reason: this rise is mostly due to oil, which increased (starting in Sept. 2007 from -4\% to almost 13\% plus on a yearly basis (p.14); a rise in oil prices from 70 to 94 Dollars; rise of mineral taxes; statistik austria: significant increas in inflation in 2007 4th quarter
+%
+%
+%% 2 Belgium
+%% http://www.indexmundi.com/belgium/inflation_rate_%28consumer_prices%29.html
+%Dez. 1999
+%a very sharp fall in yearly inflation in this time (from 2\% in December 1999 to 0.2\% in January 2000); a very clear increase in volatility; from 1999 to 2000 we had a 137\% increase in the yearly inflation rate
+%economic reason:
+%
+%% 3 Cze
+%% http://www.plzen.czso.cz/eng/redakce.nsf/i/inflation_rate
+%% http://en.wikipedia.org/wiki/Economy_of_the_Czech_Republic#1995-2000
+%Aug. 1998
+%by the end of 1998 we see a strong drop in yearly inflation rates 
+%economic reason: political and financial crisis in 1997, government spending cut, growth dropped, pegged currency forced into floating system, lead to more stabilisation
+%% http://www.allbusiness.com/finance/302725-1.html
+%In terms of economic performance in eastern Europe, 1997 can be best described as the year for the return to realism, or, perhaps, the return to fundamentals. 
+% recession until 1998
 
-\subsection{Italy}
 
-In the italian case, there is clear evidence for two breaks. 
-
-
-\begin{figure}[h!tp]
-\includegraphics[width=80mm]{ita-meanL2BB.png}
-\caption{Cramér-von Mises test for Italy}
-\end{figure}
-
-If we compare the density of a whole and the denisties of the subsets of the data, we see a clear picture:
-
-\begin{figure}[h!tp]
-\includegraphics[width=80mm]{ita-split.png}
-\caption{Parameters and Densities for subsamples}
-\end{figure}
-
-
-As we can see regarding the moments of the subsamples, we see a clear increase in variance (0.04, 0.01, 0.32), some smaller increase in the mean (0.41, 0.16, 0.18)  and a interesting increas in decrease in skewness (0.96, 0.71, $-$0.26), which means that lower values of the inflation rate are quickly becoming less probable. 
-
-
-
-Some History for easier interpretation:
-
-% this one from history-emu.pdf
-
-eleven countries had met the Maastricht Criteria by 1997, allowing the
-European monetary union to be launched in 1999. Greece was further behind in
-meeting the criteria and only joined the monetary union in 2001.
-First, entry into the euro was a much bigger structural shock for "peripheral"
-member countries such as Greece, Ireland, Portugal, and Spain than for "core"
-member countries like Germany and France. In particular, while all euro member
-countries have enjoyed lower real interest rates under monetary union, the relative
-decline was much greater for the countries on the periphery.
-Second, membership in a monetary union can amplify the asymmetric impact
-of certain shocks. A common nominal interest rate implies that persistent differences
-in national inflation rates translate into differences in real interest rates across member countries: countries with relatively higher medium-term inflation
-enjoy lower real interest rates than those with below-average inflation-stimulating
-demand, credit growth, and housing markets in the former group
-The Netherlands has lived though a
-boom-bust cycle since the euro started, with a credit boom and high inflation in
-1999-2001 followed by a contraction in economic activity that has reversed some of
-the country's real appreciation against partner countries.
-Of course, the destabilizing features of European monetary union for the
-member countries do not mean that currency union has led to a net increase in
-macroeconomic instability. The European Central Bank has been successful in
-anchoring medium-term inflation expectations across the euro area at an annual
-rate around 2 percent. At least for some countries, the attainment of such stability
-outside the euro framework may have been a more costly process.
-
-
-\section{Results}
-
-
-% in money-growth regime switchin:
-Germany: early 90ies: low inflation/ mid-end 90ies: high / and afterwards low
-UK: low regime
-
-
-just as a help
-
- wenn ma was siat dass as co-movement git: \cite{vandi} "`euro area countries move from essentially idiosyncratic inflation to co-movement in the mid-1980s"' (p. 2); "`price shocks in one country not transmitted to another"'; "`correlations remain stable until 1999 but then jumps sharpely"'; (2009-mwp-dijk-internationalinfl)
-
-wenn was passiert: zitieren von Carporale: in their estimate \cite{cap} find that each country has at least one of the parameters of their variance estimates significantly different from zero, which is a clear indication of change in volatility as well.
-
-falls Volatilität erhöht wird, verweise auf die Debatte in: $2004-wp-minford-ukjoiningemu$, die von einer Erhöhung der britischen Inflationsrate sprechen, sollte UK der EMU beitreten.
-
-falls kleine Länder auffälliges Verhalten zeigen: $2008-wp-arnold-inflationuncertainty$, "`This suggests that within EMU, inflation uncertainty may increase in countries that have a smaller influence on ECB policy."' Ihre Begründung: "`For economic agents in small regions which are hit by positive inflation shocks, it will be uncertain how and when the increase
-in inflation will be reversed. This results from imperfect information on the macroeconomic adjustment mechanism combined with the absence of a central bank dedicated to stabilizing their regional inflation rate. This does not hold true for the larger regions in the union, who have a largerweight in aggregate inflation and may therefore count on the price stability objective of the union’s central bank."'
-vergleichen mit den Ergebnissen auf S.343 (country size and inflation uncertainty).
-
-berücksichtige die DM Zone (Deutschland, Österreich, Luxemburg, Belgien und Holland), eventuell ähnlich
-
-Caporale (ausgedruckt im Diss-Aktuell Ordner) finds that in the post-Euro area there are still significant inflation differentials across countries. 
-
-Wenns grosse Unterschiede zwischen den EMU Ländern gibt: ba Caporale stoht: "`the ECb itself admits that monetary policy can only affect price developements in the Euro area as a whole and cannot influence inflation differentials across regions (The Monetary Policy of the ECB, 2004)."' Und dort findet sich auch: "`some short-term volatility is inevitable given the fact that monetary policy can only affect prices wiht long and uncertain lags, hence the focus of the ECB on medium-term price stabilisation."'
-
-Um den Anstieg in der Volatilität zu verteidigen: Caporale finds that steady state uncertainty has increased in eight out of twelve countries (p.966) (ie. Germany, France, Italy, Spain, Ireland, Finland, Luxembourg and Austria).
-
-Zum Abgleich für Break dates: Caporale Table 5.
-
-
-Wenn Ergebnisse da sind: abgleichen bei Caporale mit seiner Fig. 2, Fig. 3
-
-falls Österreich und Spanien komisch: Wilfing findet, dass Schilling und Peseta nicht zu ihrer fixen Parität konvergiert sind
-
-falls man grosse Unterschiede in der Volatilität sehen würde: $2008-wp-campolmi-laborinflvol$ point out that this can be explained by country specific labor market institutions.
-
- morana paper: S.10 untersucht convergence, je nachdem, was sich findet herausfinden, was wie ähnlich ist
-
- bei grossen Unterschieden: Busetti S.6: 3 Clustergruppen: Ger, Fra, Bel, Aut, Fin; Spa, Gre, Por, Ireland; Ned und It
-
-
-%%%% still some thought necessary for that
-% Austria:
-Sept. 2007
-
-% Belgium
-Dez. 1999
-
-% Cze
-Aug. 1998
-
-% Denmark:
-Jun. 2000
-
-% Finland
-no
-
-% France
-Dez. 2004
-
-% Germany
-Mar. 2000
-
-% Greece
-no
-
-% Hungary
-May 1998
-
-% Ireland
-Mar. 2008
-
-% Italy
-May 1996
-Dez. 2000
-
-% Lux
-Dez. 1998
-
-% Netherlands
-no
-
-% Poland
-May 2001
-
-% Portugal
-Jul. 1992
-
-% Slovenia
-Jul. 2003
-
-% Spain
-Dez. 2000
-
-% Sweden
-Jan. 1993
-
-% UK 
-Apr. 1992
-
-
-
+%% 4 Denmark:
+%Jun. 2000
+%some change in yearly inflation rate; strong increase in variance
+%economic reason: 
+%
+%% 6 Finland
+%no
+%
+%% 7 France
+%Dez. 2004
+%nothing visible in yearly inflation
+%economic reason:
+%
+%% 8 Germany
+%Mar. 2000
+%strong increase in mean and variance; 
+%economic reason: strong increases in oil price, not enough
+%
+%% 9 Greece
+%no
+%but there is severe doubt about the greek rate (looks almost like a uniform distribution)
+%
+%% 10 Hungary
+%May 1998
+%yearly inflation rate sharply decreasing till 1999
+%perhapts same explanation as for czech republic, ie. financial crisis
+%economic reasons: import restrictions have been lifted, trade liberalization; disinflationary impulses (http://findarticles.com/p/articles/mi_m4456/is_n63/ai_20792401/)
+%
+%% 11 Ireland
+%Mar. 2008
+%some fall in yearly inflation after 2008
+%economic reasons: in recession since second quarter of 2008 (http://en.wikipedia.org/wiki/Economy_of_the_Republic_of_Ireland)
+%
+%
+%% 12 Italy
+%May 1996
+%Dez. 2000
+%drop in yearly inflation rate towards lower mean around 1996; in December 2000 nothing really visible; in 2000 beginning of a much more volatile regime
+%economic reasons: in november 1996 Italy rejoined the european monetary system (left it in 1992)
+%September 1996, the new Cabinet announced Italy’s decision to take part in the Monetary Union (http://users.ox.ac.uk/~hine/seminarpapers/Visco.htm)
+%in 1999 italy qualifies for EMU
+%strong economic growth from 1996-2001
+%2000: economic crisis
+%
+%
+%% 13 Lux
+%Dez. 1998
+%in January 1999 deflation with almost 2\%; strongly increased volatility
+%economic reasons: creation of the Banque Centrale du Luxembourg (1998), founded 22.4.1998 :)
+%
+%
+%% 14 Netherlands
+%no
+%
+%% 15 Poland
+%May 2001
+%decrease in yearly inflation 
+%economic reasons: growth has slowed considerably in Q2 2001 (http://www.knowledgerush.com/kr/encyclopedia/Economy_of_Poland/); or interpret it just as a transition to a more stable path
+%
+%
+%% 16 Portugal
+%Jul. 1992
+%decrease in yearly inflation rate from 1990-2000; after 1992 or so yearly inflation stabilized;
+%economic reasons: following a transition period lasting until 1992; so this marks the end of the transition period (http://www.voyagesphotosmanu.com/portugal_economy.html)
+%
+%
+%% 17 Slovenia
+%Jul. 2003
+%economic reasons: EU member in 2004 (perhaps some sign of pre-EU convergenc); mean and volatility fell afterwards; Government announced it plans to meet Maastricht Criteria
+%In 2003, several measures were introduced to make both portfolio and direct investments easier and more transparent in Slovenia and to conduct many financial operations, including banking, securities brokering, and undertaking various credit transactions. (http://www.historycentral.com/nationbynation/Slovenia/Economy.html); 1 January 2007 Slovenia adopted the euro as the national currency
+%
+%% 18 Spain
+%Dez. 2000
+%extreme rise in inflation
+%economic reasons: 
+%
+%% 19 Sweden
+%Jan. 1993
+%until 1993 sharp decline in yearly inflation, giving away to sharp rise until 1994, then almost stable
+%economic reasons: 1992 there was a run on the currency, the central bank briefly jacking up interest to 500\% in an unsuccessful effort to defend the currency's fixed exchange rate
+%had a crisis of the 1990s; decided in 1997 against euro introduction; had a banking crises at that time and succesfully ended it in 1993
+%
+%% 20 UK 
+%Apr. 1992
+%sharp decline in yearly inflation rate
+%similar series to sweden
+%recession  hit the British economy at the start of the 1990s, beginning in the summer of 1990 and lasting until the end of 1992
+%
+%
+%
 
 
 
