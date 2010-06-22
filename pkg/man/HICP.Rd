@@ -11,7 +11,7 @@ for 20 countries for 1990--2010 as provided by the OECD.
 
 \format{
 A monthly multiple \code{"zoo"} time series with \code{"yearmon"} index
-from Jan 1990 to Mar 2010 for 20 countries.
+from Jan 1990 to Mar 2010 for 21 countries.
 }
 
 \source{
