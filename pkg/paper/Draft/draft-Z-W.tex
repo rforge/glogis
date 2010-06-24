@@ -127,50 +127,7 @@ The countries can be divided into three different groups: the EMU countries (Por
 
 \subsection{Using a generalized logistic distribution (GL)}
 
-% something more about the reason to use GL
-
-% Book Johnson 95 on logistic distribution
-
-- income distributions, otherwise often used as growth models, or rainfall models
-- definition of the distribution Abberger uses here is a generalization of 23.7 in Johnson 95 (shape ist halt hier zustätzlich noch dabei)
-- longer tails than normal distribution, nonsymmetric (which is a clear net gain)
-- more peaked in the center (net gain)
-- the things above apply to the logistic distribution, not implicitely the GL
-
-
-% searchterm for these ``generalized logistic distribution''
-% found via Google Scholars
-- in 2005-kjm-olp-gl2 it is shown, that the distribution used here is; cdf is given by: $1-\frac{\exp{-bx}}{(1+\exp{-x})^b}$ (given in this paper)
-- 2005-spl-won-parametersarmitgld: here the GL is used (they find for Autoregressions that mostly data simply is not normal or student, so they use the GL-distribution (which is only somewhat slightly differently specified)
-- 2000-ael-har-stockreturns: with almost the same reasoning as above used to model stock exchange data (not exactly gl as here but can be simplified to GL)
-- 1999-cis-won-asyminnogl: almost the same as the 2005 paper (won.. is also the author :)
-- 2007-tejof-kon-vatriskgstock: same use
-- 2001-joae-wa-garchgl: similar (not exactly using gl but very similar)
-
-
-% Econ Papers
-- often in financial return data (which has high peakes)
-- in gene expression data (since gl hast longer tails)
-
-% eu database
-% ideas
-% citeceer
-% econometric society
-% questia
-% ecb
-% jstor
-% springerlink
-% ebsco
-% wiley
-% sciencedirect
-% informaworld
-
-
-% Abberger Publikation: Abberger, K., Heiler, S. 	Simultaneous estimation of parameters for a generalized logistic distribution and application to time series models 	2000 	84 	041-049 	A Allgemeines Statistisches Archiv/Journal of the German Statistical Society
-
-- in 1987-eco-bat-inflationexpectation: the expected inflation is modelled as coming from a logistic distribution
-
-
+In econometric issues, the logistic distribution is often used in income distributions and growth models. Its use stems from the usefulness of its longer tails and its higher peak, which fits these problems somewhat better. The use of the generalized logistic distribution as we will use it in this paper is somewhat scarcer. \cite{won} use a GL distribution in an regressio model with autocorrelated errors and assumes that they follow a GL distribution rather than a Student's t-distribution, as to model the fact that oftentimes is leptokurtic and severely left or right skewed. A similar GL distribution is also used in \cite{tolikas} who analyse extreme risk and value--at--risk in the German stock market, allthough they don't use a shape parameter. Regarding inflation rates, the GL distribution is --to our best knowledge-- only used in relationship with expected inflation. \cite{batchelor} use a logistic distribution (not its generalization) to model the distribution of mean expected inflation rates. \\
 As allready stated, we now apply the general framework, as developed in \cite{z08} to a more specific model, in this case by means of a GL distribution.Prior to that, we would like to give a short justification for our using of the GL distribution. Regarding the data at hand, it was not possible to use the already existing method developed in \cite{z07}, since allmost all inflation rates, with the noteable exception of Greece, are not normally distributed and clearly exhibit asymmetric properties. Therefore, a somewhat more flexibel distribution had to be used. We needed a distribution exhibiting rather strong kurtosis and the property to be both left and right skewed. To this end we use a generalization of the logistic distribution as defined in \cite{johnson}. Its probability density is given by:
 
 \begin{eqnarray}
@@ -225,9 +182,9 @@ i.e. first the $L_2$ norm is used to aggregate over the components and then the 
 %[wann war die Erstpublikation der graphischen Methode?].
 
 
-\subsubsection{Kolmogorov-Smirnov Test}
-
-As a goodness of fit test, we use the Kolmogorov Smirnov Test for as given in \cite{massey}.
+%\subsubsection{Kolmogorov-Smirnov Test}
+%
+%As a goodness of fit test, we use the Kolmogorov Smirnov Test for as given in \cite{massey}.
 
 \subsection{Densities}
 
@@ -238,9 +195,6 @@ Another thing we wish to look at is the change in the moments of the distributio
 
 To give an idea what we would expect, we give a short overview over the history of the EMU. Following the Delors Plan with his 3 stages, we have: stage I (1990-1994), stage II (1995-1998) and stage III (1999-2002) which ended with the introduction of the Euro as legal tender. If the EMU had a significant effect upon inflation rate volatility we would expect to find a break either in the 90ies, reflecting the various waves of integration or after the introduction of the Euro due to the popular "`Teuro"' argument (i.e. the claim that the Euro lead to a significant increase in prices following the year of its introduction). [Teuro besser formulieren, gibt es dafür einen internationalen Term?]
 
-
-
-%
 %
 %Geschichte für Interpretation 
 %- verwende Daten seit 1990
@@ -250,114 +204,65 @@ To give an idea what we would expect, we give a short overview over the history 
 %- Euro Währung Buchgeld seit 1.1.1999
 %- Euro Währung Bargeld seit 1.1.2002?
 
+\section{Results}
+
+The results presented here are for the countries within the Euro--zone (Austria, Belgium, Finland, France, Germany, Greece, Ireland, Italy, Luxembourg, Netherlands, Portugal, Slovakia, Slovenia and Spain). Cypria, Malta, Andorra, Monaco, San Marino and the Vatican are left out due to data scarcity. The only ERM~II country included is Denmark, Latvia and Lithunia are excluded due to lack of data. The other EU countries included are the Czech Republic, Hungary, Poland, Sweden and the United Kingdom. Of these countries Sweden and the UK opted out of the Euro, whereas the other countries are opted for a future adoption of the Euro.
+
+% http://www.euro-anwaerter.de/anwaerter/daenemark.html
 
 
+[Estonia should be included]
 
-\section{Results-very preliminary}
-
-\begin{longtable}{|l|p{4cm}|p{3cm}|}
+\begin{longtable}{|l|p{4cm}|p{3cm}|p{3cm}|}
 \hline
-{\bf Country} & {\bf Breakpoints}    \\
+{\bf Country} & {\bf 1. breakpoint}  & {\bf 2. breakpoint  \\
 \hline
-Austria & 9.2007\\
+Austria (EURO) & Sep. 2007 & none\\
 \hline
-Belgium & 12.1999  \\
+Belgium (EURO) & Dec. 1999 & none  \\
 \hline
-Czech Republic &  7.1998  \\
+Czech Republic &  Jul. 1998  & none \\
 \hline
-Denmark & 6.2000 \\
+Denmark (ERM~II)& Jun. 2000 & none \\
 \hline
-Finland & no \\
+Finland (EURO) & none & none  \\
 \hline
-France & 12.2004  \\
+France (EURO) & Dec. 2004  & none\\
 \hline
-Germany & 5.2000 \\
+Germany (EURO) & May 2000 & Dec. 2004 \\
 \hline
-Greece & no \\
+Greece (EURO) & none & none \\
 \hline
-Hungary & 5.1998 \\
+Hungary & May 1998 & none\\
 \hline
-Ireland & 3.2008 \\
+Ireland (EURO) & Mar. 2008 & none\\
 \hline
-Italy & 5.1996; 12.2000  \\
+Italy (EURO) & May 1996 &  Dec. 2000  \\
 \hline
-Luxembourg & 12.1998 \\
+Luxembourg (EURO) & Dec. 1998 & none\\
 \hline
-Netherlands & no \\
+Netherlands  (EURO) & none & none \\
 \hline
-Poland & 5.2001  \\
+Poland & May 2001 & none\\
 \hline
-Portugal & 7.1992 \\
+Portugal (EURO) & Jul. 1992 & Mar. 2004\\
 \hline
-Slovenia & 7.2003\\
+Slovakia (EURO) & Apr. 1997 & Feb. 2004 \\
 \hline
-Spain & 12.2000  \\
+Slovenia (EURO) & Jul. 2003 & none\\
 \hline
-Sweden & 1.1993 \\
+Spain (EURO) & May 1996  & Dec. 2000\\
 \hline
-United Kingdom & 4.1992 \\
+Sweden & Jan. 1993 & none\\
+\hline
+United Kingdom & Apr. 1992 & none\\
 \hline
 \end{longtable}
 
+On this basis we trace out some groups of countries. The two biggest south european countries Italy and Spain form one group with identical break dates. Another group may be formed of the United Kingdom and Denmark. Another of the eastern european countries Czech Repbulic, Hungary and Poland. Another one of the eastern european countries that allready adopted the Euro like Slovakia and Slovenia. Another one of Germany and France. And Belgium and Luxembourg, reflecting the fact that Luxembourg and Belgium used their currencies as legal tender in one another. 
 
-%
-%\subsection{Austria}
-%
-%The Double max test for Austria is insignificant, but the Cramér-von Mises test and the Supremum of LM statistcs test are both significant. This can be interpreted as a sign, that there was some change in the series as a whole, but that we are unsure wheter this happend with respect to location, scale or shape.
-%
-%\begin{figure}[h!tp]
-%\includegraphics[width=80mm]{aut-meanL2BB.png}
-%\caption{Cramér-von Mises test for Austria}
-%\end{figure}
-%
-%Regarding the figure, we have two clear breaks, one in 1999 and another in 2008. [dating very unsure] The fxregimes procedure gives no breakdate. To give at least some intuition about the changes in variance [actually this is just scale, but can be adapted quickly] we forced 5 breaks into the Austrian inflation rates. 
-%
-%\begin{figure}[h!tp]
-%\includegraphics[width=80mm]{aut-morebreak.png}
-%\caption{Variance Estimation in Austrian Inflation Rates with 5 Breaks}
-%\end{figure}
-%
-%Only with some phantasy we can se some slight V shape (a decline in inflation volatility up to 2000, then an increase). 
-%
-%
-%
-%
-%\subsection{Belgium}
-%
-%Regarding the belgian inflation rates, all tests clearly indicate a break. 
-%
-%\begin{figure}[h!tp]
-%\includegraphics[width=80mm]{bel-meanL2BB.png}
-%\caption{Cramér-von Mises test for Belgium}
-%\end{figure}
-%
-%The fxregimes procedure indicates a breakpoint in December 2000.
-%
-%%The impact of skewness: negative skew (rechtssteil), ie. higher values of y are more probable; positive skew/right skew (linkssteil): lower values of y are more probable
-%%so if it is the case like 6-2-1 we can say that the distribution gets less of a positive skew meaning a lower inflation on average (abklären, sobald das mit den Momenten hinhaut)
-%%
-%
-%\subsection{Italy}
-%
-%In the italian case, there is clear evidence for two breaks. 
-%
-%
-%\begin{figure}[h!tp]
-%\includegraphics[width=80mm]{ita-meanL2BB.png}
-%\caption{Cramér-von Mises test for Italy}
-%\end{figure}
-%
-%If we compare the density of a whole and the denisties of the subsets of the data, we see a clear picture:
-%
-%\begin{figure}[h!tp]
-%\includegraphics[width=80mm]{ita-split.png}
-%\caption{Parameters and Densities for subsamples}
-%\end{figure}
-%
-%
-%As we can see regarding the moments of the subsamples, we see a clear increase in variance (0.04, 0.01, 0.32), some smaller increase in the mean (0.41, 0.16, 0.18)  and a interesting increas in decrease in skewness (0.96, 0.71, $-$0.26), which means that lower values of the inflation rate are quickly becoming less probable. 
-%
-%
+
+
 %
 %Some History for easier interpretation:
 %
@@ -435,121 +340,85 @@ United Kingdom & 4.1992 \\
 %% OIL: peaked in 4.7.2008 at 144, fell until 25.12.2008 to 38, afterwards increases again but at slower rate
 %% http://markets.ftd.de/commodities/factsheet_overview.html?ID_NOTATION=4062566
 %
+
+\subsection{Austria}
 %% the information is saved in a folder called "`Erläuterungen"' which has the country name
 %% http://www.statistik.at/web_de/statistiken/preise/verbraucherpreisindex_vpi_hvpi/index.html
-%% 1 Austria:
-%Sept. 2007: after Sept. 2007 we see a sharp rise in the yearly inflation rate (from 2 to almost 3.5\% in December 2007); 
-%economic reason: this rise is mostly due to oil, which increased (starting in Sept. 2007 from -4\% to almost 13\% plus on a yearly basis (p.14); a rise in oil prices from 70 to 94 Dollars; rise of mineral taxes; statistik austria: significant increas in inflation in 2007 4th quarter
-%
-%
-%% 2 Belgium
+In 2007 we saw a sharp rise in the yearly inflation rate (from 2 to almost 3.5\% in December 2007). This rise was mostly due to oil, which increased (starting in Sept. 2007 from -4\% to almost 13\% plus on a yearly basis a rise in oil prices from 70 to 94 Dollars. This was further amplified by a  rise of mineral taxes. Also the Statistic Austria official documents report a significant rise in inflation in the fourth quarter of 2007. 
+
+
+\subsection{Belgium}
 %% http://www.indexmundi.com/belgium/inflation_rate_%28consumer_prices%29.html
-%Dez. 1999
-%a very sharp fall in yearly inflation in this time (from 2\% in December 1999 to 0.2\% in January 2000); a very clear increase in volatility; from 1999 to 2000 we had a 137\% increase in the yearly inflation rate
-%economic reason:
-%
-%% 3 Cze
+There was a  very sharp fall in yearly inflation in this time (from 2\% in December 1999 to 0.2\% in January 2000). Volatility  a very clear increase in volatility; from 1999 to 2000 we had a 137\% increase in the yearly inflation rate. Economic reason?
+
+
+\subsection{Czech Republic}
 %% http://www.plzen.czso.cz/eng/redakce.nsf/i/inflation_rate
 %% http://en.wikipedia.org/wiki/Economy_of_the_Czech_Republic#1995-2000
-%Aug. 1998
-%by the end of 1998 we see a strong drop in yearly inflation rates 
-%economic reason: political and financial crisis in 1997, government spending cut, growth dropped, pegged currency forced into floating system, lead to more stabilisation
-%% http://www.allbusiness.com/finance/302725-1.html
+By the end of 1998 we see a strong drop in yearly inflation rates. Economic reason: political and financial crisis in 1997, government spending cut, growth dropped, pegged currency forced into floating system, lead to more stabilisation.
+% http://www.allbusiness.com/finance/302725-1.html
 %In terms of economic performance in eastern Europe, 1997 can be best described as the year for the return to realism, or, perhaps, the return to fundamentals. 
 % recession until 1998
 
 
-%% 4 Denmark:
-%Jun. 2000
-%some change in yearly inflation rate; strong increase in variance
-%economic reason: 
-%
-%% 6 Finland
-%no
-%
-%% 7 France
-%Dez. 2004
-%nothing visible in yearly inflation
-%economic reason:
-%
-%% 8 Germany
-%Mar. 2000
-%strong increase in mean and variance; 
-%economic reason: strong increases in oil price, not enough
-%
-%% 9 Greece
-%no
-%but there is severe doubt about the greek rate (looks almost like a uniform distribution)
-%
-%% 10 Hungary
-%May 1998
-%yearly inflation rate sharply decreasing till 1999
-%perhapts same explanation as for czech republic, ie. financial crisis
-%economic reasons: import restrictions have been lifted, trade liberalization; disinflationary impulses (http://findarticles.com/p/articles/mi_m4456/is_n63/ai_20792401/)
-%
-%% 11 Ireland
-%Mar. 2008
-%some fall in yearly inflation after 2008
-%economic reasons: in recession since second quarter of 2008 (http://en.wikipedia.org/wiki/Economy_of_the_Republic_of_Ireland)
-%
-%
-%% 12 Italy
-%May 1996
-%Dez. 2000
-%drop in yearly inflation rate towards lower mean around 1996; in December 2000 nothing really visible; in 2000 beginning of a much more volatile regime
-%economic reasons: in november 1996 Italy rejoined the european monetary system (left it in 1992)
-%September 1996, the new Cabinet announced Italy’s decision to take part in the Monetary Union (http://users.ox.ac.uk/~hine/seminarpapers/Visco.htm)
+\subsection{Denmark}
+Some change in yearly inflation rate; strong increase in variance; Economic reason?
+
+\subsection{France}
+Nothing visible in yearly inflation; Economic reason?
+
+\subsection{Germany}
+Strong increase in mean and variance; Economic reason: strong increases in oil price, not enough. Could be traced back to the poor economic performance of Germany since 2000.
+
+\subsection{Greece}
+There is severe doubt about the credibility greek rate (looks almost like a uniform distribution); extremely high variance, almost 50\% above the next hightes (Belgium).
+
+
+\subsection{Hungary}
+Yearly inflation rate sharply decreasing till 1999; perhaps same explanation as for Czech republic, import restrictions have been lifted, trade liberalization; disinflationary impulses 
+% (http://findarticles.com/p/articles/mi_m4456/is_n63/ai_20792401/)
+
+
+\subsection{Ireland}
+In recession since second quarter of 2008. The European country most severely hit by 
+% (http://en.wikipedia.org/wiki/Economy_of_the_Republic_of_Ireland)
+
+\subsection{Italy}
+Drop in yearly inflation rate towards lower mean around 1996; in December 2000 nothing really visible; in 2000 beginning of a much more volatile regime. Economic reasons: in November 1996 Italy rejoined the european monetary system (left it in 1992); in September 1996, the new Cabinet announced Italy’s decision to take part in the Monetary Union. After 2000 Italy entered an econmic crisis [auf Auffälligkeiten eingehen]
+%(http://users.ox.ac.uk/~hine/seminarpapers/Visco.htm)
 %in 1999 italy qualifies for EMU
 %strong economic growth from 1996-2001
 %2000: economic crisis
-%
-%
-%% 13 Lux
-%Dez. 1998
-%in January 1999 deflation with almost 2\%; strongly increased volatility
-%economic reasons: creation of the Banque Centrale du Luxembourg (1998), founded 22.4.1998 :)
-%
-%
-%% 14 Netherlands
-%no
-%
-%% 15 Poland
-%May 2001
-%decrease in yearly inflation 
-%economic reasons: growth has slowed considerably in Q2 2001 (http://www.knowledgerush.com/kr/encyclopedia/Economy_of_Poland/); or interpret it just as a transition to a more stable path
-%
-%
-%% 16 Portugal
-%Jul. 1992
-%decrease in yearly inflation rate from 1990-2000; after 1992 or so yearly inflation stabilized;
-%economic reasons: following a transition period lasting until 1992; so this marks the end of the transition period (http://www.voyagesphotosmanu.com/portugal_economy.html)
-%
-%
-%% 17 Slovenia
-%Jul. 2003
-%economic reasons: EU member in 2004 (perhaps some sign of pre-EU convergenc); mean and volatility fell afterwards; Government announced it plans to meet Maastricht Criteria
-%In 2003, several measures were introduced to make both portfolio and direct investments easier and more transparent in Slovenia and to conduct many financial operations, including banking, securities brokering, and undertaking various credit transactions. (http://www.historycentral.com/nationbynation/Slovenia/Economy.html); 1 January 2007 Slovenia adopted the euro as the national currency
-%
-%% 18 Spain
-%Dez. 2000
-%extreme rise in inflation
-%economic reasons: 
-%
-%% 19 Sweden
-%Jan. 1993
-%until 1993 sharp decline in yearly inflation, giving away to sharp rise until 1994, then almost stable
-%economic reasons: 1992 there was a run on the currency, the central bank briefly jacking up interest to 500\% in an unsuccessful effort to defend the currency's fixed exchange rate
-%had a crisis of the 1990s; decided in 1997 against euro introduction; had a banking crises at that time and succesfully ended it in 1993
-%
-%% 20 UK 
-%Apr. 1992
-%sharp decline in yearly inflation rate
-%similar series to sweden
-%recession  hit the British economy at the start of the 1990s, beginning in the summer of 1990 and lasting until the end of 1992
-%
-%
-%
 
+\subsection{Luxembourg}
+In January 1999 deflation with almost 2\%; strongly increased volatility; Economic reasons: creation of the Banque Centrale du Luxembourg (1998), founded 22.4.1998 :)
+
+\subsection{Poland}
+Decrease in yearly inflation; Economic reasons: growth has slowed considerably in Q2 2001; or interpret it just as a transition to a more stable path
+%(http://www.knowledgerush.com/kr/encyclopedia/Economy_of_Poland/); 
+
+\subsection{Portugal}
+Decrease in yearly inflation rate from 1990-2000; after 1992 or so yearly inflation stabilized; Economic reasons: following a transition period lasting until 1992; so this marks the end of the transition period 
+% (http://www.voyagesphotosmanu.com/portugal_economy.html)
+
+\subsection{Slovakia}
+Economic reasons?
+
+
+\subsection{Slovenia}
+Economic reasons: EU member in 2004 (perhaps some sign of pre-EU convergenc); mean and volatility fell afterwards; Government announced it plans to meet Maastricht Criteria; In 2003, several measures were introduced to make both portfolio and direct investments easier and more transparent in Slovenia and to conduct many financial operations, including banking, securities brokering, and undertaking various credit transactions. In January 2007 Slovenia adopted the euro as the national currency
+% (http://www.historycentral.com/nationbynation/Slovenia/Economy.html); 
+
+\subsection{Spain}
+Extreme rise in inflation; Economic reasons?
+
+
+\subsection{Sweden}
+Until 1993 sharp decline in yearly inflation, giving away to sharp rise until 1994, then almost stable; Economic reasons: 1992 there was a run on the currency, the central bank briefly jacking up interest to 500\% in an unsuccessful effort to defend the currency's fixed exchange rate; had a crisis of the 1990s; decided in 1997 against euro introduction; had a banking crises at that time and succesfully ended it in 1993
+
+
+\subsection{United Kingdom}
+Sharp decline in yearly inflation rate; recession  hit the British economy at the start of the 1990s, beginning in the summer of 1990 and lasting until the end of 1992
 
 
 
@@ -569,6 +438,109 @@ United Kingdom & 4.1992 \\
 
 
 
+% something more about the reason to use GL
+
+% Book Johnson 95 on logistic distribution
+%
+%- income distributions, otherwise often used as growth models, or rainfall models
+%- definition of the distribution Abberger uses here is a generalization of 23.7 in Johnson 95 (shape ist halt hier zustätzlich noch dabei)
+%- longer tails than normal distribution, nonsymmetric (which is a clear net gain)
+%- more peaked in the center (net gain)
+%- the things above apply to the logistic distribution, not implicitely the GL
+
+
+% searchterm for these ``generalized logistic distribution''
+% found via Google Scholars
+%- in 2005-kjm-olp-gl2 it is shown, that the distribution used here is; cdf is given by: $1-\frac{\exp{-bx}}{(1+\exp{-x})^b}$ (given in this paper)
+%- 2005-spl-won-parametersarmitgld: here the GL is used (they find for Autoregressions that mostly data simply is not normal or student, so they use the GL-distribution (which is only somewhat slightly differently specified)
+%- 2000-ael-har-stockreturns: with almost the same reasoning as above used to model stock exchange data (not exactly gl as here but can be simplified to GL)
+%- 1999-cis-won-asyminnogl: almost the same as the 2005 paper (won.. is also the author :)
+%- 2007-tejof-kon-vatriskgstock: same use
+%- 2001-joae-wa-garchgl: similar (not exactly using gl but very similar)
+%
+%
+%% Econ Papers
+%- often in financial return data (which has high peakes)
+%- in gene expression data (since gl hast longer tails)
+
+% eu database
+% ideas
+% citeceer
+% econometric society
+% questia
+% ecb
+% jstor
+% springerlink
+% ebsco
+% wiley
+% sciencedirect
+% informaworld
+
+
+% Abberger Publikation: Abberger, K., Heiler, S. 	Simultaneous estimation of parameters for a generalized logistic distribution and application to time series models 	2000 	84 	041-049 	A Allgemeines Statistisches Archiv/Journal of the German Statistical Society
+
+%- in 1987-eco-bat-inflationexpectation: the expected inflation is modelled as coming from a logistic distribution
+
+
+
+%
+%\subsection{Austria}
+%
+%The Double max test for Austria is insignificant, but the Cramér-von Mises test and the Supremum of LM statistcs test are both significant. This can be interpreted as a sign, that there was some change in the series as a whole, but that we are unsure wheter this happend with respect to location, scale or shape.
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{aut-meanL2BB.png}
+%\caption{Cramér-von Mises test for Austria}
+%\end{figure}
+%
+%Regarding the figure, we have two clear breaks, one in 1999 and another in 2008. [dating very unsure] The fxregimes procedure gives no breakdate. To give at least some intuition about the changes in variance [actually this is just scale, but can be adapted quickly] we forced 5 breaks into the Austrian inflation rates. 
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{aut-morebreak.png}
+%\caption{Variance Estimation in Austrian Inflation Rates with 5 Breaks}
+%\end{figure}
+%
+%Only with some phantasy we can se some slight V shape (a decline in inflation volatility up to 2000, then an increase). 
+%
+%
+%
+%
+%\subsection{Belgium}
+%
+%Regarding the belgian inflation rates, all tests clearly indicate a break. 
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{bel-meanL2BB.png}
+%\caption{Cramér-von Mises test for Belgium}
+%\end{figure}
+%
+%The fxregimes procedure indicates a breakpoint in December 2000.
+%
+%%The impact of skewness: negative skew (rechtssteil), ie. higher values of y are more probable; positive skew/right skew (linkssteil): lower values of y are more probable
+%%so if it is the case like 6-2-1 we can say that the distribution gets less of a positive skew meaning a lower inflation on average (abklären, sobald das mit den Momenten hinhaut)
+%%
+%
+%\subsection{Italy}
+%
+%In the italian case, there is clear evidence for two breaks. 
+%
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{ita-meanL2BB.png}
+%\caption{Cramér-von Mises test for Italy}
+%\end{figure}
+%
+%If we compare the density of a whole and the denisties of the subsets of the data, we see a clear picture:
+%
+%\begin{figure}[h!tp]
+%\includegraphics[width=80mm]{ita-split.png}
+%\caption{Parameters and Densities for subsamples}
+%\end{figure}
+%
+%
+%As we can see regarding the moments of the subsamples, we see a clear increase in variance (0.04, 0.01, 0.32), some smaller increase in the mean (0.41, 0.16, 0.18)  and a interesting increas in decrease in skewness (0.96, 0.71, $-$0.26), which means that lower values of the inflation rate are quickly becoming less probable. 
+%
+%
 
 \setstretch{1,3}
 
