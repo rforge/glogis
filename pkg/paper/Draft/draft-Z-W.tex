@@ -1,21 +1,8 @@
 \documentclass[titlepage,a4paper, fleqn, flalign]{article} \usepackage[pdftex]{graphicx}
 \usepackage[multiple]{footmisc} \pagestyle{myheadings}
 \usepackage[latin1]{inputenc}
-\usepackage{fancyhdr}
-\usepackage{rotating}
-\usepackage{graphicx}
-\usepackage{longtable}
-\usepackage{amsmath}
 \usepackage{ltxtable}
-\usepackage{tabularx}
-\usepackage{rotating}
-\usepackage{array}
-\usepackage{amssymb}
-\usepackage{pstricks}
-\usepackage{qtree}
-\usepackage{lscape}
 \usepackage{setspace}
-\usepackage[numbers,round]{natbib}
 \usepackage{harvard}
 
 \graphicspath{{Figures/}}
@@ -23,22 +10,6 @@
 
 \begin{document}
 
-
-%\title{Draft  \\[2cm]
-%\textbf{Structural Breaks in Inflation Rates}}
-%
-%\author{ \scriptsize by \\
-%Mag. Thomas WINDBERGER\\
-%Prof. Dr. Achim ZEILEIS \\
-%\scriptsize Doctoral Advisors: \\
-%\scriptsize Univ.-Prof.Dr. Jesus Crespo-Cuaresma \\
-%\scriptsize A.Univ.-Prof.Dr. Janette Walde \\ [1cm]}
-%
-%
-%
-%\maketitle
-
-% anderthalb Zeilen Abstand inne
 
 
 \setstretch{1,5}
@@ -180,11 +151,80 @@ We use the Cramér von Mises type test as given in \cite{z07}. The test statistic
 
 i.e. first the $L_2$ norm is used to aggregate over the components and then the mean of the resulting aggregated process is used as the test statistic. This can also be shown graphically as developed in 
 %[wann war die Erstpublikation der graphischen Methode?].
-
-
-%\subsubsection{Kolmogorov-Smirnov Test}
 %
-%As a goodness of fit test, we use the Kolmogorov Smirnov Test for as given in \cite{massey}.
+%
+%\subsubsection{Kolmogorov-Smirnov Test}
+%% information from: Heiberger/Holland: Statistical Analysis and Data Display
+%
+%The one sample test tests whether a random sample is coming from a hypothesized null distribution. It compares the maximum discrepancy between the empirical cumulative distribution of the data, defined as S(y) = fraction of the data that is less than or equal to y and the cdf of the hypothesized population being sampled. The null hypothesis (ie. that a dataset has a distribution described by a fully determined (theoretical) distribution function) is rejected at a given significance level if the testing statistic exceeds the critical value.
+%It is not possible to use the Kolmogorov–Smirnov test when the parameters of the distribution function are estimated from the same dataset onwhich they are tested. This, however, is usually the case in any practical application. This approach leads to type II error (failing to reject the null hypothesiswhen it is false).
+%% Bemerkung: der ganze obige Absatz stammt aus: gamma-ksmirnov im Goodness-of-Fit Ordner; daher etwas umformulieren
+%
+%% this text: Kendal's Advanced Theory of Statistics, Sixth Edition, Volume 2A, by Alan Stuard et al.
+%The measure of deviation used is the maximum difference between $S_n(x)$ (the cdf given by the observed sample) and $F_0(x)$ (the cdf hypothesized under $H_0$). Where $S_n(x)$ is r/n where r is the number of observations less than or equal x and n is the sample size.
+%
+%\begin{eqnarray}
+%& & D_n = \underset{x}{sup}|S_n(x)-F_0(x)|
+%\end{eqnarray}
+%
+%When the hypothesized distribution is composite, say $F_0(x|\theta_1,\theta_2,...\theta_s)$, with s paramters $\theta_j$, we must select s functions $t_1,...t_s$ of the $x_i$ for this purpose. [in the easy case $F_0$ is uniformly distributed on (0,1)] The transformed variables are now:
+%
+%\begin{eqnarray}
+%& & y_i = \int_{-\infty}^{x_i} f_0(t_1,t_2,..t_s) du
+%\end{eqnarray}
+%
+%but they are neither independent nor uniformly distributed, and their disribution depend on general both on the hypothetical distribution $F_0$ and on the true values of its parameters. So in our 3--parameter case there is some problem. 
+%Perhaps the most serious limitation is that the distribution must be fully specified. That is, if location, scale, and shape parameters are estimated from the data, the critical region of the K-S test is no longer valid. It typically must be determined by simulation.
+%
+%% http://www.itl.nist.gov/div898/handbook/eda/section3/eda35g.htm
+% 
+%% sup ist hier das Maximum
+%% ist der Wert grösser als der kritische Wert, wird die H0 abgelehnt
+%% http://de.wikipedia.org/wiki/Kolmogorow-Smirnow-Test
+%
+%
+%% There is some more refined distribution theory for the KS test with estimated parameters (see Durbin, 1973), but that is not implemented in ks.test.
+%% Durbin, J. (1973) Distribution theory for tests based on the sample distribution function. SIAM. 
+%
+%
+%
+%% A Kolmogorov - Smirnov goodness-of-fit test for the two-parameter weibull distribution when the parameters are estimated from the data 
+%
+%http://www.sciencedirect.com/science?_ob=ArticleURL&_udi=B6V47-4D452FR-4P&_user=10&_coverDate=12%2F31%2F1982&_rdoc=1&_fmt=high&_orig=search&_sort=d&_docanchor=&view=c&_searchStrId=1385134404&_rerunOrigin=google&_acct=C000050221&_version=1&_urlVersion=0&_userid=10&md5=3102a52af9d8937550065045f0b94ee3
+%
+%
+%
+%%Handbook of parametric and nonparametric statistical procedures von Sheskin David wäre nützlich
+%
+%
+%\subsubsection{The $\chi^2$ Test}
+%
+%The main problem is to determine the number of classes k (data is grouped into k classes where we then calculate the difference between observed and expected frequencies). In a continouus distribution case, there are no natural boundaries. One procedure advocated by Mann and Gumbel was to choose the classes so that - given k - the hypothetical probabilites are all equal to 1/k. Recommendations: use classes with equal or nearly equal probabilities. Determine number of classes by:
+%
+%\begin{eqnarray}
+%& & k = b (\frac{2^{1/2}(n-1)}{\lambda_{\alpha} + G^{-1}P_0})
+%\end{eqnarray}
+%
+%with b between 2 and 4; where $\lambda_{\alpha}$ is the critical value (ie. 1.64 in normal distribution case); P is the value of the power function, and $G^{-1}$ comes from ????.
+%In case of ML estimation, critical values should be adjusted upwards.
+%The test statistic follows, approximately, a chi-square distribution with (k - c) degrees of freedom where k is the number of non-empty cells and c = the number of estimated parameters (including location and scale parameters  and shape parameters) for the distribution + 1.
+%
+%\begin{eqnarray}
+%& & \chi^2 = \sum_{i=1}^k \frac{O_i - E_i}{E_i}
+%\end{eqnarray}
+%
+%where the $O_i$ are the observed frequencies and the $E_i$ the expected frequencies. Null hypothesis is rejected if: $\chi^2 $>$ \chi^2_{\alpha, k-c}$.
+%One rule would be to let k be equal to  $3.765(N-1)^{2/5}$ for a 5\% significance level, when using intervals with equal probability under $H_0$. But the statistical community still does not agree on the optimal choice of k. [see 15715341- goodness of fit folder, untere und obere grenze sind +- infinity]
+%
+%
+%
+%
+%
+%
+
+
+
+
 
 \subsection{Densities}
 
