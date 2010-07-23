@@ -110,11 +110,12 @@ glogisfit.default <- function(x, weights = NULL,
   names(par) <- c("location", "scale", "shape")
 
   ## moments
+	## calculate exp(par)[2] and exp(par)[3] due to log estimation
   mom <- c(  
-    "mean"      = as.vector(par[1] + (digamma(par[3]) - digamma(1)) * par[2]),
-    "variance"  = as.vector((psigamma(par[3], deriv = 1) + psigamma(1, deriv = 1)) * par[2]^2),
-    "skewness"  = as.vector((psigamma(par[3], deriv = 2) - psigamma(1, deriv = 2)) / 
-                  (psigamma(par[3], deriv = 1) + psigamma(1, deriv = 1))^(3/2))
+    "mean"      = as.vector(par[1] + (digamma(exp(par)[3]) - digamma(1)) * exp(par)[2]),
+    "variance"  = as.vector((psigamma(exp(par)[3], deriv = 1) + psigamma(1, deriv = 1)) * exp(par)[2]^2),
+    "skewness"  = as.vector((psigamma(exp(par)[3], deriv = 2) - psigamma(1, deriv = 2)) / 
+                  (psigamma(exp(par)[3], deriv = 1) + psigamma(1, deriv = 1))^(3/2))
   )
 
   ## collect and return everything
