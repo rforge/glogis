@@ -1,21 +1,9 @@
-\documentclass[a4paper, 5p, preprint]{elsarticle}
-\usepackage{graphicx,a4wide,color,hyperref}
+\documentclass[nojss]{jss}
 \usepackage[latin1]{inputenc}
-\usepackage[authoryear, round]{natbib}
-\bibpunct{(}{)}{;}{a}{}{,}
-\pagestyle{myheadings}
-
-
-\biboptions{longnamesfirst,angle,semicolon}
-
 
 \graphicspath{{Figures/}}
 
-
-\begin{document}
-
-
-\title{Still need a good title}
+\title{Something about Euro, EMU, and Inflation}
 
 % Verkaufsstrategien
 % 1. Widerlegung des Teuro Effektes
@@ -24,36 +12,44 @@
 % 	 so etwa in Slowenien und der Slovakei ein Bruch bevor diese Staaten dem ERMII/EURO beitreten
 % 4. Finanzkrise: schwieriger, ausser Irland keine Änderung > 2008
 
-\author[rvt]{A.˜Zeileis}
-\author[focal]{T.˜Windberger}
-\address[rvt]{University of Innsbruck, Institute for Statistics, Universitätsstraße 15, 6020 Innsbruck, Austria}
-\address[focal]{University of Innsbruck, Austria}
+\author{Thomas Windberger\\Universit\"at Innsbruck \And
+        Achim Zeileis\\Universit\"at Innsbruck
+}
+\Plainauthor{Thomas Windberger, Achim Zeileis}
+
+\Abstract{
+  The aim of this paper is to shed some light on the effect of the European Monetary Union (EMU)
+  on changing the volatility of the inflation rates in its Member States. 
+}
+
+\Keywords{inflation rate, structural break, EMU}
 
 
-\date{}
-\maketitle
+\Address{
+  Thomas Windberger, Achim Zeileis\\
+  Department of Statistics\\
+  Universit\"at Innsbruck\\
+  Universit\"atsstraße 15\\
+  6020 Innsbruck, Austria\\
+  E-mail: \email{Thomas.Windberger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org}
+}
 
-\begin{abstract}
-The aim of this paper is to shed some light on the effect of the European Monetary Union (EMU)  on changing the volatility of the inflation rates in its Member States. 
-\end{abstract}
 
-
-\begin{keyword}
-inflation rate \sep structural break \sep EMU 
-\end{keyword}
+\begin{document}
 
 
 \section{Introduction}
 
-The ECB defines price stability ``as a year-on-year increase in the Harmonized Index of Consumer Prices (HICP) for the Euro area of below 2\%'' \citet{castel}. \citet{emerson} makes it clear, that a high inflation rate is also more variable and uncertain and in that way causes more relative price variability, leading to a less efficient price mechanism (p.~22). Thus to achieve a low inflation rate and low variability of inflation must be a key issue for the central bank. \\
-The question of interest centers around the way in which a countries decision to join the EMU changed its inflation rate dynamics. There are a number of reasons why these should change indeed. Given that a country experienced quite volatile inflation rates, its efforts to meet the convergence criteria are likely to lead to a change at least in the mean and possible in the volatility of their respective inflation rates as well. This has indeed been the case for a number of EMU countries, like Spain, Italy and Portugal, reflecting their effort to meet the Maastricht Criteria for inflation rates.
+The European Central Bank (ECB) defines price stability ``as a year-on-year increase in the Harmonized Index of Consumer Prices (HICP) for the Euro area of
+below 2\%'' \citep{castel}. \citet{emerson} make it clear, that a high inflation rate is also more variable and uncertain and in that way causes more relative price variability, leading to a less efficient price mechanism (p.~22). Thus to achieve a low inflation rate and low variability of inflation must be a key issue for the central bank. \\
+The question of interest centers around the way in which a countries decision to join the European Monetary Union (EMU) changed its inflation rate dynamics. There are a number of reasons why these should change indeed. Given that a country experienced quite volatile inflation rates, its efforts to meet the convergence criteria are likely to lead to a change at least in the mean and possible in the volatility of their respective inflation rates as well. This has indeed been the case for a number of EMU countries, like Spain, Italy and Portugal, reflecting their effort to meet the Maastricht Criteria for inflation rates.
 
 
 
 
-\section{Literature Overview}
+\section{Literature overview}
 
-Theory unfortunately is quite unsure about whether or not the creation of a monetary union between two or more states is likely to reduce or increase the variability or even the level of the inflation rate.  \citet{cooper} points out, that "a central bank under a monetary union will internalize the interdependence between countries and optimally choose a lower inflation rate" and he argues that a "central Bank governing the growth of money supply will optimally choose zero inflation." This is not the case with the ECB which targets at 2\% so as to avoid the risk of deflation. It is thus not quite clear how a monetary union will affect the volatility and the level of the inflation rate.\\
+Theory unfortunately is quite unsure about whether or not the creation of a monetary union between two or more states is likely to reduce or increase the variability or even the level of the inflation rate.  \citet{cooper} points out, that ``a central bank under a monetary union will internalize the interdependence between countries and optimally choose a lower inflation rate" and he argues that a ``central Bank governing the growth of money supply will optimally choose zero inflation." This is not the case with the ECB which targets at 2\% so as to avoid the risk of deflation. It is thus not quite clear how a monetary union will affect the volatility and the level of the inflation rate.\\
 An interesting approach to this question is taken by \citet{holte}. He creates a two country model for monetary policy analysis along the line of two models by \citet{mc1} and \citet{mc2} as well as \citet{gali}. The inflation is modeled by a hybrid Phillips curve (NKPC) specification and there are a number of different home country interest rate rules, like strict inflation targeting, flexible targeting, pegging to a currency and --  monetary union. What he finds out via simulations of these different interest rate rules is that the standard deviation of the home CPI inflation rate can be substantially reduced by joining a monetary union. But monetary policy in a monetary union does not explicitly stabilize the output gap and inflation rate in case of national economic shocks. The effects of joining on inflation rate variability depend on structural parameters like risk aversion, price flexibility, export demand elasticity, openness and shock correlations. Due to the fact that not all of these parameters are known and that their interaction as well has to be guessed, theory has some troubles answering the question of this paper. \\
 \citet{cap} estimate short-run and steady-state inflation uncertainty in 12 EMU countries and find a considerable degree of heterogeneity across EMU countries in terms of average inflation, its degree of persistence and both types of uncertainty. They use a time-varying model with a GARCH specification for the unconditional volatility of inflation and find some instability in the conditional volatility. \\
 In a paper examining structural convergence of the inflation rates in EU countries, \citet{palomba} try to answer the question if during the 1990s the inflation rate dynamics of EU countries become more similar. They find that convergence in time of inflation dynamics was only partly observable. 
@@ -65,15 +61,17 @@ Inquiring into the convergence properties of inflation rates among countries of 
 
 \section{Data}
 
-Inflation is measured as the logarithm of the monthly change in the HICP from 1.1990---3.2010, so $x_t = 100\cdot \log(HICP_{t}/HICP_{t-1})$. Countries included are Austria,	Belgium,	Czech Republic,	Denmark, Estonia,	Finland,	France,	Germany,	Greece,	Hungary,	Ireland,	Italy,	Luxembourg,	Netherlands,	Poland,	Portugal,	Spain,	Sweden,		United Kingdom and the	Euro area.  The data are obtained from the OECD Statistics. \\
+Inflation is measured as the logarithm of the monthly change in the HICP from 1.1990--3.2010, so $x_t = 100\cdot \log(\mathit{HICP}_{t}/\mathit{HICP}_{t-1})$. Countries included are Austria,	Belgium,	Czech Republic,	Denmark, Estonia,	Finland,	France,	Germany,	Greece,	Hungary,	Ireland,	Italy,	Luxembourg,	Netherlands,	Poland,	Portugal,	Spain,	Sweden,		United Kingdom and the	Euro area.  The data are obtained from the OECD Statistics. \\
 The countries can be divided into three different groups: the EURO countries (Portugal, Spain, Italy, Greece, France, Belgium, Estonia\footnote{although Estonia enters in 2011}, Netherlands, Germany, Austria, Ireland, Slovenia, Luxembourg and Finland), EU members without ERM~II (Exchange Rate Mechanism): United Kingdom, Sweden, Poland, Czech Republic, Hungary. Denmark stands on its own as a member of the EU and the ERM~II, but not yet a member of the EMU.
 
 
 \section{Methods}
 
-\subsection{A generalized logistic distribution (GL)}
+\subsection{A generalized logistic distribution}
 
-In econometric issues, the logistic distribution is often used in income distributions and growth models. Its use stems from the usefulness of its longer tails and its higher peak, which fits these problems somewhat better. The use of the generalized logistic distribution as we will use it in this paper is somewhat scarcer. \citet{won} uses a GL distribution in a regression model with autocorrelated errors and assumes that they follow a GL distribution rather than a Student's t-distribution, as to model the fact that these are oftentimes  leptokurtic and severely left or right skewed. A similar GL distribution is also used in \citet{tolikas} who analyses extreme risk and value--at--risk in the German stock market, all though they don't use a shape parameter. Regarding inflation rates, the GL distribution is --to our best knowledge-- only used in relationship with expected inflation. \citet{batchelor} use a logistic distribution (not its generalization) to model the distribution of mean expected inflation rates. \\
+In econometric issues, the logistic distribution is often used in income distributions and growth models. Its use stems from the usefulness of its longer
+tails and its higher peak, which fits these problems somewhat better. The use of the generalized logistic distribution as we will use it in this paper is
+somewhat scarcer. \citet{won} uses a generalized logistic (GL) distribution in a regression model with autocorrelated errors and assumes that they follow a GL distribution rather than a Student's t-distribution, as to model the fact that these are oftentimes  leptokurtic and severely left or right skewed. A similar GL distribution is also used in \citet{tolikas} who analyses extreme risk and value--at--risk in the German stock market, all though they don't use a shape parameter. Regarding inflation rates, the GL distribution is --to our best knowledge-- only used in relationship with expected inflation. \citet{batchelor} use a logistic distribution (not its generalization) to model the distribution of mean expected inflation rates. \\
 As already stated, we now apply the general framework, as developed in \citet{z07} to a more specific model, in this case by means of a GL distribution. Prior to that, we would like to give a short justification for our using of the GL distribution. Regarding the data at hand, it was not possible to use the already existing method developed in \citet{z07}, since almost all inflation rates, with the notable exception of Greece, are not normally distributed and clearly exhibit asymmetric properties. \\
 Therefore, a somewhat more flexible distribution had to be used. We needed a distribution exhibiting rather strong kurtosis and the property to be both left and right skewed. To this end we use a generalization of the logistic distribution as defined in \citet{johnson}. Its probability density is given by:
 
@@ -115,24 +113,24 @@ The resulting score function ($\psi()$) for the parameters (the derivatives of t
 \end{eqnarray}
 
 
-An enhancement to the already existing R package "`strucchange"', which currently does not support a generalized logistic distribution (GL) is provided with this paper. The asymptotic testing theory still holds for this generalization. [Beweis] \\
-The first part of the results we are going to present here, i.e. the tests and the graphical illustration of the empirical fluctuation process can be found in \citet{z07}. the second part of the results - the dating procedure and the illustration of the densities fitted for the subsamples (divided by the breaks) - ca be found in \citet{z10}.
+An enhancement to the already existing \proglang{R} package \pkg{strucchange}, which currently does not support a generalized logistic distribution (GL) is provided with this paper. The asymptotic testing theory still holds for this generalization. [Beweis] \\
+The first part of the results we are going to present here, i.e., the tests and the graphical illustration of the empirical fluctuation process can be found in \citet{z07}. the second part of the results - the dating procedure and the illustration of the densities fitted for the subsamples (divided by the breaks) - ca be found in \citet{z10}.
 
 \subsection{Tests}
 
-\subsubsection{Cramér-von Mises statistic - \\ Nyblom Hansen Test}
+\subsubsection{Cram{\'e}r-von Mises statistic -- Nyblom-Hansen test}
 
-We use the Cramér von Mises type test as given in \citet{z07}. The test statistic is given by:
+We use the Cram{\'e}r von Mises type test as given in \citet{z07}. The test statistic is given by:
 
 \begin{eqnarray}
 & & \frac{1}{n} \sum_{i=1}^n \Vert efp(\frac{i}{n}) \Vert_2^2
 \end{eqnarray}
 
-i.e. first the $L_2$ norm is used to aggregate over the components and then the mean of the resulting aggregated process is used as the test statistic. This can also be shown graphically.
+i.e., first the $L_2$ norm is used to aggregate over the components and then the mean of the resulting aggregated process is used as the test statistic. This can also be shown graphically.
 
 
 
-\subsubsection{The $\chi^2$ Test}
+\subsubsection[The chi-squared test]{The $\chi^2$ test}
 
 The main problem is to determine the number of classes k (data is grouped into k classes where we then calculate the difference between observed and expected frequencies). In a continuous distribution case, there are no natural boundaries. 
 As given in \citet{kendal} the maximum likelihood estimation of the parameters is not a big problem if k is large enough. The classes are taken to cover equal ranges of the variate, which can be done easily once k is determined. This procedure was advocated by Mann and Gumberl. One rule would be to let k be equal to  $3.765(N-1)^{2/5}$ for a 5\% significance level, when using intervals with equal probability under $H_0$, as given in \citet{boreo}. We use this rule with a range of [3,2*k-3] for the tests and report any pvalues below 0.05. 
@@ -142,7 +140,7 @@ As given in \citet{kendal} the maximum likelihood estimation of the parameters i
 
 Another thing we wish to look at is the change in the moments of the distribution after a break occurred and whether or not the subsample fit of the GL-distribution is preferable to another. Although our interest centers on the variance of the respective inflation rate, skewness should not altogether be ignored. If we  observe - for example - a change in skewness from positive to negative from one regime to another, we could conclude that now we will observe higher values in the inflation rate since its density shifted to the right.
 
-\subsection{Expected Results}
+\subsection{Expected results}
 
 To give an idea what we would expect, we give a short overview over the history of the EMU. Following the Delors Plan with his 3 stages, we have: stage I (1990-1994), stage II (1995-1998) and stage III (1999-2002) which ended with the introduction of the Euro as legal tender. If the EMU had a significant effect upon inflation rate volatility we would expect to find a break either in the 90ies, reflecting the various waves of integration or after the introduction of the Euro due to the popular argument that the introduction of EURO coins and paper money led to a considerable price increase.
 
@@ -153,7 +151,7 @@ The results presented here are for the countries within the Euro--zone (Austria,
 % http://en.wikipedia.org/wiki/European_Exchange_Rate_Mechanism#Replacement_with_the_euro_and_ERM_II
 % http://en.wikipedia.org/wiki/Eurozone
 
-\begin{table}[h!tp]\scriptsize
+\begin{table}[t!]
 \begin{center}
 \begin{tabular}{llll}
 \hline
@@ -180,13 +178,10 @@ Spain          & 1999--2002   & May 1996 & Dec 2000 \\
 Sweden         & no--no      & Jan 1993 &          \\
 United Kingdom & no--no       & Apr 1992 &          \\ \hline
 \end{tabular}
-\caption{\label{tab:breakpoints} Dating of break points.}
-\subcaption{First date: entry to ERM~II, second date: EURO introduction.}
+\caption{\label{tab:breakpoints} Dating of break points. First date: entry to ERM~II, second date: EURO introduction.}
 \end{center}
 \end{table}
 
-
-\normalsize
 
 On this basis we can trace out 6 groups of countries with rather distinct behavior. Group 1 consists of Italy and Spain (both very similar) and possibly Belgium, Luxembourg and Portugal. Group 2 is an Eastern European group comprising Poland, the Czech Republic, Slovenia, Slovakia and Hungary. Group 3 is a Non-ERM~II member group including Sweden and the United Kingdom. The Netherlands, Greece and Finland build group 4 which exhibits no changes. Group 5 is composed of France, Germany, Austria and Denmark. Ireland stands on its own and is the only country which changed its inflation dynamics as an aftermarch of the financial crises of 2008. \\
 What we can observe for almost all the EURO countries is a increase in variance and mean, with the exception of Ireland. Since inflation volatility increased in all countries, we find no proof of a common claim that inflation uncertainty may increase in countries that have a smaller influence on ECB policy. \\
@@ -210,11 +205,7 @@ What we can observe for almost all the EURO countries is a increase in variance 
 \section{Conlcusion}
 
 
-\section{References}
-\bibliographystyle{elsarticle-harv}
 \bibliography{papers}
-
-
 
 
 \end{document}
