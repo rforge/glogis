@@ -82,7 +82,8 @@ plot(x_bp)
 
 <<plot3, eval=FALSE>>=
 par(mfrow = c(1, x_nbreaks + 1))
-for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = names(x_rf)[i])
+for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
+  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
 @
 
 %-----------------------------------------------------------

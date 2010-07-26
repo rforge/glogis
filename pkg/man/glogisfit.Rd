@@ -29,10 +29,10 @@ glogisfit(x, \dots)
   method = "BFGS", hessian = TRUE, \dots)
 \method{glogisfit}{formula}(formula, data, subset, na.action, weights, x = TRUE, \dots)
 
-\method{plot}{glogisfit}(x, main = "", xlab = deparse(x$call), fill = "lightgray",
+\method{plot}{glogisfit}(x, main = "", xlab = NULL, fill = "lightgray",
   col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", \dots)
 
-\method{summary}{glogisfit}(object, log = TRUE, \dots)
+\method{summary}{glogisfit}(object, log = TRUE, breaks = NULL, \dots)
 \method{coef}{glogisfit}(object, log = TRUE, \dots)
 \method{vcov}{glogisfit}(object, log = TRUE, \dots)
 }
@@ -67,6 +67,9 @@ glogisfit(x, \dots)
   \item{log}{logical option in some extractor methods indicating whether scale and
     shape parameters should be reported in logs (default) or the original
     levels.}
+  \item{breaks}{interval breaks for the chi-squared goodness-of-fit test.
+    Either a numeric vector of two or more cutpoints or a single number (greater than or
+    equal to 2) giving the number of intervals.}
   \item{\dots}{arguments passed to methods.}
 }
 

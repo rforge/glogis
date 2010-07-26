@@ -109,8 +109,7 @@ glogisfit.default <- function(x, weights = NULL,
   par[2:3] <- exp(par[2:3])
   names(par) <- c("location", "scale", "shape")
 
-  ## moments
-	
+  ## moments	
   mom <- c(  
     "mean"      = as.vector(par[1] + (digamma(par[3]) - digamma(1)) * par[2]),
     "variance"  = as.vector((psigamma(par[3], deriv = 1) + psigamma(1, deriv = 1)) * par[2]^2),
@@ -192,7 +191,7 @@ print.glogisfit <- function(x, digits = max(3, getOption("digits") - 3), ...)
   invisible(x)
 }
 
-summary.glogisfit <- function(object, log = TRUE, ...)
+summary.glogisfit <- function(object, log = TRUE, breaks = NULL, ...)
 {
   ## extend coefficient table
   cf <- coef(object, log = log)
@@ -204,6 +203,19 @@ summary.glogisfit <- function(object, log = TRUE, ...)
   
   ## number of iterations
   object$iterations <- as.vector(tail(na.omit(object$optim$count), 1))
+
+  ## chi-squared goodness-of-fit test
+  if(!is.null(object$x)) {
+    if(is.null(breaks)) breaks <- min(max(3, ceiling(length(object$x)/5) - 1), floor(3.765 * length(object$x)^(2/5)))
+    if(length(breaks) == 1) breaks <- qglogis(seq(0, 1, length = breaks + 1),
+      location = object$parameters[1], scale = object$parameters[2], shape = object$parameters[3])
+    breaks <- as.numeric(breaks)
+    ct <- chisq.test(table(cut(object$x, breaks = breaks, include.lowest = TRUE)),
+      p = diff(pglogis(breaks, location = object$parameters[1], scale = object$parameters[2], shape = object$parameters[3])))
+    ct$method <- "Chi-squared goodness-of-fit test"
+    ct$data.name <- "discretized observations"
+    object$chisq.test <- ct
+  }
   
   ## return
   class(object) <- "summary.glogisfit"
@@ -222,6 +234,10 @@ print.summary.glogisfit <- function(x, digits = max(3, getOption("digits") - 3),
   
     cat("\nLog-likelihood:", formatC(x$loglik, digits = digits),
       "on", sum(sapply(x$coefficients, NROW)), "Df")
+    if(!is.null(x$chisq.test)) cat("\nGoodness-of-fit statistic:",
+      formatC(x$chisq.test$statistic, digits = digits),
+      "on", x$chisq.test$parameter, "DF,  p-value:",
+      format.pval(x$chisq.test$p.value, digits = digits))
     cat(paste("\nNumber of iterations in", x$method, "optimization:", x$iterations, "\n"))
   }
   
@@ -229,7 +245,7 @@ print.summary.glogisfit <- function(x, digits = max(3, getOption("digits") - 3),
 }
 
 ## visualization
-plot.glogisfit <- function(x, main = "", xlab = deparse(x$call), fill = "lightgray",
+plot.glogisfit <- function(x, main = "", xlab = NULL, fill = "lightgray",
   col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", ...)
 {
   if(is.null(x$x)) stop("Data not stored in 'glogisfit' object.")
@@ -237,6 +253,10 @@ plot.glogisfit <- function(x, main = "", xlab = deparse(x$call), fill = "lightgr
     aux1 <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
     aux2 <- hist(x$x, plot = FALSE)$density
     ylim <- range(c(dglogis(aux1, x$parameters[1], x$parameters[2], x$parameters[3]), aux2))
+  }
+  if(is.null(xlab)) {
+    xlab <- if(is.null(x$x)) deparse(x$call) else paste(deparse(x$call),
+      "\nGoodness-of-fit p-value: ", format.pval(summary(x)$chisq.test$p.value, digits = max(3, getOption("digits") - 3)), sep = "")
   }
   rval <- hist(x, main = main, xlab = xlab, col = fill, ylim = ylim, ...)
   lines(x, col = col, lwd = lwd, lty = lty)
