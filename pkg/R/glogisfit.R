@@ -90,11 +90,12 @@ glogisfit.default <- function(x, weights = NULL,
       if(p3 < 0) return(Inf)
       -sum(w * dglogis(x, location = par[1], scale = p2, shape = p3, log = TRUE))
     }
+    need_trafo <- which(is.na(fixed)) %in% 2:3
     start2 <- start
-    start2[which(is.na(fixed)) %in% 2:3] <- exp(start2[which(is.na(fixed)) %in% 2:3])
+    start2[need_trafo] <- exp(start2[need_trafo])
     opt2 <- optim(par = start2, fn = llfun2)
     start <- opt2$par
-    start[2:3] <- log(start[2:3])
+    start[need_trafo] <- log(start[need_trafo])
     opt <- optim(par = start, fn = llfun, gr = gradfun, hessian = hessian, method = method, control = list(...))
   }
   
