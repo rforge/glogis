@@ -1,0 +1,72 @@
+\documentclass[11pt,compress,t]{beamer}
+\usetheme{Z}
+\usepackage{amsfonts,amstext,amsmath}
+%% need no \usepackage{Sweave}
+
+\setkeys{Gin}{width=\textwidth}
+\SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, keep.source=TRUE}
+
+<<preliminaries>>=
+## packages
+library("glogis")
+library("fxregime")
+
+## additional functions
+moments <- function(object, ...) UseMethod("moments")
+moments.glogisfit <- function(object, ...) object$moments
+moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
+  t(sapply(refit(object, breaks = breaks), "[[", "moments"))
+
+## data
+data("HICP", package = "glogis")
+HICP <- HICP[, colnames(HICP) != "EU"]
+hicp <- 100 * diff(log(na.omit(HICP)))
+@
+
+\begin{document}
+
+\title{Structural Breaks in Inflation Dynamics within the European Monetary Union}
+\author{Thomas Windberger, Achim Zeileis}
+\URL{http://R-Forge.R-project.org/projects/glogis/}
+\lecture{Structural Breaks in Inflation Dynamics within the European Monetary Union}
+
+\subsection{Overview}
+
+\begin{frame}
+\frametitle{Overview}
+
+\begin{itemize}
+  \item Introduction
+  \item More
+  \begin{itemize}
+    \item \dots
+    \item \dots
+  \end{itemize}
+\end{itemize}
+
+
+\end{frame}
+
+\subsection{Introduction}
+
+\begin{frame}
+\frametitle{Introduction}
+
+Introduction
+
+\end{frame}
+
+\begin{frame}
+\frametitle{More}
+
+\vspace*{-0.8cm}
+
+<<plot-some, fig=TRUE, height=5, width=7>>=
+library("lattice")
+print(xyplot(hicp[, c("Germany", "Italy", "Greece")]))
+@
+
+\end{frame}
+
+
+\end{document}
