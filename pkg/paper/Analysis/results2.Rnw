@@ -20,12 +20,48 @@ options(prompt = "R> ", continue = "+  ", width = 70,
 
 %% packages and additional code
 <<package-code>>=
-library("glogis")
 library("fxregime")
+
 moments <- function(object, ...) UseMethod("moments")
-moments.glogisfit <- function(object, ...) object$moments
-moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
-  t(sapply(refit(object, breaks = breaks), "[[", "moments"))
+moments.fxregimes <- function(object, ...) coef(object, ...)
+
+plot.fxlm <- function(x, main = "", xlab = NULL, fill = "lightgray",
+  col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", ...)
+{
+  x$parameters <- c(coef(x)[1], sqrt(coef(x)[2]))
+  x$x <- model.response(model.frame(x))
+  if(is.null(ylim)) {
+    aux1 <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
+    aux2 <- hist(x$x, plot = FALSE)$density
+    ylim <- range(c(dnorm(aux1, x$parameters[1], x$parameters[2]), aux2))
+  }
+  if(is.null(xlab)) {
+    xlab <- deparse(x$call)
+  }
+  rval <- hist(x, main = main, xlab = xlab, col = fill, ylim = ylim, ...)
+  lines(x, col = col, lwd = lwd, lty = lty)
+  if(identical(legend, TRUE)) legend <- "topleft"
+  if(!identical(legend, FALSE)) legend(legend,
+    paste(c("mean", "sd"), ": ", format(round(x$parameters, pmax(getOption("digits") - 4, 1))), sep = ""),
+    bty = "n")
+
+  invisible(rval)
+}
+
+hist.fxlm <- function(x, main = "", xlab = deparse(x$call),
+  col = "lightgray", freq = FALSE, ...)
+{
+  hist(model.response(model.frame(x)), main = main, xlab = xlab, col = col, freq = freq, ...)
+}
+
+
+lines.fxlm <- function(x, ...)
+{
+  x$parameters <- c(coef(x)[1], sqrt(coef(x)[2]))
+  x$x <- model.response(model.frame(x))
+  aux <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
+  lines(aux, dnorm(aux, x$parameters[1], x$parameters[2]), ...)
+}
 @
 
 
@@ -34,22 +70,24 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 data("HICP", package = "glogis")
 HICP <- HICP[, colnames(HICP) != "EU"]
 add_breaks <- structure(rep(0, ncol(HICP)), .Names = colnames(HICP))
-add_breaks[c("Germany", "Portugal", "Slovakia", "Spain")] <- 1
+add_breaks[c("Germany", "Portugal", "Spain")] <- 1
 @
 
-%% analysis "macro" (assumes existence of "i", "HICP", and "add_breaks")
+%% analysis "macro" (assumes existence of "i" and "HICP")
 <<analysis, eval=FALSE>>=
 ## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
+x <- 100 * diff(log(HICP))
+x <- x[!is.na(x[,i]),]
+names(x)[i] <- "x"
 
 ## fit full-sample model
-x_gf <- glogisfit(x)
+x_lm <- fxlm(x ~ 1, data = x)
 
 ## assess stability of full-sample model
-x_efp <- gefp(x_gf, fit = NULL)
+x_efp <- gefp(x_lm, fit = NULL)
 
 ## estimate breakpoints (with minimal segment size of 2 years)
-x_bp <- breakpoints(x_gf, h = 24)
+x_bp <- fxregimes(x ~ 1, data = x, h = 24)
 
 ## (minimal) number of breaks
 x_nbreaks <- if(sctest(x_efp, functional = supLM(0.1))$p.value > 0.05) {
@@ -58,21 +96,24 @@ x_nbreaks <- if(sctest(x_efp, functional = supLM(0.1))$p.value > 0.05) {
   max(1, length(breakdates(x_bp))) + add_breaks[i]
 }
 
+## associated breakdates
+x_bd <- breakdates(x_bp, breaks = x_nbreaks)
+
 ## refit segmented model
 x_rf <- refit(x_bp, breaks = x_nbreaks)
 
 ## save everything
-save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(HICP)[i], ".rda", sep = ""))
+save(x, x_lm, x_efp, x_bp, x_nbreaks, x_bd, x_rf, file = paste(colnames(HICP)[i], "2.rda", sep = ""))
 @
 
-%% plot "macros" (assuming existence "x", "x_gf", ...)
+%% plot "macros" (assuming existence "x", "x_lm", ...)
 <<plot1, eval=FALSE>>=
 par(mfrow = c(1, 2))
-plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
-lines(x_bp, breaks = x_nbreaks)
-lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
+plot(x$x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
+abline(v = x_bd, lty = 2)
+lines(fitted(x_bp, breaks = x_nbreaks), col = 4)
 plot(x_efp, functional = supLM(0.1), main = "supLM test")
-lines(x_bp, breaks = x_nbreaks)
+abline(v = x_bd, lty = 2)
 @
 
 <<plot2, eval=FALSE>>=
@@ -82,8 +123,7 @@ plot(x_bp)
 
 <<plot3, eval=FALSE>>=
 par(mfrow = c(1, x_nbreaks + 1))
-for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
-  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
+for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = names(x_rf)[i])
 @
 
 %-----------------------------------------------------------
@@ -91,7 +131,7 @@ for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Go
 <<>>=
 i <- 1
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -139,7 +179,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 2
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -188,7 +228,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 3
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -237,7 +277,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 4
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -285,7 +325,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 5
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -334,7 +374,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 6
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -383,7 +423,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 7
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -432,7 +472,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 8
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -481,7 +521,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 9
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -530,7 +570,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 10
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -579,7 +619,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 11
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -628,7 +668,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 12
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -677,7 +717,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 13
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -726,7 +766,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 14
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -775,7 +815,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 15
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -824,7 +864,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 16
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -873,7 +913,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 17
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -922,7 +962,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 18
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -971,7 +1011,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 19
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -1020,7 +1060,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 20
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
@@ -1069,7 +1109,7 @@ moments(x_bp, breaks = x_nbreaks)
 <<>>=
 i <- 21
 nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
+fnam <- paste(nam, "2.rda", sep = "")
 @
 
 \section*{\Sexpr{nam}}
