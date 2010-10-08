@@ -1,7 +1,3 @@
-
-<!-- This is the project specific website template -->
-<!-- It can be changed as liked or replaced by other content -->
-
 <?php
 
 $domain=ereg_replace('[^\.]*\.(.*)$','\1',$_SERVER['HTTP_HOST']);
@@ -30,8 +26,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 </table>
 
 
-<!-- get project title  -->
-<!-- own website starts here, the following may be changed as you like -->
+<h1>glogis: Fitting and Testing Generalized Logistic Distributions</h1>
 
 <?php if ($handle=fopen('http://'.$domain.'/export/projtitl.php?group_name='.$group_name,'r')){
 $contents = '';
@@ -41,11 +36,14 @@ while (!feof($handle)) {
 fclose($handle);
 echo $contents; } ?>
 
-<!-- end of project description -->
+<p> The <strong>project summary page</strong> you can find
+<a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name;?>/"><strong>here</strong></a>.
+</p>
 
-<p> No content added. </p>
 
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<h1>Structural Breaks in Inflation Dynamics within the European Monetary Union</h1>
+<h2>Thomas Winderberger, Achim Zeileis</h2>
+
 
 </body>
 </html>
