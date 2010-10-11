@@ -3,6 +3,17 @@
 $domain=ereg_replace('[^\.]*\.(.*)$','\1',$_SERVER['HTTP_HOST']);
 $group_name=ereg_replace('([^\.]*)\..*$','\1',$_SERVER['HTTP_HOST']);
 $themeroot='http://R-Forge.R-project.org/themes/rforge/';
+$rs_pkg = db_query("
+		   SELECT *
+	       FROM plugin_rforge_package_db
+	       WHERE unix_group_name='$project_name'
+			  AND pkg_name='$pkg_name';");
+	       if (db_numrows($rs_pkg)!=1) {
+		       echo "<h2>Package $pkg_name not found in project $project_name!<h2>";
+		       return false;
+	       }
+	       $pkg = db_fetch_array($rs_pkg);
+
 
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
@@ -48,7 +59,7 @@ echo $contents; } ?>
 <ul>
   <li><a href="https://R-Forge.R-project.org/scm/viewvc.php/*checkout*/pkg/paper/Slides/slides.pdf?root=glogis">Slides</a></li>
   <li><a href="https://R-Forge.R-project.org/scm/viewvc.php/*checkout*/pkg/paper/Paper/draft.pdf?root=glogis">Manuscript draft</a></li>
-  <li><a href="https://R-Forge.R-project.org/src/contrib/glogis_0.0-4.tar.gz">R package</a>
+  <li><a href="https://R-Forge.R-project.org/src/contrib/glogis_<?php echo $pkg['version'];?>.tar.gz">R package</a>
 </ul>
 
 </body>
