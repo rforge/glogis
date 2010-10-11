@@ -1,11 +1,13 @@
 \documentclass[11pt,compress,t]{beamer}
 \usetheme{Z}
 \usepackage{amsfonts,amstext,amsmath}
+\usepackage{longtable}
 %% need no \usepackage{Sweave}
-
 
 \setkeys{Gin}{width=\textwidth}
 \SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, keep.source=TRUE}
+
+
 
 <<preliminaries>>=
 ## packages
@@ -24,7 +26,68 @@ HICP <- HICP[, colnames(HICP) != "EU"]
 hicp <- 100 * diff(log(na.omit(HICP)))
 @
 
+%% analysis "macro" (assumes existence of "i", "HICP", and "add_breaks")
+<<analysis, eval=FALSE>>=
+## compute returns
+x <- 100 * diff(log(na.omit(HICP[,i])))
+
+## fit full-sample model
+x_gf <- glogisfit(x)
+
+## assess stability of full-sample model
+x_efp <- gefp(x_gf, fit = NULL)
+
+## estimate breakpoints (with minimal segment size of 2 years)
+x_bp <- breakpoints(x_gf, h = 24)
+
+## (minimal) number of breaks
+x_nbreaks <- if(sctest(x_efp, functional = supLM(0.1))$p.value > 0.05) {
+  0
+} else {
+  max(1, length(breakdates(x_bp))) + add_breaks[i]
+}
+
+## refit segmented model
+x_rf <- refit(x_bp, breaks = x_nbreaks)
+
+## save everything
+save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(HICP)[i], ".rda", sep = ""))
+@
+
+
+%% plot "macros" (assuming existence "x", "x_gf", ...)
+<<plot1, eval=FALSE>>=
+par(mfrow = c(1, 2))
+plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
+lines(x_bp, breaks = x_nbreaks)
+lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
+plot(x_efp, functional = supLM(0.1), main = "supLM test")
+lines(x_bp, breaks = x_nbreaks)
+@
+
+<<plot2, eval=FALSE>>=
+par(mfrow = c(1, 1))
+plot(x_bp)
+@
+
+<<plot3, eval=FALSE>>=
+par(mfrow = c(1, x_nbreaks + 1))
+for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
+  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
+@
+
+<<plot4, eval=FALSE>>=
+par(mfrow = c(1, 1))
+plot(x_efp, aggregate = FALSE)
+@
+
+%## testing parameter instability
+%aut_gefp <- gefp(aut_gf, fit = NULL)
+%plot(aut_gefp, aggregate = FALSE) # doppelmax Test
+
+
 \begin{document}
+
 
 \title{Structural Breaks in Inflation Dynamics within the European Monetary Union}
 \author{Thomas Windberger, Achim Zeileis}
@@ -39,10 +102,15 @@ hicp <- 100 * diff(log(na.omit(HICP)))
 
 \begin{itemize}
   \item Introduction
-  \item Data
+    \item Data
   \begin{itemize}
     \item HICP
   \end{itemize}
+  \item Model
+    \begin{itemize}
+    \item GL--Distribution
+  \end{itemize}
+  \item Results
   \item Methods
   \begin{itemize}
     \item Model
@@ -51,7 +119,6 @@ hicp <- 100 * diff(log(na.omit(HICP)))
     \end{itemize}
     \item Distribution reasoning
   \end{itemize} 
-  \item Results
 \end{itemize}
 
 
@@ -98,97 +165,53 @@ hicp <- 100 * diff(log(na.omit(HICP)))
 First step: local sub--index of a specific price collected item $R_{iy}^t$:
 % for each city y from all its outlets j, by use of the geometric mean of all prices collected from the outlets
 \begin{eqnarray}
-R_{iy}^t & = & \frac{(\prod_{j=1}^n p_{iyj}^t)^{1/n}}{(\prod_{j=1}^n p_{iyj}^0)^{1/n}}
+R_{iy}^t & = & \frac{(\prod_{j=1}^n p_{iyj}^t)^{1/n}}{(\prod_{j=1}^n p_{iyj}^0)^{1/n}} \nonumber
 \end{eqnarray}
 
 Second step: sub--index for whole country $R_i^t$:
 % weighted mean of the subindices of this item for all cities
 \begin{eqnarray}
-R_i^t & = & \sum_{y=1}^m R_{iy}^t G_y 
+R_i^t & = & \sum_{y=1}^m R_{iy}^t G_y \nonumber
 \end{eqnarray}
 % where G_y is the population weight
 % this R_i^t is then weighted again: say food is part of HICP and chocolate is part of food, chocolate is weighted into overall food index
 \begin{eqnarray}
-R_h^{t,T} = R_h^{12,T-1} \left[ \frac{\sum_{i=1}^q w_i^T R_i^t/R_i^{12,T-1}}{\sum_{i=1}^q w_i^T} \right]
+R_h^{t,T} = R_h^{12,T-1} \left[ \frac{\sum_{i=1}^q w_i^T R_i^t/R_i^{12,T-1}}{\sum_{i=1}^q w_i^T} \right] \nonumber
 \end{eqnarray}
 % where q is the number of collected items in the food basket
 
 
 Third step: weighted average of all included individual subindices:
 \begin{eqnarray}
-HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T}
+HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T} \nonumber
 \end{eqnarray}
 % where gamma_i is some weight attached to food
 % so the HICP is: a weighted average (HICP_t) of a weighted average (R_i^t) of a weighted average R_{iy}^t
 % source: www.statistics.gr/portal/page/portal/ESYE/PAGE-themes?p_param=A0515&r_param=DKT90&y_param=MT&mytabs=0 the HICP Methodology
 \end{frame}
 
-
-\subsection{Methods}
+\subsection{Model}
 \begin{frame}
-\frametitle{Model}
 
-% sollte noch schön bündig sein
-
-\begin{eqnarray}
-& H_0: \theta_i = \theta_0 \; (i=1,...,n) 
-\end{eqnarray}
-
-% parameters estimated by negative log-likelihood (NLL)
-
-First order conditions $\psi(y_i,x_i,\theta_i)=\delta \psi(y_i,x_i,\theta_i)/\delta \theta$:
-
-\begin{eqnarray}
-& \underset{\theta \in \Theta}{argmin} \sum_{i=1}^n \psi(y_i,x_i,\theta) = \hat{\theta}, \\
-& \sum_{i=1}^n \psi(y_i,x_i,\hat{\theta}) = 0 
-\end{eqnarray}
-
-Under certain assumptions, a central limit theorem holds:
-% for details: Z2010 S.1698
-\begin{eqnarray}
-\sqrt{n}(\hat{\theta}) \overset{d}{\rightarrow} \mathcal{N}(0,A_0^{-1} B_0 A_0^{-1}), \\
-A_0 = plim \; n^{-1} \sum_{i=1}^n E[-\psi'(y_i,x_i,\theta_0)], \\
-B_0 = plim \; n^{-1} \sum_{i=1}^n VAR[-\psi(y_i,x_i,\theta_0)]
-\end{eqnarray}
-
-%where $\psi'$ is the derivative of $\psi$, again with respect to $\theta$. 
-
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Model}
-
-The empirical fluctuation process efp(.), defined as the decorrelated partial sum process of the empirical estimating functions, converges to a k-dimensional Brownian bridge $W^0(.)$ on the interval [0,1].
-
-\begin{eqnarray}
-efp(t) = \hat{B}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} \psi(y_i,x_i,\hat{\theta}) \; (0 \leq t \leq 1), \\
-efp(.) \overset{d}{\rightarrow} W^0(.)
-\end{eqnarray}
-\end{frame}
-
-
-\begin{frame}
 \frametitle{GL--Distribution}
 
+For series $y = 100\cdot log(HICP_t/HICP_{t-1})$ we assume a GL--distribution given by:
+
 \begin{eqnarray}
-f(\pi | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\frac{\pi_i-\theta}{\sigma}}}{(1+\exp^{-\frac{\pi_i-\theta}{\sigma}})^{(\delta+1)}}
+f(y | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})^{(\delta+1)}} \nonumber
 \end{eqnarray}
 
 with location ($\theta$), scale ($\sigma$) and shape ($\delta$). For $\delta=1$ the distribution simplifies to the logistic
 distribution, for $\delta < 1$ it is skewed to the left and for $\delta > 1$ it is skewed to the right. 
-
-
+% verify this: Regress+ Appendix A  Compendium of Common Probability Distributions 
 % include graphics to show densities, should be smaller....
 % as a explanation why to use the GL--distribution
-
 \end{frame}
 
 \begin{frame}
 \frametitle{Some examples}
 
-<<plot-some, fig=TRUE, height=4.5, width=8>>=
+<<examples, fig=TRUE, height=4.5, width=8>>=
 par(mfrow = c(1, 3))
 denp <- density(hicp[, "Finland"])
 plot(denp, ylab = "", main="left-skewed", xlab = "", xlim = c(-2, 2), ylim = c(0, 1.4))
@@ -200,8 +223,82 @@ plot(denp2, ylab = "", main="right-skewed", xlab = "", xlim = c(-2, 2), ylim = c
 \end{frame}
 
 
+\begin{frame}
+\frametitle{First 3 Moments of the GL--Distribution}
+% quelle: dp02_15.pdf
+% Paper: ML-Estimation in the Location-Scale-Shape Model of the Generalized Logistic Distribution
+\begin{eqnarray}
+E(y) & = & \theta + \sigma(\psi(\delta) - \psi(1)) \nonumber \\
+VAR(y) & = & \sigma^2(\psi'(1)+\psi'(\delta)) \nonumber \\
+SKEW(y) & = & \frac{\psi''(1) + \psi''(\delta)}{(\psi'(1)+\psi'(\delta))^\frac{3}{2}} \nonumber  
+\end{eqnarray}
+% where \psi is the digamma function Gamma'(b)/Gamma(b) and its derivatives  
+\end{frame}
 
 
+\begin{frame}
+% sollte noch schön bündig sein
+% then we want to know if there is some change in our distribution via variations in the scores
+\frametitle{Scores}
+
+The resulting score functions s() are given by:
+% for the parameters (the derivatives of the log-likelihood) 
+
+\small
+\begin{eqnarray}
+s(y,\theta) & = & \frac{\delta loglik(y|\theta,\sigma, \delta)}{\delta \theta}  \nonumber \\
+& = & \frac{1}{\sigma} - (\delta+1)\cdot\frac{\frac{1}{\sigma}\exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})}  \nonumber \\
+s(y,\delta) & = & \frac{\delta loglik(y|\theta,\sigma, \delta)}{\delta \delta} \nonumber \\
+& = &  \frac{1}{\delta} - \log(1+\exp^{-\frac{y-\theta}{\sigma}}) \nonumber \nonumber 
+\end{eqnarray}
+
+% where loglik is the log-likelihood of y
+
+\begin{eqnarray}
+s(y,\sigma) & = & \frac{\delta loglik(y|\theta,\sigma, \delta)}{\delta \sigma} \nonumber  \\
+& = & -\frac{1}{\sigma} + \frac{1}{\sigma^2}(y-\theta) - (\delta+1) \nonumber \\
+& \times &  \quad \frac{\frac{1}{\sigma^2}(y-\theta)\exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})} \nonumber
+\end{eqnarray}
+\end{frame}
+
+\begin{frame}
+\frametitle{Testing Procedure}
+
+% Are the moments stable?
+For the 3--dimensional parameter $\psi = (\theta, \sigma, \delta)$ we test:
+
+\begin{eqnarray}
+& H_0: \psi_i = \psi_0 \; (i=1,...,n) \nonumber
+\end{eqnarray}
+
+% parameters estimated by negative log-likelihood (NLL)
+
+\begin{eqnarray}
+& \underset{\psi \in \Psi}{argmin} \sum_{t=1}^n s(y_t,\psi) = \hat{\psi}, \nonumber\\
+& \sum_{t=1}^n s(y_t,\hat{\psi}) = 0 \nonumber
+\end{eqnarray}
+
+Under certain assumptions, a central limit theorem holds:
+% for details: Z2010 S.1698
+\begin{eqnarray}
+\sqrt{n}(\hat{\psi}) \overset{d}{\rightarrow} \mathcal{N}(0,A_0^{-1} B_0 A_0^{-1}), \nonumber \\
+A_0 = plim \; n^{-1} \sum_{t=1}^n E[-s'(y_t,\psi_0)], \nonumber \\
+B_0 = plim \; n^{-1} \sum_{t=1}^n VAR[-s(y_t,\psi_0)] \nonumber
+\end{eqnarray}
+%where $\psi'$ is the derivative of $\psi$, again with respect to $\theta$. 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{efp}
+
+The empirical fluctuation process efp(.), defined as the decorrelated partial sum process of the empirical estimating functions, converges to a 3-dimensional Brownian bridge $W^0(\cdot)$ on the interval [0,1].
+
+\begin{eqnarray}
+efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_t,\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
+efp(\cdot) \overset{d}{\rightarrow} W^0(.) \nonumber
+\end{eqnarray}
+\end{frame}
 
 
 \begin{frame}
@@ -210,7 +307,7 @@ plot(denp2, ylab = "", main="right-skewed", xlab = "", xlim = c(-2, 2), ylim = c
 We use Supremum of LM statistics:
 
 \begin{eqnarray}
-S_{supLM} = \underset{t \in [\pi, 1-\pi]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)}
+\underset{t \in [0.1, 0.9]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 
 and also supply a $\chi^2$ goodness of fit test for the GL--distribution.
@@ -218,42 +315,96 @@ and also supply a $\chi^2$ goodness of fit test for the GL--distribution.
 \end{frame}
 
 
-\subsection{Results}
+\begin{frame}
+\frametitle{Breakpoint Estimation}
+% if instability is detected, natural to ask when
+The partial log--likelihood is given by:
+\begin{eqnarray}
+\sum_{b=1}^B \sum_{\tau=\tau_{b-1}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+\end{eqnarray}
+% with systemspecific parameters \theta^{(b)}, \sigma^{(b)}, \delta^{(b) and breakpoints \tau_1,...\tau_B
+% simultaneously estimated
+% minimal segment size is 2 years = 24 observations
 
+% MORE 
+
+\end{frame}
+
+
+\subsection{An Example}
+
+\begin{frame}
+\frametitle{Slovenia}
+
+<<slovenia, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(1, 2))
+plot(hicp[, "Slovenia"], main="HICP", ylab="100 * diff(log(HICP))", xlab ="")
+denp <- density(hicp[, "Slovenia"])
+plot(denp, ylab = "", main="Density", xlab = "", xlim = c(-2, 2), ylim = c(0, 1.4))
+@
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Test}
+<<>>=
+i <- 18
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+\section*{\Sexpr{nam}}
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Moment changes}
+% for a better understanding of the sources of the change (change in shape means that it is now less skewed to the right, so inflation is lower)
+<<fig=TRUE, height=6, width=8>>=
+<<plot4>>
+@
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Goodness of fit Test}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{frame}
+
+
+
+
+
+
+
+\subsection{Results}
 \begin{frame}
 \frametitle{Result Table}
 
-\tiny
-\begin{table}[ht!p]
-\begin{center}
-\begin{tabular}{llll}
+
+
+\begin{longtable}{|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|}
 \hline
-Country        & Dates  & \multicolumn{2}{l}{Breakpoints}  \\ \hline
-Austria        & 1999--2002   	& Sep 2007 &          \\
-Belgium        & 1999--2002   	& Dec 1999 &          \\
-Czech Republic & no--no		 			& Jul 1998 &          \\
-Denmark        & 1999--no 			& Jun 2000 &          \\
-Estonia        & 2004--2011   	& Mar 1998 &          \\
-Finland        & 1999--2002   	& none     &          \\
-France         & 1999--2002   	& Dec 2004 &          \\
-Germany        & 1999--2002   	& May 2000 & Dec 2004 \\
-Greece         & 2001--2002   	& none     &          \\
-Hungary        & no--no       	& May 1998 &          \\
-Ireland        & 1999--2002   	& Mar 2008 &          \\
-Italy          & 1999--2002   	& May 1996 & Dec 2000 \\
-Luxembourg     & 1999--2002   	& Dec 1998 &          \\
-Netherlands    & 1999--2002   	& none     &          \\
-Poland         & no--no      		& May 2001 &          \\
-Portugal       & 1999--2002   	& Jul 1992 & Mar 2004 \\
-Slovakia       & 2005--2009   & Apr 1997 & Feb 2004 \\
-Slovenia       & 2004--2007   & Jul 2003 &          \\
-Spain          & 1999--2002   & May 1996 & Dec 2000 \\
-Sweden         & no--no      & Jan 1993 &          \\
-United Kingdom & no--no       & Apr 1992 &          \\ \hline
-\end{tabular}
-\caption{\label{tab:breakpoints} Dating of break points. First date: entry to ERM~II, second date: EURO introduction.}
-\end{center}
-\end{table}
+{\bf Country} & {\bf Segment 1} & {\bf Segment 2} & {\bf ERM II} & {\bf EURO}   \\
+\hline
+Austria & bla & bla & 1999(1) & bla \\
+\hline
+\end{longtable}
+
+% ERM II not good information, leave out, since ERM II only for non EURO countries, and EMS (european monetary system) as the prior organisation very unstable
 
 \end{frame}
 
