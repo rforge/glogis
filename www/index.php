@@ -26,31 +26,29 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 </table>
 
 
-<h1>glogis: Fitting and Testing Generalized Logistic Distributions</h1>
-<h2>Thomas Winderberger, Achim Zeileis</h2>
+<h2>glogis: Fitting and Testing Generalized Logistic Distributions</h2>
+<h3>Thomas Winderberger, Achim Zeileis</h3>
 
-<?php if ($handle=fopen('http://'.$domain.'/export/projtitl.php?group_name='.$group_name,'r')){
-$contents = '';
-while (!feof($handle)) {
-	$contents .= fread($handle, 8192);
-}
-fclose($handle);
-echo $contents; } ?>
+<p>R package for fitting and testing generalized logistic distributions (type I).</p>
 
-<p>
-  <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name;?>/">Project summary page</a>.
-</p>
+<ul>
+  <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name;?>/">R-Forge summary page</a>.
+  <li>R package: [<a href="https://R-Forge.R-project.org/src/contrib/glogis_0.0-4.tar.gz">source package</a>]
+      [<a href="https://R-Forge.R-project.org/bin/windows/contrib/latest/glogis_0.0-4.zip">Windows binary</a>]
+      [<a href="https://R-Forge.R-project.org/bin/macosx/leopard/contrib/latest/glogis_0.0-4.tgz">MacOS X binary</a>]
+</ul>
 
 
-<h1>Structural Breaks in Inflation Dynamics within the European Monetary Union</h1>
-<h2>Thomas Winderberger, Achim Zeileis</h2>
+<h2>Structural Breaks in Inflation Dynamics within the European Monetary Union</h2>
+<h3>Thomas Winderberger, Achim Zeileis</h3>
+
+<p>Investigation of European inflation rates based on Harmonized Index of Consumer Prices (HICP).
+Inflation series are estimated by generalized logistic distribution model, tested for structural breaks, and (if any) breakpoints
+are determined.</p>
 
 <ul>
   <li><a href="https://R-Forge.R-project.org/scm/viewvc.php/*checkout*/pkg/paper/Slides/slides.pdf?root=glogis">Slides</a></li>
   <li><a href="https://R-Forge.R-project.org/scm/viewvc.php/*checkout*/pkg/paper/Paper/draft.pdf?root=glogis">Manuscript draft</a></li>
-  <li>R package: [<a href="https://R-Forge.R-project.org/src/contrib/glogis_0.0-4.tar.gz">source package</a>]
-      [<a href="https://R-Forge.R-project.org/bin/windows/contrib/latest/glogis_0.0-4.zip">Windows binary</a>]
-      [<a href="https://R-Forge.R-project.org/bin/macosx/leopard/contrib/latest/glogis_0.0-4.tgz">MacOS X binary</a>]
 </ul>
 
 </body>
