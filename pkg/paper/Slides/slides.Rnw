@@ -91,7 +91,7 @@ plot(x_efp, aggregate = FALSE)
 
 \title{Structural Breaks in Inflation Dynamics within the European Monetary Union}
 \author{Thomas Windberger, Achim Zeileis}
-\URL{http://R-Forge.R-project.org/projects/glogis/}
+\URL{http://glogis.R-Forge.R-project.org/}
 \lecture{Structural Breaks in Inflation Dynamics within the European Monetary Union}
 
 
@@ -387,24 +387,78 @@ load(fnam)
 
 
 
-
-
-
 \subsection{Results}
 \begin{frame}
 \frametitle{Result Table}
 
+% automatical inclusion does not work
 
-
-\begin{longtable}{|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|}
+\begin{longtable}{|p{1.6cm}|p{1.6cm}|p{1.6cm}|p{1.6cm}|p{1.5cm}|p{1.5cm}|}
 \hline
-{\bf Country} & {\bf Segment 1} & {\bf Segment 2} & {\bf ERM II} & {\bf EURO}   \\
+{\bf Country} & {\bf Segment 1} & {\bf Segment 2} & {\bf Segment 3} & {\bf EMS/ERM II} & {\bf EURO}   \\
 \hline
-Austria & bla & bla & 1999(1) & bla \\
+Austria & 1990(2)--2007(9)   & 2007(10)--2010(3)  & -- & 1995(1) & 1999(1) \\
 \hline
+Belgium & bla & bla & bla & 1979(1) & 1999(1) \\
+\hline
+Czech Republic & bla & bla & bla & no & no \\
+\hline
+Denmark & bla & bla & bla & 1999(1) & no   \\
+\hline
+Estonia  & bla & bla & bla & 2004(6) & 2011(1) \\
+\hline 
+Finland & bla & bla &  bla & 1996(10) & 1999(1) \\
+\hline 
+France & bla & bla & & bla 1979(1) & 1999(1) \\
+\hline
+Germany & bla & bla &  bla & 1979(1) & 1999(1) \\
+\hline 
+Greece & bla & bla & bla & 1999(1) & 2001(1) \\
+\hline
+Hungary & bla & bla & bla & no & no \\
+\hline
+Ireland & bla & bla & bla & 1979(1) & 1999(1) \\
+\hline
+Italy & bla & bla & bla & 1979(1) & 1999(1) \\
+\hline 
+Luxembourg  & bla & bla & bla & 1979(1) & 1999(1) \\
+\hline
+Netherlands  & bla & bla & bla & 1979(1) & 1999(1) \\
+\hline
+Poland & bla & bla & bla & no & no \\
+\hline
+Portugal & bla & bla & bla & 1992(4) & 1999(1) \\
+\hline
+Slovakia & bla & bla & bla & 2005(11) & 2009(1) \\
+\hline
+Slovenia & bla & bla & bla & 2004(6) & 2007(1) \\
+\hline
+Spain & bla & bla & bla & 1989(6) 1999(1) \\
+\hline
+Sweden & bla & bla & bla & no & no \\
+\hline
+United Kingdom & bla & bla & bla & 1990(10)\footnote{left after the Black Wednesday 1992} & no \\
+\hline 
 \end{longtable}
 
-% ERM II not good information, leave out, since ERM II only for non EURO countries, and EMS (european monetary system) as the prior organisation very unstable
+
+% Ziel: hier in der Tabelle alle Daten automatisch von R einfügen, dafür den Vormittag verwenden, am Nachmittag Rest machen (also die neuen Folien mit der 
+% Ländergruppierung
+
+%\begin{verbatim}
+%<<echo=FALSE, results=tex>>=
+%coef(x_bp, breaks = x_nbreaks)
+%@
+%
+%
+%<<echo=FALSE, results=tex>>=
+%moments(x_bp, breaks = x_nbreaks)
+%@
+%
+%
+%\end{verbatim}
+
+
 
 \end{frame}
 

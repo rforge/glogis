@@ -1,5 +1,8 @@
 \documentclass[nojss]{jss}
 \usepackage[latin1]{inputenc}
+\usepackage{longtable}
+\usepackage{lscape}
+\usepackage{multirow}
 
 \graphicspath{{Figures/}}
 
@@ -155,36 +158,162 @@ To help with the interpretation, we give a short overview over the history of th
 % http://en.wikipedia.org/wiki/European_Exchange_Rate_Mechanism#Replacement_with_the_euro_and_ERM_II
 % http://en.wikipedia.org/wiki/Eurozone
 
-\begin{table}[ht!p]
-\begin{center}
-\begin{tabular}{llll}
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
 \hline
-Country        & Dates  & \multicolumn{2}{l}{Breakpoints}  \\ \hline
-Austria        & 1995--2002   	& Sep 2007 &          \\
-Belgium        & 1979--2002   	& Dec 1999 &          \\
-Czech Republic & no--no		 			& Jul 1998 &          \\
-Denmark        & 1979/1999--no 			& Jun 2000 &          \\
-Estonia        & 2004--2011   	& Mar 1998 &          \\
-Finland        & 1996--2002   	& none     &          \\
-France         & 1979--2002   	& Dec 2004 &          \\
-Germany        & 1979--2002   	& May 2000 & Dec 2004 \\
-Greece         & 1998--2002   	& none     &          \\
-Hungary        & no--no       	& May 1998 &          \\
-Ireland        & 1979--2002   	& Mar 2008 &          \\
-Italy          & 1979--2002   	& May 1996 & Dec 2000 \\
-Luxembourg     & 1979--2002   	& Dec 1998 &          \\
-Netherlands    & 1979--2002   	& none     &          \\
-Poland         & no--no      		& May 2001 &          \\
-Portugal       & 1992--2002   	& Jul 1992 & Mar 2004 \\
-Slovakia       & 2005--2009   & Apr 1997 & Feb 2004 \\
-Slovenia       & 2004--2007   & Jul 2003 &          \\
-Spain          & 1989--2002   & May 1996 & Dec 2000 \\
-Sweden         & no--no      & Jan 1993 &          \\
-United Kingdom & 1990--no       & Apr 1992 &          \\ \hline
-\end{tabular}
-\caption{\label{tab:breakpoints} Dating of break points. First date: entry to EMS or ERM~II, second date: EURO introduction.}
-\end{center}
-\end{table}
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Austria} & 1990(2)--2007(9)   & 2007(10)--2010(3) & -- & 1995(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1635 & mean: 0.1731 & &  &  \\
+ & var: 0.05694 & var: 0.16310 & &  &  \\
+ & skew: 0.6056 & skew: 0.1691 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Belgium} & 1991(2)--1999(12)   & 2001(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1459 & mean: 0.1768 & &  &  \\
+ & var: 0.06401 & var: 0.95401 & &  &  \\
+ & skew: -0.03708 & skew: 0.50356 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Czech Republic} & 1995(2)--1998(7)   & 1998(8)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.6969 & mean: 0.1821& &  &  \\
+ & var: 0.3363 & var: 0.2156 & &  &  \\
+ & skew: 1.139 & skew: 0.990 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Denmark} & 1990(2)--2000(6)   & 2000(7)--2010(3) & -- & 1999(1) & no \\ 
+\cline{2-4}
+ & mean: 0.1664 & mean: 0.1676& &  &  \\
+ & var: 0.09078 & var: 0.18758 & &  &  \\
+ & skew: -0.7425 & skew: 1.0471 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Estonia} & 1996(2)--1998(3)   & 1998(4)--2010(3) & -- & 2004(6) & 2011(1) \\ 
+\cline{2-4}
+ & mean: 0.8649 & mean: 0.3328 & &  &  \\
+ & var: 0.4196 & var: 0.2062 & &  &  \\
+ & skew: 0.4041 & skew: 0.8016 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Finland} & 1990(2)--2010(3)   & -- & -- & 1996(10) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1653 &  & &  &  \\
+ & var: 0.1321 &  & &  &  \\
+ & skew: 0.2798 &  &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{France} & 1990(2)--2004(12)   & 2005(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1588 & mean: 0.1504 & &  &  \\
+ & var: 0.05769 & var: 0.13134 & &  &  \\
+ & skew: 0.1965 & skew: -0.7942 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Germany} & 1995(2)--2000(5)   & 2000(6)--2004(12) & 2005(1)--2010(3) & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.08799 & mean: 0.14018 & mean: 0.14183 &  &  \\
+ & var: 0.06013 & var: 0.16352 & var: 0.18384 &  &  \\
+ & skew: 0.9219 & skew: 0.9920 & skew: -0.6625 &  &  \\
+\hline
+\newpage 
+\hline
+\multirow{4}{*}{Greece} & 1995(2)--2010(3)   & -- & -- & 1999(1) & 2001(1) \\ 
+\cline{2-4}
+ & mean: 0.3227 &  & &  &  \\
+ & var: 1.48 &  & &  &  \\
+ & skew: 0.4314 &  &   &  &  \\
+\hline
+\hline
+\multirow{4}{*}{Hungary} & 1995(2)--1998(5)   & 1998(6)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 1.6064 & mean: 0.5068 & &  &  \\
+ & var: 1.0243 & var: 0.3161 & &  &  \\
+ & skew: 0.8781 & skew: 0.7095 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Ireland} & 1995(2)--2008(3)   & 2008(4)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.2546 & mean: -0.1313 & &  &  \\
+ & var: 0.2045 & var: 0.1836 & &  &  \\
+ & skew: -0.6958 & skew: -0.9947 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Italy} & 1990(2)--1996(5)   & 1996(7)--2000(12) & 2001(1)--2010(3) & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.4135 & mean: 0.1676 & mean: 0.1819&  &  \\
+ & var: 0.04129 & var: 0.01997 & var: 0.32117 &  &  \\
+ & skew: 0.9627 & skew: 0.7261 & skew: -0.2605 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Luxembourg} & 1995(2)--1998(12)   & 1999(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.08761 & mean: 0.22425 & &  &  \\
+ & var: 0.01340 & var: 0.53108 & &  &  \\
+ & skew: 0.2606 & skew: -0.4836 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Netherlands} & 1990(2)--2010(3)   & -- & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1854 &  & &  &  \\
+ & var: 0.293 &  & &  &  \\
+ & skew: 0.5984 &  &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Poland} & 1996(2)--2001(5)   & 2001(6)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.8548 & mean: 0.2024 & &  &  \\
+ & var: 0.4212 & var: 0.1232 & &  &  \\
+ & skew: 0.6675 & skew: -0.3148 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Portugal} & 1990(2)--1992(7)   & 1992(8)--2004(3) & 2004(4)--2010(3) & 1992(4) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.8519 & mean: 0.2700 & mean: 0.1605&  &  \\
+ & var: 0.1718 & var: 0.1052 & var: 0.2559 &  &  \\
+ & skew: 1.1394 & skew: 0.8653 & skew: 0.5690 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Slovakia} & 1995(2)--1997()   & 1997(5)--2004(2) & 2004(3)--2010(3) & 2005(11) & 2009(1) \\ 
+\cline{2-4}
+ & mean: 0.4799 & mean: 0.5872 & mean: 0.1865 &  &  \\
+ & var: 0.05768 & var: 0.44150 & var: 0.08903 &  &  \\
+ & skew: 1.139 & skew: 1.140 & skew: 1.139 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Slovenia} & 1996(2)--2003(7)   & 2003(8)--2010(3) & -- & 2004(6) & 2007(1) \\ 
+\cline{2-4}
+ & mean: 0.6309 & mean: 0.2436 & &  &  \\
+ & var: 0.2108 & var: 0.3440 & &  &  \\
+ & skew: 0.5883 & skew: 0.1426 &   &  &  \\
+\hline 
+\newpage
+\hline
+\multirow{4}{*}{Spain} & 1992(2)--1996(5)   & 1996(6)--2000(12) & 2001(1)--2010(3) & 1989(6) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.3724 & mean: 0.2001 & mean: 0.2225 &  &  \\
+ & var: 0.06960 & var: 0.03988 & var: 0.34215 &  &  \\
+ & skew: 1.13909 & skew: 0.01874 & skew: -0.36200 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Sweden} & 1990(2)--1993(1)   & 1993(2)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.4748 & mean: 0.1552 & &  &  \\
+ & var: 0.5715 & var: 0.1848 & &  &  \\
+ & skew: 1.1393 & skew: 0.5344 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{United Kingdom} & 1990(2)--1992(4)   & 1992(5)--2010(3) & -- & 1990(10)\footnote{left after the Black Wednesday 1992} & no \\ 
+\cline{2-4}
+ & mean: 0.5703 & mean: 0.1615 & &  &  \\
+ & var: 0.3869 & var: 0.1490 & &  &  \\
+ & skew: 1.139 & skew: -1.265 &   &  &  \\
+\hline 
+\end{longtable}
+
+% \endfoot beendet ganz
 
 % EMS was never very stable
 % careful: ERM II für nicht EURO Mitglieder, EMS war Vorgänger, auch für EURO Mitglieder
