@@ -32,7 +32,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <p>R package for fitting and testing generalized logistic distributions (type I).</p>
 
 <ul>
-  <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name;?>/">R-Forge summary page</a>.
+  <li><a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name;?>/">R-Forge summary page</a></li>
   <li>R package: [<a href="https://R-Forge.R-project.org/src/contrib/glogis_0.0-4.tar.gz">source package</a>]
       [<a href="https://R-Forge.R-project.org/bin/windows/contrib/latest/glogis_0.0-4.zip">Windows binary</a>]
       [<a href="https://R-Forge.R-project.org/bin/macosx/leopard/contrib/latest/glogis_0.0-4.tgz">MacOS X binary</a>]
