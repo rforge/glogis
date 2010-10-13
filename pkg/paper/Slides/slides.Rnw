@@ -2,6 +2,7 @@
 \usetheme{Z}
 \usepackage{amsfonts,amstext,amsmath}
 \usepackage{longtable}
+\usepackage{multirow}
 %% need no \usepackage{Sweave}
 
 \setkeys{Gin}{width=\textwidth}
@@ -102,23 +103,16 @@ plot(x_efp, aggregate = FALSE)
 
 \begin{itemize}
   \item Introduction
-    \item Data
-  \begin{itemize}
-    \item HICP
-  \end{itemize}
+  \item Data
+%  \begin{itemize}
+%    \item HICP
+%  \end{itemize}
   \item Model
-    \begin{itemize}
-    \item GL--Distribution
-  \end{itemize}
-  \item Results
-  \item Methods
-  \begin{itemize}
-    \item Model
-    \begin{itemize}
-    	\item Test
-    \end{itemize}
-    \item Distribution reasoning
-  \end{itemize} 
+%    \begin{itemize}
+%    \item GL--Distribution
+% 		\end{itemize}
+  \item Example
+  \item Result Tables
 \end{itemize}
 
 
@@ -237,7 +231,6 @@ SKEW(y) & = & \frac{\psi''(1) + \psi''(\delta)}{(\psi'(1)+\psi'(\delta))^\frac{3
 
 
 \begin{frame}
-% sollte noch schön bündig sein
 % then we want to know if there is some change in our distribution via variations in the scores
 \frametitle{Scores}
 
@@ -282,8 +275,8 @@ Under certain assumptions, a central limit theorem holds:
 % for details: Z2010 S.1698
 \begin{eqnarray}
 \sqrt{n}(\hat{\psi}) \overset{d}{\rightarrow} \mathcal{N}(0,A_0^{-1} B_0 A_0^{-1}), \nonumber \\
-A_0 = plim \; n^{-1} \sum_{t=1}^n E[-s'(y_t,\psi_0)], \nonumber \\
-B_0 = plim \; n^{-1} \sum_{t=1}^n VAR[-s(y_t,\psi_0)] \nonumber
+%A_0 = plim \; n^{-1} \sum_{t=1}^n E[-s'(y_t,\psi_0)], \nonumber \\
+%B_0 = plim \; n^{-1} \sum_{t=1}^n VAR[-s(y_t,\psi_0)] \nonumber
 \end{eqnarray}
 %where $\psi'$ is the derivative of $\psi$, again with respect to $\theta$. 
 \end{frame}
@@ -291,12 +284,12 @@ B_0 = plim \; n^{-1} \sum_{t=1}^n VAR[-s(y_t,\psi_0)] \nonumber
 
 \begin{frame}
 \frametitle{efp}
-
-The empirical fluctuation process efp(.), defined as the decorrelated partial sum process of the empirical estimating functions, converges to a 3-dimensional Brownian bridge $W^0(\cdot)$ on the interval [0,1].
+% similar to a cumulated sum of residuals
+The empirical fluctuation process $efp(\cdot)$, defined as the decorrelated partial sum process of the empirical estimating functions, converges to a 3-dimensional Brownian bridge $W^0(\cdot)$ on the interval [0,1].
 
 \begin{eqnarray}
 efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_t,\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
-efp(\cdot) \overset{d}{\rightarrow} W^0(.) \nonumber
+efp(\cdot) \overset{d}{\rightarrow} W^0(\cdot) \nonumber
 \end{eqnarray}
 \end{frame}
 
@@ -318,20 +311,22 @@ and also supply a $\chi^2$ goodness of fit test for the GL--distribution.
 \begin{frame}
 \frametitle{Breakpoint Estimation}
 % if instability is detected, natural to ask when
+% assumge segments in data, that are stable but change with every segment
 The partial log--likelihood is given by:
 \begin{eqnarray}
 \sum_{b=1}^B \sum_{\tau=\tau_{b-1}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 \end{eqnarray}
+
+Breakpoint selection via modified BIC 
+% search over all conceivable partitions can be cut shortly applying Bellman principle 
 % with systemspecific parameters \theta^{(b)}, \sigma^{(b)}, \delta^{(b) and breakpoints \tau_1,...\tau_B
 % simultaneously estimated
 % minimal segment size is 2 years = 24 observations
 
-% MORE 
-
 \end{frame}
 
 
-\subsection{An Example}
+\subsection{Example}
 
 \begin{frame}
 \frametitle{Slovenia}
@@ -352,7 +347,7 @@ i <- 18
 nam <- colnames(HICP)[i]
 fnam <- paste(nam, ".rda", sep = "")
 @
-\section*{\Sexpr{nam}}
+%\section*{\Sexpr{nam}}
 <<>>=
 if(file.exists(fnam)) {
 load(fnam)
@@ -385,143 +380,6 @@ load(fnam)
 \end{frame}
 
 
-
-
-\subsection{Results}
-\begin{frame}
-\frametitle{Result Table}
-
-% automatical inclusion does not work
-
-\begin{longtable}{|p{1.6cm}|p{1.6cm}|p{1.6cm}|p{1.6cm}|p{1.5cm}|p{1.5cm}|}
-\hline
-{\bf Country} & {\bf Segment 1} & {\bf Segment 2} & {\bf Segment 3} & {\bf EMS/ERM II} & {\bf EURO}   \\
-\hline
-Austria & 1990(2)--2007(9)   & 2007(10)--2010(3)  & -- & 1995(1) & 1999(1) \\
-\hline
-Belgium & bla & bla & bla & 1979(1) & 1999(1) \\
-\hline
-Czech Republic & bla & bla & bla & no & no \\
-\hline
-Denmark & bla & bla & bla & 1999(1) & no   \\
-\hline
-Estonia  & bla & bla & bla & 2004(6) & 2011(1) \\
-\hline 
-Finland & bla & bla &  bla & 1996(10) & 1999(1) \\
-\hline 
-France & bla & bla & & bla 1979(1) & 1999(1) \\
-\hline
-Germany & bla & bla &  bla & 1979(1) & 1999(1) \\
-\hline 
-Greece & bla & bla & bla & 1999(1) & 2001(1) \\
-\hline
-Hungary & bla & bla & bla & no & no \\
-\hline
-Ireland & bla & bla & bla & 1979(1) & 1999(1) \\
-\hline
-Italy & bla & bla & bla & 1979(1) & 1999(1) \\
-\hline 
-Luxembourg  & bla & bla & bla & 1979(1) & 1999(1) \\
-\hline
-Netherlands  & bla & bla & bla & 1979(1) & 1999(1) \\
-\hline
-Poland & bla & bla & bla & no & no \\
-\hline
-Portugal & bla & bla & bla & 1992(4) & 1999(1) \\
-\hline
-Slovakia & bla & bla & bla & 2005(11) & 2009(1) \\
-\hline
-Slovenia & bla & bla & bla & 2004(6) & 2007(1) \\
-\hline
-Spain & bla & bla & bla & 1989(6) 1999(1) \\
-\hline
-Sweden & bla & bla & bla & no & no \\
-\hline
-United Kingdom & bla & bla & bla & 1990(10)\footnote{left after the Black Wednesday 1992} & no \\
-\hline 
-\end{longtable}
-
-
-% Ziel: hier in der Tabelle alle Daten automatisch von R einfügen, dafür den Vormittag verwenden, am Nachmittag Rest machen (also die neuen Folien mit der 
-% Ländergruppierung
-
-%\begin{verbatim}
-%<<echo=FALSE, results=tex>>=
-%coef(x_bp, breaks = x_nbreaks)
-%@
-%
-%
-%<<echo=FALSE, results=tex>>=
-%moments(x_bp, breaks = x_nbreaks)
-%@
-%
-%
-%\end{verbatim}
-
-
-
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Austria}
-
-% possibly better to just insert from results.pdf
-
-\begin{figure}[ht!p]
-  \centering
-    \includegraphics{results-012.pdf}
-  \caption{Series and supLM test for Austria}
-  \label{aut}
-\end{figure}
-
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Austria}
-
-% possibly better to just insert from results.pdf
-
-\begin{figure}[ht!p]
-  \centering
-    \includegraphics{results-014.pdf}
-  \caption{Goodness of fit test for Austria}
-  \label{aut}
-\end{figure}
-
-\end{frame}
-
-
-
-\begin{frame}
-\frametitle{Austria}
-
-Economic Interpretation: 
-
-\begin{itemize}
-\item Oil price increase
-\item Increase in mineral taxes 	
-\item No change following EURO introduction
-\end{itemize}
-
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Slovenia}
-
-% possibly better to just insert from results.pdf
-
-\begin{figure}[ht!p]
-  \centering
-    \includegraphics{results-131.pdf}
-  \caption{Series and supLM test for Slovenia}
-  \label{aut}
-\end{figure}
-\end{frame}
-
-
 \begin{frame}
 \frametitle{Slovenia}
 
@@ -537,6 +395,316 @@ Economic Interpretation:
 \end{itemize}
 
 \end{frame}
+
+
+
+\subsection{Result Table}
+\begin{frame}
+\frametitle{Result Table}
+
+% in subgropus ? (and only small results?)
+
+\begin{itemize}
+\item 6 possible groups:
+\item Central countries: Austria, France, Germany 
+\item Eastern countries: Czech Republic, Estonia, Hungary, Poland, Slovakia and Slovenia
+\item Ireland
+% finacial crisis
+\item No change countries: Finland, Greece, Netherlands
+\item Northern counries: Denmark, Sweden, United Kingdom
+% allthough Denmark rather special case
+\item Southern countries: Italy, Portugal, Spain; with Belgium and Luxembourg 
+% since last two show similar behaviour
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Central countries:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Austria} & 1990(2)--2007(9)   & 2007(10)--2010(3) & -- & 1995(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1635 & mean: 0.1731 & &  &  \\
+ & var: 0.05694 & var: 0.16310 & &  &  \\
+ & skew: 0.6056 & skew: 0.1691 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{France} & 1990(2)--2004(12)   & 2005(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1588 & mean: 0.1504 & &  &  \\
+ & var: 0.05769 & var: 0.13134 & &  &  \\
+ & skew: 0.1965 & skew: -0.7942 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Germany} & 1995(2)--2000(5)   & 2000(6)--2004(12) & 2005(1)--2010(3) & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.08799 & mean: 0.14018 & mean: 0.14183 &  &  \\
+ & var: 0.06013 & var: 0.16352 & var: 0.18384 &  &  \\
+ & skew: 0.9219 & skew: 0.9920 & skew: -0.6625 &  &  \\
+\hline
+\hline 
+\end{longtable}
+\end{frame}
+
+\begin{frame}
+\frametitle{Central countries:}
+% input graphics
+<<central, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(2, 2))
+plot(hicp[, "Austria"], main="Austria", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "France"], main="France", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Germany"], main="Germany", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+\begin{frame}
+\frametitle{Eastern countries:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Czech Republic} & 1995(2)--1998(7)   & 1998(8)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.6969 & mean: 0.1821& &  &  \\
+ & var: 0.3363 & var: 0.2156 & &  &  \\
+ & skew: 1.139 & skew: 0.990 &   &  &  \\
+\hline
+\hline
+\multirow{4}{*}{Estonia} & 1996(2)--1998(3)   & 1998(4)--2010(3) & -- & 2004(6) & 2011(1) \\ 
+\cline{2-4}
+ & mean: 0.8649 & mean: 0.3328 & &  &  \\
+ & var: 0.4196 & var: 0.2062 & &  &  \\
+ & skew: 0.4041 & skew: 0.8016 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Hungary} & 1995(2)--1998(5)   & 1998(6)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 1.6064 & mean: 0.5068 & &  &  \\
+ & var: 1.0243 & var: 0.3161 & &  &  \\
+ & skew: 0.8781 & skew: 0.7095 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Poland} & 1996(2)--2001(5)   & 2001(6)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.8548 & mean: 0.2024 & &  &  \\
+ & var: 0.4212 & var: 0.1232 & &  &  \\
+ & skew: 0.6675 & skew: -0.3148 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Slovakia} & 1995(2)--1997(4)   & 1997(5)--2004(2) & 2004(3)--2010(3) & 2005(11) & 2009(1) \\ 
+\cline{2-4}
+ & mean: 0.4799 & mean: 0.5872 & mean: 0.1865 &  &  \\
+ & var: 0.05768 & var: 0.44150 & var: 0.08903 &  &  \\
+ & skew: 1.139 & skew: 1.140 & skew: 1.139 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Slovenia} & 1996(2)--2003(7)   & 2003(8)--2010(3) & -- & 2004(6) & 2007(1) \\ 
+\cline{2-4}
+ & mean: 0.6309 & mean: 0.2436 & &  &  \\
+ & var: 0.2108 & var: 0.3440 & &  &  \\
+ & skew: 0.5883 & skew: 0.1426 &   &  &  \\
+\hline
+\hline 
+\end{longtable}
+\end{frame}
+
+\begin{frame}
+\frametitle{Central countries:}
+% input graphics
+<<eastern, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(2, 3))
+plot(hicp[, "CzechRepublic"], main="Czech Republic", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Estonia"], main="Estonia", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Hungary"], main="Hungary", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Poland"], main="Poland", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Slovakia"], main="Slovakia", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Slovenia"], main="Slovenia", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Ireland:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Ireland} & 1995(2)--2008(3)   & 2008(4)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.2546 & mean: -0.1313 & &  &  \\
+ & var: 0.2045 & var: 0.1836 & &  &  \\
+ & skew: -0.6958 & skew: -0.9947 &   &  &  \\
+\hline 
+\hline 
+\end{longtable}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ireland:}
+% input graphics
+<<ireland, fig=TRUE, height=4.5, width=8>>=
+plot(hicp[, "Ireland"], main="Ireland", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+\begin{frame}
+\frametitle{No change countries:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Finland} & 1990(2)--2010(3)   & -- & -- & 1996(10) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1653 &  & &  &  \\
+ & var: 0.1321 &  & &  &  \\
+ & skew: 0.2798 &  &   &  &  \\
+\hline
+\hline
+\multirow{4}{*}{Greece} & 1995(2)--2010(3)   & -- & -- & 1999(1) & 2001(1) \\ 
+\cline{2-4}
+ & mean: 0.3227 &  & &  &  \\
+ & var: 1.48 &  & &  &  \\
+ & skew: 0.4314 &  &   &  &  \\
+\hline
+\hline
+\multirow{4}{*}{Netherlands} & 1990(2)--2010(3)   & -- & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1854 &  & &  &  \\
+ & var: 0.293 &  & &  &  \\
+ & skew: 0.5984 &  &   &  &  \\
+\hline 
+\hline 
+\end{longtable}
+\end{frame}
+
+\begin{frame}
+\frametitle{No change countries:}
+% input graphics
+<<nochange, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(2, 2))
+plot(hicp[, "Finland"], main="Finland", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Greece"], main="Greece", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Netherlands"], main="Netherlands", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+\begin{frame}
+\frametitle{Northern countries:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Denmark} & 1990(2)--2000(6)   & 2000(7)--2010(3) & -- & 1999(1) & no \\ 
+\cline{2-4}
+ & mean: 0.1664 & mean: 0.1676& &  &  \\
+ & var: 0.09078 & var: 0.18758 & &  &  \\
+ & skew: -0.7425 & skew: 1.0471 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Sweden} & 1990(2)--1993(1)   & 1993(2)--2010(3) & -- & no & no \\ 
+\cline{2-4}
+ & mean: 0.4748 & mean: 0.1552 & &  &  \\
+ & var: 0.5715 & var: 0.1848 & &  &  \\
+ & skew: 1.1393 & skew: 0.5344 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{United Kingdom} & 1990(2)--1992(4)   & 1992(5)--2010(3) & -- & 1990(10) & no \\ 
+\cline{2-4}
+ & mean: 0.5703 & mean: 0.1615 & &  &  \\
+ & var: 0.3869 & var: 0.1490 & &  &  \\
+ & skew: 1.139 & skew: -1.265 &   &  &  \\
+\hline 
+\hline 
+\end{longtable}
+\end{frame}
+
+\begin{frame}
+\frametitle{Northern countries:}
+% input graphics
+<<northern, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(2, 2))
+plot(hicp[, "Denmark"], main="Denmark", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Sweden"], main="Sweden", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "UnitedKingdom"], main="United Kingdom", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+\begin{frame}
+\frametitle{Southern countries:}
+\tiny
+\begin{longtable}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|} 
+\hline
+Country & Segment~1 & Segment~2 & Segment~3 & ERM~II/EMS & EURO \\
+\hline
+\hline
+\multirow{4}{*}{Belgium} & 1991(2)--1999(12)   & 2000(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.1459 & mean: 0.1768 & &  &  \\
+ & var: 0.06401 & var: 0.95401 & &  &  \\
+ & skew: -0.03708 & skew: 0.50356 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Italy} & 1990(2)--1996(5)   & 1996(7)--2000(12) & 2001(1)--2010(3) & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.4135 & mean: 0.1676 & mean: 0.1819&  &  \\
+ & var: 0.04129 & var: 0.01997 & var: 0.32117 &  &  \\
+ & skew: 0.9627 & skew: 0.7261 & skew: -0.2605 &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Luxembourg} & 1995(2)--1998(12)   & 1999(1)--2010(3) & -- & 1979(1) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.08761 & mean: 0.22425 & &  &  \\
+ & var: 0.01340 & var: 0.53108 & &  &  \\
+ & skew: 0.2606 & skew: -0.4836 &   &  &  \\
+\hline 
+\hline
+\multirow{4}{*}{Portugal} & 1990(2)--1992(7)   & 1992(8)--2004(3) & 2004(4)--2010(3) & 1992(4) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.8519 & mean: 0.2700 & mean: 0.1605&  &  \\
+ & var: 0.1718 & var: 0.1052 & var: 0.2559 &  &  \\
+ & skew: 1.1394 & skew: 0.8653 & skew: 0.5690 &  &  \\
+\hline 
+\hline
+\hline
+\multirow{4}{*}{Spain} & 1992(2)--1996(5)   & 1996(6)--2000(12) & 2001(1)--2010(3) & 1989(6) & 1999(1) \\ 
+\cline{2-4}
+ & mean: 0.3724 & mean: 0.2001 & mean: 0.2225 &  &  \\
+ & var: 0.06960 & var: 0.03988 & var: 0.34215 &  &  \\
+ & skew: 1.13909 & skew: 0.01874 & skew: -0.36200 &  &  \\
+\hline 
+\end{longtable}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Southern countries:}
+
+% input graphics
+<<southern, fig=TRUE, height=4.5, width=8>>=
+par(mfrow = c(2, 3))
+plot(hicp[, "Belgium"], main="Belgium", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Italy"], main="Italy", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Luxemburg"], main="Luxembourg", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Portugal"], main="Portugal", ylab="100 * diff(log(HICP))", xlab ="")
+plot(hicp[, "Spain"], main="Spain", ylab="100 * diff(log(HICP))", xlab ="")
+@
+\end{frame}
+
+
+
 
 
 
