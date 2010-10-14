@@ -219,12 +219,12 @@ plot(denp2, ylab = "", main="right-skewed", xlab = "", xlim = c(-2, 2), ylim = c
 
 \begin{frame}
 \frametitle{First 3 Moments of the GL--Distribution}
-% quelle: dp02_15.pdf
+% quelle: dp02_15.pdf 
 % Paper: ML-Estimation in the Location-Scale-Shape Model of the Generalized Logistic Distribution
 \begin{eqnarray}
 E(y) & = & \theta + \sigma(\psi(\delta) - \psi(1)) \nonumber \\
 VAR(y) & = & \sigma^2(\psi'(1)+\psi'(\delta)) \nonumber \\
-SKEW(y) & = & \frac{\psi''(1) + \psi''(\delta)}{(\psi'(1)+\psi'(\delta))^\frac{3}{2}} \nonumber  
+SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3}{2}} \nonumber  
 \end{eqnarray}
 % where \psi is the digamma function Gamma'(b)/Gamma(b) and its derivatives  
 \end{frame}
@@ -305,6 +305,8 @@ We use Supremum of LM statistics:
 
 and also supply a $\chi^2$ goodness of fit test for the GL--distribution.
 
+% goodness of fit test H0 is not rejected 23-21 (44 periods in total) times, ie. in 52% of the cases
+
 \end{frame}
 
 
@@ -313,6 +315,7 @@ and also supply a $\chi^2$ goodness of fit test for the GL--distribution.
 % if instability is detected, natural to ask when
 % assumge segments in data, that are stable but change with every segment
 The partial log--likelihood is given by:
+% partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
 \sum_{b=1}^B \sum_{\tau=\tau_{b-1}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 \end{eqnarray}
@@ -393,7 +396,6 @@ Economic Interpretation:
 \item strong contraction in money supply (M1) starting in 2003 
 % search for good explanations, why variance is always higher 
 \end{itemize}
-
 \end{frame}
 
 
