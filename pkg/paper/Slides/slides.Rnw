@@ -5,6 +5,7 @@
 \usepackage{multirow}
 %% need no \usepackage{Sweave}
 
+
 \setkeys{Gin}{width=\textwidth}
 \SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, keep.source=TRUE}
 
@@ -14,6 +15,7 @@
 ## packages
 library("glogis")
 library("fxregime")
+library("lattice")
 
 ## additional functions
 moments <- function(object, ...) UseMethod("moments")
@@ -63,7 +65,7 @@ erm <- yearmon(c(
 	Hungary = NA,
 	Ireland = 1979 + 2/12,
 	Italy = 1979 + 2/12,
-	Luxemburg = 1979 + 2/12,
+	Luxembourg = 1979 + 2/12,
 	Netherlands = 1979 + 2/12,
 	Poland = NA,
 	Portugal = 1992 + 3/12,
@@ -87,7 +89,7 @@ erm2 <- yearmon(c(
 	Hungary = NA,
 	Ireland = NA,
 	Italy = NA,
-	Luxemburg = NA,
+	Luxembourg = NA,
 	Netherlands = NA,
 	Poland = NA,
 	Portugal = NA,
@@ -111,7 +113,7 @@ eur <- yearmon(c(
 	Hungary = NA,
 	Ireland = 1999,
 	Italy = 1999,
-	Luxemburg = 1999,
+	Luxembourg = 1999,
 	Netherlands = 1999,
 	Poland = NA,
 	Portugal = 1999,
@@ -237,7 +239,6 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 
 
 
-
 \begin{document}
 
 
@@ -304,7 +305,9 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 		\begin{itemize}
 		\item EURO countries
 		\item EU members withouth ERM~II
+		% like Sweden, UK, poland, czech republic, Hungary, Romania, Bulgaria
 		\item Others
+		% Denmark: ERM~II but not EURO, Estonia, Latvia, Lithuania
 		\end{itemize}
   \item 21 Monthly HICP series, unadjusted
   \item Source: OECD Statistics
@@ -385,8 +388,15 @@ SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3
 % then we want to know if there is some change in our distribution via variations in the scores
 \frametitle{Scores}
 
+% before starting with scores give motivation:
+%1. choose appropriate estimation technique (ML) and its score function
+%2. empirical partial sum process (efp) used to capture instabilities (efp governed by FCLT)
+%3. measure fluctuation within process by a scalar functional yielding some test statistic (like supLM)
+%4. then breakpoint selection
+% under parameter stability the scores have 0 mean 
 3 components $s()=(s_{\theta}, s_{\sigma}, s_{\delta})$:
 % for the parameters (the derivatives of the log-likelihood) 
+% scores given in dp02_15 p.14
 
 \small
 \begin{eqnarray}
@@ -413,7 +423,7 @@ For the 3--dimensional parameter $\phi = (\theta, \sigma, \delta)$ we test:
 
 % under parameter stability
 \begin{eqnarray}
-& H_0: \phi_i = \phi_0 \; (t=1,...,n) \nonumber
+& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber
 \end{eqnarray}
 
 % parameters estimated by ML 
@@ -438,7 +448,7 @@ To examine changes we employ the empirical scores $s(y_t|\hat{\phi})$
 
 
 \begin{frame}
-\frametitle{Empirical scores}
+\frametitle{Empirical Fluctuation Process}
 % similar to a cumulated sum of residuals
 % view as cumulative deviations where we are able to get test values 
 The empirical fluctuation process $efp(\cdot)$ is given by:
@@ -461,6 +471,9 @@ We use Supremum of LM statistics:
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 
+% optimal to test for a singel abrupt change of unknown timing
+% reject when fluctuation of the empirical process becomes improbably large compared to the fluctuation of the limiting process (i.e. when boundaries are crossed)
+
 p--values can be computed from:
 
 \begin{eqnarray}
@@ -468,6 +481,7 @@ p--values can be computed from:
 \end{eqnarray}
 
 % with W^0 beeing a 3--dimensional brwonina motion W^0(t() = W(t) - tW(1)
+% brownian motion: zeitstetiger stochastischer Prozess, der normalverteilte, unabhängige Zuwächse E(W) = 0, Var=t; W(t) ~ N(0,t)
 % goodness of fit test H0 is not rejected 23-21 (44 periods in total) times, ie. in 52% of the cases
 
 \end{frame}
@@ -475,10 +489,22 @@ p--values can be computed from:
 
 \begin{frame}
 \frametitle{Breakpoint Estimation}
+
+% step by step:
+%1. choose m, the number of breaks (if suggested by supLM test , m=1 or higher)
+%2. minimize the log-likelihood function by segmenting in a way to minimize the sum of the log-likelihoods
+%3. save penalty terms 
+%4. increase m and do steps 2-3 once more
+%5. choose m with the best LWZ value (which is a modified BIC) 0.299*log(n)^2.1 (p.1701 Z(2010))
+%there is a minimal distance of h=24 between breakpoints
+% computation becomes burdensome (of order O(n-2*h)^m, ie. h is minimum size of segment, m is number of breakpoints with n=200 and m=1 and h=24, 152 possible breakpoints)
+% but there exists an algorithm of Bai and Perron that decreases computational burden (Z2010, p.1700f)
+
+
 % if instability is detected, natural to ask when
 % assumge segments in data, that are stable but change with every segment
 \begin{itemize}
-\item If instability detected, estimate $B\in[0,6]$ breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
+\item If instability detected, estimate $B\in[1,6]$ breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
 % partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
 \sum_{b=1}^B \sum_{t=\tau_{b-1}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
@@ -578,6 +604,7 @@ load(fnam)
 <<plot4>>
 @
 % careful: the red lines are the doppelmax statistics not the supLM (just dont mention it:) 
+% doppelmax given by: max_i=1...n max_j=1...k |epf_j(i/n))| ; i.e. aggregated over both time and components
 \end{frame}
 
 %
@@ -609,7 +636,7 @@ Economic Interpretation:
 % The ratio of gross government debt to GDP must not exceed 60% at the end of the preceding fiscal year
 %  Exchange rate: Applicant countries should have joined the exchange-rate mechanism (ERM II) under the European Monetary System (EMS) for two consecutive years and should not have devalued its currency during the period.
 % Long-term interest rates: The nominal long-term interest rate must not be more than 2 percentage points higher than in the three lowest inflation member states.
-\item entered ERM~II in June 2004; declared ready by ECB and EC in May 2006
+\item entered ERM~II in June 2004; declared ready to join by ECB  in May 2006
 % http://ec.europa.eu/economy_finance/focuson/focuson9120_en.htm
 \item from 2003 onwards much lower mean, but higher variance
 \item most reforms regarding financial sector introduced in 2003
@@ -663,8 +690,20 @@ writeLines(unlist(lapply(c(2, 13), format_moments)))
 @
 \end{longtable}
 
-
+% could be looking much better
+\begin{center}
+<<belga, fig=TRUE, height=3, width=4>>=
+print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.omit(HICP[, "Luxembourg"])))), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg")))
+@
+\end{center}
 \end{frame}
+
+
+
+
+%xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.omit(HICP[, "Luxembourg"])))), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg"))
+
+
 
 \begin{frame}
 \frametitle{Italy and Spain}
@@ -680,7 +719,12 @@ Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & EURO \\
 writeLines(unlist(lapply(c(12, 19), format_moments)))
 @
 \end{longtable}
+
 \end{frame}
+
+
+
+
 
 \begin{frame}
 \frametitle{Ireland}
