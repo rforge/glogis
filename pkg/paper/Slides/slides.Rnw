@@ -291,6 +291,9 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
   	% same as former comecon countries 
   	\item Southern European countries
   	% profit from a more credible central bank which is more inclined towards price stability
+  	\item Central European countries
+  	% not that clear cut evidence; if previous central bank was hawkish towards inflation doubtful that we would find a lot of change
+  	% theory does not know for certain what would happen --> very dependend upon parameterization in the model (for example \cite{holte}
   	\end{itemize}
 % former high inflation country now lower, imports credibility  
 % monetary discipline for new EURO countries like Estonia, Slovenia...
@@ -304,6 +307,8 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \begin{frame}
 \frametitle{Data}
 \begin{itemize}
+  \item 21 Monthly HICP series, unadjusted
+  \item Source: OECD Statistics
 	\item 3 groups
 		\begin{itemize}
 		\item EURO countries
@@ -312,12 +317,27 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 		\item Others
 		% Denmark: ERM~II but not EURO, Estonia, Latvia, Lithuania
 		\end{itemize}
-  \item 21 Monthly HICP series, unadjusted
-  \item Source: OECD Statistics
 \end{itemize}
 \end{frame}
 
+\subsection{Model}
+\begin{frame}
+\frametitle{Model}
 
+\begin{itemize}
+\item Actually some alternatives
+	\begin{itemize}
+	\item ARIMA
+	\item GARCH
+	% then test for a breakpoint in the parameters
+	% which does not work for short time series and it is doubtful if there are any effects
+	% generalized autoregressive conditional heteroscedasticity
+	\end{itemize}
+\item Our model
+\end{itemize}
+
+
+\end{frame}
 
 
 \subsection{Model}
@@ -351,7 +371,7 @@ SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3
 
 
 \begin{frame}
-\frametitle{Testing Procedure}
+\frametitle{Framework}
 % before starting  give motivation:
 %1. choose appropriate estimation technique (ML) and its score function
 %2. empirical partial sum process (efp) used to capture instabilities (efp governed by FCLT)
@@ -364,12 +384,12 @@ For the 3--dimensional parameter $\phi = (\theta, \sigma, \delta)$ we test:
 
 % under parameter stability
 \begin{eqnarray}
-& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber
-\end{eqnarray}
-
-% parameters estimated by ML 
-
-\begin{eqnarray}
+& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber \\ 
+%\end{eqnarray}
+%
+%% parameters estimated by ML 
+%
+%\begin{eqnarray}
 & \underset{\phi \in \Phi}{argmin} \sum_{t=1}^n \log f(y_t|\phi) = \hat{\phi}, \nonumber\\
 & \sum_{t=1}^n s(y_t|\hat{\phi}) = 0 \nonumber
 \end{eqnarray}
@@ -391,7 +411,7 @@ To examine changes we employ the empirical scores $s(y_t|\hat{\phi})$
 % then we want to know if there is some change in our distribution via variations in the scores
 \frametitle{Scores}
 
-3 components $s()=(s_{\theta}, s_{\sigma}, s_{\delta})$:
+3 components, $s()=(s_{\theta}, s_{\sigma}, s_{\delta})$:
 % for the parameters (the derivatives of the log-likelihood) 
 % scores given in dp02_15 p.14
 
@@ -463,7 +483,7 @@ p--values can be computed from:
 %2. minimize the log-likelihood function by segmenting in a way to minimize the sum of the log-likelihoods
 %3. save penalty terms 
 %4. increase m and do steps 2-3 once more
-%5. choose m with the best LWZ value (which is a modified BIC) 0.299*log(n)^2.1 (p.1701 Z(2010))
+%5. choose m with the best LWZ value (which is a modified BIC) 0.299*log(n)^2.1 (p.1701 Z(2010)); the lower the value the better the model
 %there is a minimal distance of h=24 between breakpoints
 % computation becomes burdensome (of order O(n-2*h)^m, ie. h is minimum size of segment, m is number of breakpoints with n=200 and m=1 and h=24, 152 possible breakpoints)
 % but there exists an algorithm of Bai and Perron that decreases computational burden (Z2010, p.1700f)
@@ -472,11 +492,17 @@ p--values can be computed from:
 % if instability is detected, natural to ask when
 % assumge segments in data, that are stable but change with every segment
 \begin{itemize}
-\item If instability detected, estimate $B\in[1,6]$ breakpoints $\tau_1,...,\tau_B$ via minimization of full segmented likelihood:
+\item If instability detected, estimate $B\in[1,6]$ breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
 % partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
-\sum_{b=1}^B \sum_{t=\tau_{b-1}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+% \sum_{b=1}^B \sum_{t=\tau_{(b-1)}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+% with \tau_0 = T = n
+% if m = 1 and n = 200, we have \tau_0= 0, \tau_1 = 100, \tau_2 = n
+\sum_{b=1}^B \sum_{t=\tau_{b-1} + 1}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 \end{eqnarray}
+
+
+
 
 \item Estimate models with B=1,...,6 breakpoints; select via modified BIC 
 % BIC: log(n) is the penalty term; in modified LWZ: 0.299*log(n)^2.1 (p.1701 Z(2010))
@@ -584,6 +610,12 @@ load(fnam)
 %@
 %% only if enough time
 %\end{frame}
+\begin{frame}
+\frametitle{Breakpoint Selection}
+<<slovbpsel, fig=TRUE, height=5.5, width=8>>=
+<<plot2>>
+@
+\end{frame}
 
 
 \begin{frame}
