@@ -29,14 +29,15 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 
 ## For the creation of the tables
 ## <<tabelle, eval=FALSE>>=
-if(!file.exists(file.path("C:/Dissertation/Paper-1-Z", "Analysis", "Austria.rda"))) {
-setwd(file.path("..", "Analysis"))
-Sweave("analysis.Rnw")
-setwd(file.path("..", "Slides"))
+root_dir <- do.call("file.path", as.list(head(strsplit(getwd(), .Platform$file.sep)[[1]], -1)))
+if(!file.exists(file.path(root_dir, "Analysis", "Austria.rda"))) {
+setwd(file.path(root_dir, "Analysis"))
+Sweave("results.Rnw")
+setwd(file.path(root_dir, "Slides"))
 }
 
 ## query result file names
-fnam <- Sys.glob(file.path("..", "Analysis", "*.rda"))
+fnam <- Sys.glob(file.path(root_dir, "Analysis", "*.rda"))
 fnam2 <- grep("2", fnam, fixed = TRUE)
 if(length(fnam2) > 0) fnam <- fnam[-fnam2]
 
@@ -131,7 +132,7 @@ eur <- yearmon(c(
 
 ## sequentially load data
 for(i in seq_along(fnam)) {
-  load(file.path("..", "Analysis", fnam[i]))
+  load(file.path(root_dir, "Analysis", fnam[i]))
   results[[i]] <- list(
     data = x,
     model0 = x_gf,
@@ -857,3 +858,11 @@ HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T} \nonumber
 
 
 \end{document}
+
+x <- -40:40/10
+plot(x, dglogis(x, 0, 1, 2), type = "l", lty = 3,
+  xlab = "y", ylab = expression(f(group("", y, "|"), 0, 1, delta)))
+lines(x, dglogis(x, 0, 1, 1), type = "l", lty = 1)
+lines(x, dglogis(x, 0, 1, 1/2), type = "l", lty = 2)
+legend("topleft", expression(delta == 2, delta == 1, delta == 0.5),
+  lty = c(3, 1, 2), bty = "n")
