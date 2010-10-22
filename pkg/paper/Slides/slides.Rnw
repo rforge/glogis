@@ -215,7 +215,7 @@ lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
 @
 
 <<plot1d, eval=FALSE>>=
-plot(x, main = "Slovenia", ylab = "100 * diff(log(HICP))", xlab = "Time")
+plot(x, main = "HICP", ylab = "100 * diff(log(HICP))", xlab = "Time")
 @
 
 <<plot1b, eval=FALSE>>=
@@ -496,9 +496,9 @@ p--values can be computed from:
 % partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
 % \sum_{b=1}^B \sum_{t=\tau_{(b-1)}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
-% with \tau_0 = T = n
 % if m = 1 and n = 200, we have \tau_0= 0, \tau_1 = 100, \tau_2 = n
-\sum_{b=1}^B \sum_{t=\tau_{b-1} + 1}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+% have to introduce \tau_0 = 0 and \tau_b+1 = n
+\sum_{b=0}^B \sum_{t=\tau_b + 1}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 \end{eqnarray}
 
 
