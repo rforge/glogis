@@ -307,7 +307,7 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \begin{frame}
 \frametitle{Data}
 \begin{itemize}
-  \item 21 Monthly HICP series, unadjusted
+  \item 21 monthly HICP series, unadjusted
   \item Source: OECD Statistics
 	\item 3 groups
 		\begin{itemize}
@@ -351,7 +351,7 @@ For series $y = 100\cdot log(HICP_t/HICP_{t-1})$ we assume a GL--distribution gi
 f(y | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})^{(\delta+1)}} \nonumber
 \end{eqnarray}
 
-with location ($\theta$), scale ($\sigma$) and shape ($\delta$). \\
+with location $\theta$, scale $\sigma$ and shape $\delta$. \\
 
 % For $\delta=1$ the distribution simplifies to the logistic distribution, for $\delta < 1$ it is skewed to the left and for $\delta > 1$ it is skewed to the right. 
 % Regress+ Appendix A  Compendium of Common Probability Distributions 
@@ -380,7 +380,7 @@ SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3
 % under parameter stability the scores have 0 mean 
 
 
-For the 3--dimensional parameter $\phi = (\theta, \sigma, \delta)$ we test:
+3--dimensional parameter $\phi = (\theta, \sigma, \delta)$:
 
 % under parameter stability
 \begin{eqnarray}
@@ -394,7 +394,7 @@ For the 3--dimensional parameter $\phi = (\theta, \sigma, \delta)$ we test:
 & \sum_{t=1}^n s(y_t|\hat{\phi}) = 0 \nonumber
 \end{eqnarray}
 
-To examine changes we employ the empirical scores $s(y_t|\hat{\phi})$
+Empirical scores $s(y_t|\hat{\phi})$ to examine changes
 % then we can apply a CLT (central limit theorem)
 
 %Under certain assumptions, a central limit theorem holds:
@@ -436,7 +436,7 @@ s_{\delta}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, 
 \frametitle{Empirical Fluctuation Process}
 % similar to a cumulated sum of residuals
 % view as cumulative deviations where we are able to get test values 
-The empirical fluctuation process $efp(\cdot)$ is given by:
+The empirical fluctuation process $efp(\cdot)$:
 
 \begin{eqnarray}
 efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_t|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
@@ -446,14 +446,14 @@ efp(\cdot) \overset{d}{\rightarrow} W^0(\cdot) \nonumber
 % with W^0 beeing a 3--dimensional brwonina motion W^0(t() = W(t) - tW(1)
 % brownian motion: zeitstetiger stochastischer Prozess, der normalverteilte, unabhängige Zuwächse E(W) = 0, Var=t; W(t) ~ N(0,t)
 
-We can employ a Functional Central Limit Theorem (FCLT) on $efp(\cdot)$
+Functional Central Limit Theorem (FCLT) for $efp(\cdot)$
 \end{frame}
 
 
 \begin{frame}
 \frametitle{Test}
 
-We use Supremum of LM statistics:
+Supremum of LM statistics:
 
 \begin{eqnarray}
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)} \nonumber
@@ -504,7 +504,7 @@ p--values can be computed from:
 
 
 
-\item Estimate models with B=1,...,6 breakpoints; select via modified BIC 
+\item Estimate models with B breakpoints; select best via modified BIC 
 % BIC: log(n) is the penalty term; in modified LWZ: 0.299*log(n)^2.1 (p.1701 Z(2010))
 \end{itemize}
 % search over all conceivable partitions can be cut shortly applying Bellman principle 
@@ -652,12 +652,12 @@ Economic Interpretation:
 \frametitle{Results}
 
 % in subgropus and only some for presentation
-Some countries exhibit very similar patterns
+Some countries follow very similar patterns
 
 \begin{itemize}
-\item Eastern countries: Czech Republic, Estonia, Hungary, Poland, Slovakia and Slovenia
+\item Eastern countries: Czech Republic, Estonia, Hungary, Poland and possibly Slovakia 
 % mean and var decline end of 90s start of 00s
-% extreme skewness in case of Slovenia
+% extreme skewness in case of Slovakia
 \item Belgium and Luxembourg
 % strong increase in variance in 99, 00
 \item Italy and Spain
