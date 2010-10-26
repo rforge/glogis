@@ -14,6 +14,7 @@
 
 <<preliminaries>>=
 ## packages
+Sys.setlocale("LC_TIME", "English")
 library("glogis")
 library("fxregime")
 library("lattice")
@@ -37,7 +38,8 @@ setwd(file.path(root_dir, "Slides"))
 }
 
 ## query result file names
-fnam <- Sys.glob(file.path(root_dir, "Analysis", "*.rda"))
+## fixed file path
+fnam <- Sys.glob(file.path("..", "Analysis", "*.rda"))
 fnam2 <- grep("2", fnam, fixed = TRUE)
 if(length(fnam2) > 0) fnam <- fnam[-fnam2]
 
@@ -151,11 +153,12 @@ mom <- lapply(results, function(obj) t(sapply(obj$model, moments)))
 ## LaTeX formatting
 format_moments <- function(i, digits = 3) {
   rval <- format(round(mom[[i]], digits = digits), nsmall = digits)
-  rval <- cbind("", rownames(rval), matrix(paste("$", rval, "$", sep = ""), ncol = 3), "", "", "")
+  #rval <- cbind("", rownames(rval), matrix(paste("$", rval, "$", sep = ""), ncol = 3), "", "", "")
+  rval <- cbind("", rownames(rval), matrix(paste("$", rval, "$", sep = ""), ncol = 3))
   rval[1,1] <- if(is.character(i)) i else names(mom)[i]
-  rval[1,6] <- if(is.na(results[[i]]$erm)) "--" else format(results[[i]]$erm)
-  rval[1,7] <- if(is.na(results[[i]]$erm2)) "--" else format(results[[i]]$erm2)
-  rval[1,8] <- if(is.na(results[[i]]$eur)) "--" else format(results[[i]]$eur)
+  #rval[1,6] <- if(is.na(results[[i]]$erm)) "--" else format(results[[i]]$erm)
+  #rval[1,7] <- if(is.na(results[[i]]$erm2)) "--" else format(results[[i]]$erm2)
+  #rval[1,8] <- if(is.na(results[[i]]$eur)) "--" else format(results[[i]]$eur)
   rval <- apply(rval, 1, paste, collapse = " & ")
   rval <- paste(rval, "\\\\")
   rval[length(rval)] <- paste(rval[length(rval)], "\\hline")
@@ -258,8 +261,7 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \frametitle{Overview}
 
 \begin{itemize}
-  \item Introduction
-  \item Data
+  \item Introduction and Data
 %  \begin{itemize}
 %    \item HICP
 %  \end{itemize}
@@ -278,17 +280,17 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \subsection{Introduction}
 
 \begin{frame}
-\frametitle{Introduction}
+\frametitle{Introduction and Data}
 
 
 \begin{itemize}
-  \item Did EMU change inflation dynamics ?
-  \item Economic Reasons
+  \item Did European Monetary Union (EMU) change inflation dynamics?
+  \item Economic reasons
   	\begin{itemize}
-  	\item Former COMECON countries
+  	\item Former Council for Mutual Economic Assistance (COMECON) countries
   	% abkürzung für: Council for Mutual Economic Assistance
   	% stabilise inflation for EURO introduction or ERM II entry
-  	\item Ex--Jugoslavia
+  	\item Ex--Yugoslavia
   	% same as former comecon countries 
   	\item Southern European countries
   	% profit from a more credible central bank which is more inclined towards price stability
@@ -299,27 +301,19 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 % former high inflation country now lower, imports credibility  
 % monetary discipline for new EURO countries like Estonia, Slovenia...
 % differences still have to remain \cite{duarte}, ECB stabilises the global inflation rate, no more power to focus on some nation
-\end{itemize}
-\end{frame}
-
-
-\subsection{Data}
-
-\begin{frame}
-\frametitle{Data}
-\begin{itemize}
-  \item 21 monthly HICP series, unadjusted
+  \item 21 monthly unadjusted Harmonised Index of Consumer Prices (HICP) series
   \item Source: OECD Statistics
 	\item 3 groups
 		\begin{itemize}
 		\item EURO countries
-		\item EU members withouth ERM~II
+		\item EU members withouth Exchange Rate Mechanism~II (ERM~II) 
 		% like Sweden, UK, poland, czech republic, Hungary, Romania, Bulgaria
 		\item Others
 		% Denmark: ERM~II but not EURO, Estonia, Latvia, Lithuania
 		\end{itemize}
 \end{itemize}
 \end{frame}
+
 
 \subsection{Model}
 \begin{frame}
@@ -332,18 +326,23 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 	\item GARCH
 	% then test for a breakpoint in the parameters
 	% which does not work for short time series and it is doubtful if there are any effects
+	% also: arima and garch test for a corelation structure
 	% generalized autoregressive conditional heteroscedasticity
 	\end{itemize}
 \item Our model
+	\begin{itemize}
+	\item Investigate changes in mean, variance and skewness over time
+	\item Not interested in correlation structure
+	% not a problem with correlation of series, no change if estimated with HAC (heteroscedasticity and autocorrelation adjusted estimator)
+	\end{itemize}
+	% talk about multivariate models like the one from palomba with inflation convergence etc.
 \end{itemize}
 
 
 \end{frame}
 
 
-\subsection{Model}
 \begin{frame}
-
 \frametitle{Generalized Logistic Distribution (GL)}
 
 For series $y = 100\cdot log(HICP_t/HICP_{t-1})$ we assume a GL--distribution given by:
@@ -380,22 +379,26 @@ SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3
 %4. then breakpoint selection
 % under parameter stability the scores have 0 mean 
 
+Estimate:
 
-3--dimensional parameter $\phi = (\theta, \sigma, \delta)$:
+\begin{eqnarray}
+& \underset{\phi \in \Phi}{argmin} \sum_{t=1}^n \log f(y_t|\phi) = \hat{\phi}, \nonumber\\
+& \sum_{t=1}^n s(y_t|\hat{\phi}) = 0 \nonumber
+\end{eqnarray}
+
+Assuming $\phi = (\theta, \sigma, \delta)$ is constant:
 
 % under parameter stability
 \begin{eqnarray}
-& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber \\ 
+& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber 
 %\end{eqnarray}
 %
 %% parameters estimated by ML 
 %
 %\begin{eqnarray}
-& \underset{\phi \in \Phi}{argmin} \sum_{t=1}^n \log f(y_t|\phi) = \hat{\phi}, \nonumber\\
-& \sum_{t=1}^n s(y_t|\hat{\phi}) = 0 \nonumber
 \end{eqnarray}
 
-Empirical scores $s(y_t|\hat{\phi})$ to examine changes
+Compute empirical scores $s(y_t|\hat{\phi})$
 % then we can apply a CLT (central limit theorem)
 
 %Under certain assumptions, a central limit theorem holds:
@@ -412,29 +415,31 @@ Empirical scores $s(y_t|\hat{\phi})$ to examine changes
 % then we want to know if there is some change in our distribution via variations in the scores
 \frametitle{Scores}
 
-3 components, $s()=(s_{\theta}, s_{\sigma}, s_{\delta})$:
+3 components $(s_{\theta}, s_{\sigma}, s_{\delta})$, with $\tilde{y} = \exp^{-\frac{y-\theta}{\sigma}}$
 % for the parameters (the derivatives of the log-likelihood) 
 % scores given in dp02_15 p.14
 
 \small
-\begin{eqnarray}
-s_{\theta}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \theta}  \nonumber \\
-& = & \frac{1}{\sigma} - (\delta+1)\cdot\frac{\frac{1}{\sigma}\exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})}  \nonumber \\
-s_{\sigma}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \sigma} \nonumber  \\
-& = & -\frac{1}{\sigma} + \frac{1}{\sigma^2}(y-\theta) - (\delta+1) \nonumber \\
-& \times &  \quad \frac{\frac{1}{\sigma^2}(y-\theta)\exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})} \nonumber
-\end{eqnarray}
-\begin{eqnarray}
-s_{\delta}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \delta} \nonumber \\
-& = &  \frac{1}{\delta} - \log(1+\exp^{-\frac{y-\theta}{\sigma}}) \nonumber 
-\end{eqnarray}
+\begin{align}
+s_{\theta}(y|\theta, \sigma, \delta) & =  \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \theta}  \nonumber \\
+&=  \frac{1}{\sigma} - (\delta+1)\cdot\frac{\frac{1}{\sigma}\tilde{y}}{(1+\tilde{y})}  \nonumber \\
+s_{\sigma}(y|\theta, \sigma, \delta) & =  \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \sigma} \nonumber  \\
+& =  -\frac{1}{\sigma} + \frac{1}{\sigma^2}(y-\theta) - (\delta+1) \times \frac{\frac{1}{\sigma^2}(y-\theta)\tilde{y}}{(1+\tilde{y})} \nonumber \\
+%\end{eqnarray}
+%
+%\begin{eqnarray}
+s_{\delta}(y|\theta, \sigma, \delta) & =  \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \delta} \nonumber \\
+& =   \frac{1}{\delta} - \log(1+\tilde{y}) \nonumber 
+\end{align}
 % where loglik is the log-likelihood of y
 \end{frame}
 
 
-
 \begin{frame}
 \frametitle{Empirical Fluctuation Process}
+% t in there: is reskaliert: floor(i/n), läuft immer von 0-1; bei 1 muss der Prozess wieder auf 0 enden (daher immer so bogenmässige form)
+% decorrelation throught V^-1/2 
+% 3d BB: 3*n matrix; brownsche brücke: geht zu t=1 auf 0 zurück, als nebenbedingung 
 % similar to a cumulated sum of residuals
 % view as cumulative deviations where we are able to get test values 
 The empirical fluctuation process $efp(\cdot)$:
@@ -446,8 +451,10 @@ efp(\cdot) \overset{d}{\rightarrow} W^0(\cdot) \nonumber
 
 % with W^0 beeing a 3--dimensional brwonina motion W^0(t() = W(t) - tW(1)
 % brownian motion: zeitstetiger stochastischer Prozess, der normalverteilte, unabhängige Zuwächse E(W) = 0, Var=t; W(t) ~ N(0,t)
-
-Functional Central Limit Theorem (FCLT) for $efp(\cdot)$
+\begin{itemize}
+\item Functional Central Limit Theorem (FCLT) for $efp(\cdot)$
+\item $W^0$ converges to a 3--dimensional Brownian Bridge
+\end{itemize}
 \end{frame}
 
 
@@ -455,6 +462,8 @@ Functional Central Limit Theorem (FCLT) for $efp(\cdot)$
 \frametitle{Test}
 
 Supremum of LM statistics:
+% aggregates values at te times t=1,2,....,n
+% explain with the graphics that shows residuals very clearly
 
 \begin{eqnarray}
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)} \nonumber
@@ -493,20 +502,21 @@ p--values can be computed from:
 % if instability is detected, natural to ask when
 % assumge segments in data, that are stable but change with every segment
 \begin{itemize}
-\item If instability detected, estimate $B\in[1,6]$ breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
+\item If instability detected, estimate B breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
 % partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
 % \sum_{b=1}^B \sum_{t=\tau_{(b-1)}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 % if m = 1 and n = 200, we have \tau_0= 0, \tau_1 = 100, \tau_2 = n
 % have to introduce \tau_0 = 0 and \tau_b+1 = n
-\sum_{b=0}^B \sum_{t=\tau_b + 1}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+\sum_{b=1}^{B+1} \sum_{t=\tau_b + 1}^{\tau_b} \log f(y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 \end{eqnarray}
 
 
 
 
-\item Estimate models with B breakpoints; select best via modified BIC 
+\item Estimate models with $B=1,...6$ breakpoints; select best via modified BIC 
 % BIC: log(n) is the penalty term; in modified LWZ: 0.299*log(n)^2.1 (p.1701 Z(2010))
+% all breakpoints and all segments are simultaneously estimated
 \end{itemize}
 % search over all conceivable partitions can be cut shortly applying Bellman principle 
 % with systemspecific parameters \theta^{(b)}, \sigma^{(b)}, \delta^{(b) and breakpoints \tau_1,...\tau_B
@@ -538,6 +548,20 @@ load(fnam)
 <<plot1d>>
 @
 \end{center}
+
+% does not work for all
+\invisible<1>{
+\small
+\begin{longtable}{|l|l|r|r|r|}
+\hline
+\textcolor{white}{Country} & \textcolor{white}{Segment} & \textcolor{white}{Mean} & \textcolor{white}{Variance} & \textcolor{white}{Skewness}  \\
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(lapply(c(18), format_moments)))
+@
+\end{longtable}
+}
+
 \end{frame}
 
 
@@ -562,11 +586,24 @@ load(fnam)
 @
 
 \end{center}
+
+\small
+\begin{longtable}{|l|l|r|r|r|}
+\hline
+Country & Segment & Mean & Variance & Skewness  \\
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(lapply(c(18), format_moments)))
+@
+\end{longtable}
+
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Test}
+\frametitle{Slovenia--Test}
+% the line is at the point where the LR ratio is maximal, but we estimate LM and LM is converging to LR asympotically
+
 <<>>=
 i <- 18
 nam <- colnames(HICP)[i]
@@ -593,8 +630,13 @@ load(fnam)
 
 
 \begin{frame}
-\frametitle{Moment changes}
+\frametitle{Slovenia--Moment Changes}
 % for a better understanding of the sources of the change (change in shape means that it is now less skewed to the right, so inflation is lower)
+% the lines are the max of the absolute value; 1. aggregate over time, 2. aggregate over components
+% "C:\Program Files\R\R-2.11.1-x64\bin\Rgui.exe
+% change languate to english: Sys.setlocale("LC_TIME", "English")
+
+
 <<fig=TRUE, height=5.5, width=8>>=
 <<plot4>>
 @
@@ -612,7 +654,7 @@ load(fnam)
 %% only if enough time
 %\end{frame}
 \begin{frame}
-\frametitle{Breakpoint Selection}
+\frametitle{Slovenia--Breakpoint Selection}
 <<slovbpsel, fig=TRUE, height=5.5, width=8>>=
 <<plot2>>
 @
@@ -687,12 +729,16 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.om
 
 \begin{frame}
 \frametitle{Belgium and Luxembourg}
+
+% get rid of ERM, ERM~II and Euro column; automatically include text
+% change monthly abbrevations in R, not only local change but more; something like monthly abbrevations
+% spalten rechtszentriert
+
 % heavy increase in variance both countries exactly around EURO introduction 
 % interesting thing: both were allready in a currency union (the belgish--luxembourg union)
-\tiny
-\begin{longtable}{|l|l|l|l|l|l|l|l|}
+\begin{longtable}{|l|l|r|r|r|}
 \hline
-Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & EURO \\
+Country & Segment & Mean & Variance & Skewness  \\
 \hline
 <<echo=FALSE, results=tex>>=
 writeLines(unlist(lapply(c(2, 13), format_moments)))
@@ -722,10 +768,10 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Italy"]))), 100*diff(log(na.omit
 % identical break dates
 % now lower mean than in the 90s 
 % after Dec 2000, almost 2 years after EURO heavy increase in volatility (very similar to Belgium and Luxembourg)
-\tiny
-\begin{longtable}{|l|l|l|l|l|l|l|l|}
+% Italy and Spain: commitment led to less frequent fiscal shocks 
+\begin{longtable}{|l|l|r|r|r|}
 \hline
-Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & EURO \\
+Country & Segment & Mean & Variance & Skewness \\
 \hline
 <<echo=FALSE, results=tex>>=
 writeLines(unlist(lapply(c(12, 19), format_moments)))
@@ -740,10 +786,9 @@ writeLines(unlist(lapply(c(12, 19), format_moments)))
 \begin{frame}
 \frametitle{Ireland}
 % deflationary effects of financial crisis clearly visible
-\tiny
-\begin{longtable}{|l|l|l|l|l|l|l|l|}
+\begin{longtable}{|l|l|r|r|r|}
 \hline
-Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & EURO \\
+Country & Segment & Mean & Variance & Skewness \\
 \hline
 <<echo=FALSE, results=tex>>=
 writeLines(unlist(lapply(c(11), format_moments)))
@@ -751,14 +796,14 @@ writeLines(unlist(lapply(c(11), format_moments)))
 \end{longtable}
 
 \begin{center}
-<<ireland, fig=TRUE, height=5, width=8>>=
+<<ireland, fig=TRUE, height=4.7, width=8>>=
 plot(100*diff(log(na.omit(HICP[, "Ireland"]))), main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
 @
 \end{center}
 \end{frame}
 
 \begin{frame}
-\frametitle{No change countries}
+\frametitle{No Change Countries}
 % could be looking much better
 \begin{center}
 <<nochange, fig=TRUE, height=5, width=8>>=
@@ -769,12 +814,11 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Finland"]))), 100*diff(log(na.om
 
 
 \begin{frame}
-\frametitle{No change countries}
+\frametitle{No Change Countries}
 % most interesting country: greece (extremely high variance, looks almost like a result of a random number seed 
-\tiny
-\begin{longtable}{|l|l|l|l|l|l|l|l|}
+\begin{longtable}{|l|l|r|r|r|}
 \hline
-Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & EURO \\
+Country & Segment & Mean & Variance & Skewness  \\
 \hline
 <<echo=FALSE, results=tex>>=
 writeLines(unlist(lapply(c(9,14,6), format_moments)))
@@ -796,11 +840,14 @@ writeLines(unlist(lapply(c(9,14,6), format_moments)))
 \frametitle{Conclusion}
 
 \begin{itemize}
-\item Stabilizing Effect of EURO
+% include some more
+
+\item Stabilizing Effect of EURO?
 % mention eastern european countries like Slovenia
 \item Overall lowering in mean inflation rates
-\item Overall increase in volatility
+\item Overall increase in volatility, possibly due to change in definitions or data collection
 % why? discuss with participants; some fluctuation is natural but is there any good reason for this?
+% delve into problematic of the countrries
 \end{itemize}
 \end{frame}
 
@@ -839,26 +886,10 @@ HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T} \nonumber
 
 
 % to show left and right skewed gl - distribution
-% does not work --> why????
-%\begin{frame}
-%\frametitle{GL--right and left skewed}
-%
-%
-%\begin{center}
-%<<glrl, fig=TRUE, height=4, width=8>>=
-%df <- data.frame(glogisr = rglogis(100000, 1,2,1.5), glogisl = rglogis(100000, 1,2,.7))
-%df.m <- melt(df)
-%ggplot(df.m) + geom_freqpoly(aes(x=value, y = ..density.., colour = variable))
-%@
-%\end{center}
-%
-%
-%\end{frame}
-
-
-
-\end{document}
-
+\begin{frame}
+\frametitle{GL--right and left skewed}
+\begin{center}
+<<glrl, fig=TRUE, height=5, width=8>>=
 x <- -40:40/10
 plot(x, dglogis(x, 0, 1, 2), type = "l", lty = 3,
   xlab = "y", ylab = expression(f(group("", y, "|"), 0, 1, delta)))
@@ -866,3 +897,10 @@ lines(x, dglogis(x, 0, 1, 1), type = "l", lty = 1)
 lines(x, dglogis(x, 0, 1, 1/2), type = "l", lty = 2)
 legend("topleft", expression(delta == 2, delta == 1, delta == 0.5),
   lty = c(3, 1, 2), bty = "n")
+@
+\end{center}
+\end{frame}
+
+
+\end{document}
+
