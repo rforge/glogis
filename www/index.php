@@ -40,7 +40,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 
 <h2>Structural Breaks in Inflation Dynamics within the European Monetary Union</h2>
-<h3>Thomas Winderberger, Achim Zeileis</h3>
+<h3>Thomas Windberger, Achim Zeileis</h3>
 
 <p>Investigation of European inflation rates based on Harmonized Index of Consumer Prices (HICP).
 Inflation series are estimated by generalized logistic distribution model, tested for structural breaks, and (if any) breakpoints
