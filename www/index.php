@@ -27,7 +27,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 
 <h2>glogis: Fitting and Testing Generalized Logistic Distributions</h2>
-<h3>Thomas Winderberger, Achim Zeileis</h3>
+<h3>Thomas Windberger, Achim Zeileis</h3>
 
 <p>R package for fitting and testing generalized logistic distributions (type I).</p>
 
