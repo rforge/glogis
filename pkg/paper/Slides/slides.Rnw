@@ -14,12 +14,10 @@
 
 <<preliminaries>>=
 ## packages
-Sys.setlocale("LC_TIME", "English")
+if(Sys.getlocale() != "C") Sys.setlocale("LC_TIME", "English")
 library("glogis")
 library("fxregime")
 library("lattice")
-library("ggplot2")
-
 
 ## additional functions
 moments <- function(object, ...) UseMethod("moments")
@@ -27,19 +25,15 @@ moments.glogisfit <- function(object, ...) object$moments
 moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
   t(sapply(refit(object, breaks = breaks), "[[", "moments"))
   
-
 ## For the creation of the tables
-## <<tabelle, eval=FALSE>>=
 root_dir <- do.call("file.path", as.list(head(strsplit(getwd(), .Platform$file.sep)[[1]], -1)))
-if(!file.exists(file.path(root_dir, "Analysis", "Austria.rda"))) {
 setwd(file.path(root_dir, "Analysis"))
-Sweave("results.Rnw")
+fnam <- Sys.glob("*.rda")
+if(!file.exists("Austria.rda")) Sweave("results.Rnw")
 setwd(file.path(root_dir, "Slides"))
-}
 
 ## query result file names
 ## fixed file path
-fnam <- Sys.glob(file.path("..", "Analysis", "*.rda"))
 fnam2 <- grep("2", fnam, fixed = TRUE)
 if(length(fnam2) > 0) fnam <- fnam[-fnam2]
 
@@ -131,7 +125,6 @@ eur <- yearmon(c(
 ))
 
 
-
 ## sequentially load data
 for(i in seq_along(fnam)) {
   load(file.path(root_dir, "Analysis", fnam[i]))
@@ -165,85 +158,40 @@ format_moments <- function(i, digits = 3) {
   return(rval)
 }
 
+xyplot.gefp <- function(x, panel = NULL, ylim = NULL, ...)
+{
+  cval <- maxBB$computeCritval(0.05, ncol(x$process))
+  if(is.null(ylim)) ylim <- range(c(range(x$process), 1.1 * cval, -1.1 * cval)) 
 
+  gefp_plot <- function(x, y, subscripts, groups, panel = panel.xyplot,
+    col = 1, type = "p", pch = 20, lty = 1, lwd = 1, ...)
+  {
+    col <- rep(as.list(col), length = nlevels(groups))
+    type <- rep(as.list(type), length = nlevels(groups))
+    pch <- rep(as.list(pch), length = nlevels(groups))
+    lty <- rep(as.list(lty), length = nlevels(groups))
+    lwd <- rep(as.list(lwd), length = nlevels(groups))
+
+    for(g in 1:nlevels(groups)) {
+      idx <- levels(groups)[g] == groups[subscripts]
+      if (any(idx)) panel(x[idx], y[idx], ...,
+        col = col[[g]], type = type[[g]], pch = pch[[g]],
+        lty = lty[[g]], lwd = lwd[[g]])
+      grid::grid.lines(y = grid::unit(0, "native"))
+      grid::grid.lines(y = grid::unit(cval, "native"), gp = grid::gpar(col = 2))
+      grid::grid.lines(y = grid::unit(-cval, "native"), gp = grid::gpar(col = 2))
+    }
+  }
+  if(is.null(panel)) panel <- gefp_plot
+  
+  xyplot(x$process, panel = panel, ylim = ylim, ...)
+}
 
 
 ## data
 data("HICP", package = "glogis")
 HICP <- HICP[, colnames(HICP) != "EU"]
 @
-%
-%% analysis "macro" (assumes existence of "i", "HICP", and "add_breaks")
-<<analysis, eval=FALSE>>=
-## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
-
-## fit full-sample model
-x_gf <- glogisfit(x)
-
-## assess stability of full-sample model
-x_efp <- gefp(x_gf, fit = NULL)
-
-## estimate breakpoints (with minimal segment size of 2 years)
-x_bp <- breakpoints(x_gf, h = 24)
-
-## (minimal) number of breaks
-x_nbreaks <- if(sctest(x_efp, functional = supLM(0.1))$p.value > 0.05) {
-  0
-} else {
-  max(1, length(breakdates(x_bp))) + add_breaks[i]
-}
-
-## refit segmented model
-x_rf <- refit(x_bp, breaks = x_nbreaks)
-
-## save everything
-save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(HICP)[i], ".rda", sep = ""))
-@
-
-
-% plot "macros" (assuming existence "x", "x_gf", ...)
-<<plot1, eval=FALSE>>=
-par(mfrow = c(1, 2))
-plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
-lines(x_bp, breaks = x_nbreaks)
-lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
-plot(x_efp, functional = supLM(0.1), main = "supLM test")
-lines(x_bp, breaks = x_nbreaks)
-@
-
-<<plot1a, eval=FALSE>>=
-plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
-lines(x_bp, breaks = x_nbreaks)
-lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
-@
-
-<<plot1d, eval=FALSE>>=
-plot(x, main = "HICP", ylab = "100 * diff(log(HICP))", xlab = "Time")
-@
-
-<<plot1b, eval=FALSE>>=
-plot(x_efp, functional = supLM(0.1), main = "supLM test")
-lines(x_bp, breaks = x_nbreaks)
-@
-
-<<plot2, eval=FALSE>>=
-par(mfrow = c(1, 1))
-plot(x_bp)
-@
-
-<<plot3, eval=FALSE>>=
-par(mfrow = c(1, x_nbreaks + 1))
-for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
-  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
-@
-
-<<plot4, eval=FALSE>>=
-par(mfrow = c(1, 1))
-plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
-@
-
-
 
 
 \begin{document}
@@ -267,7 +215,7 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 %  \end{itemize}
   \item Model
 %    \begin{itemize}
-%    \item GL--Distribution
+%    \item GL-Distribution
 % 		\end{itemize}
   \item Example
   \item Results
@@ -290,7 +238,7 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
   	\item Former Council for Mutual Economic Assistance (COMECON) member states
   	% abkürzung für: Council for Mutual Economic Assistance
   	% stabilise inflation for EURO introduction or ERM II entry
-  	\item Ex--Yugoslavia countries
+  	\item Ex-Yugoslavia countries
   	% same as former comecon countries 
   	\item Southern European countries
   	% profit from a more credible central bank which is more inclined towards price stability
@@ -301,7 +249,7 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 % former high inflation country now lower, imports credibility  
 % monetary discipline for new EURO countries like Estonia, Slovenia...
 % differences still have to remain \cite{duarte}, ECB stabilises the global inflation rate, no more power to focus on some nation
-  \item 21 monthly unadjusted Harmonised Index of Consumer Prices (HICP) series
+  \item Harmonised Index of Consumer Prices (HICP) for 21 countries. Monthly unadjusted data up to March~2010
   \item Source: OECD Statistics
 	\item 3 groups
 		\begin{itemize}
@@ -320,24 +268,31 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \frametitle{Model}
 
 \begin{itemize}
-\item Some alternatives
+\item Our approach:
 	\begin{itemize}
-	\item ARIMA
-	\item GARCH
-	\item Multivariate models
+	\item Track evolution of distribution over time for each country
+	\item Investigate changes in mean, variance, and skewness over time
+	\item Idea: Identify changes associated with intervetions, crises, etc.
+	% not a problem with correlation of series, no change if estimated with HAC (heteroscedasticity and autocorrelation adjusted estimator)
+	\end{itemize}
+	% talk about multivariate models like the one from palomba with inflation convergence etc.
+\item Of less interest in this analysis:
+	\begin{itemize}
+	\item Correlation over time (e.g., ARIMA, GARCH)
+	\item Correlation between countries (e.g., VAR)
 	% multivariate like palombas
 	% then test for a breakpoint in the parameters
 	% which does not work for short time series and it is doubtful if there are any effects
 	% also: arima and garch test for a corelation structure
 	% generalized autoregressive conditional heteroscedasticity
 	\end{itemize}
-\item Our model
+\item Selected method:
 	\begin{itemize}
-	\item Investigate changes in mean, variance and skewness over time
-	\item Not interested in correlation structure
-	% not a problem with correlation of series, no change if estimated with HAC (heteroscedasticity and autocorrelation adjusted estimator)
+	\item Maximum likelihood for flexible distribution: Generalized logistic distribution allowing
+	for fat tails, and potential skewness
+	\item Testing and dating of structural breaks
+	\item Neglect correlation structure or treat as nuisance parameter
 	\end{itemize}
-	% talk about multivariate models like the one from palomba with inflation convergence etc.
 \end{itemize}
 
 
@@ -345,9 +300,9 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 
 
 \begin{frame}
-\frametitle{Generalized Logistic Distribution (GL)}
+\frametitle{Generalized Logistic (GL) Distribution}
 
-For series $y = 100\cdot log(HICP_t/HICP_{t-1})$ we assume a GL--distribution given by:
+For return series $y_t = 100\cdot log(HICP_t/HICP_{t-1})$ ($t = 1, \dots, n$) we assume a GL distribution given by:
 
 \begin{eqnarray}
 f(y | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})^{(\delta+1)}} \nonumber
@@ -357,7 +312,7 @@ with location $\theta$, scale $\sigma$ and shape $\delta$. \\
 
 % For $\delta=1$ the distribution simplifies to the logistic distribution, for $\delta < 1$ it is skewed to the left and for $\delta > 1$ it is skewed to the right. 
 % Regress+ Appendix A  Compendium of Common Probability Distributions 
-% as a explanation why to use the GL--distribution
+% as a explanation why to use the GL-distribution
 
 Moments:
 
@@ -381,18 +336,19 @@ SKEW(y) & = & \frac{\psi''(\delta) - \psi''(1)}{(\psi'(1)+\psi'(\delta))^\frac{3
 %4. then breakpoint selection
 % under parameter stability the scores have 0 mean 
 
-Estimate:
-
+Assuming $\phi = (\theta, \sigma, \delta)$ is stable over time $t$, it
+can be estimated by maximum likelihood, or equivalently solving the estimating equations:
 \begin{eqnarray}
-& \underset{\phi \in \Phi}{argmin} \sum_{t=1}^n \log f(y_t|\phi) = \hat{\phi}, \nonumber\\
-& \sum_{t=1}^n s(y_t|\hat{\phi}) = 0 \nonumber
+& \hat{\phi} ~=~ \underset{\phi}{argmax} \sum_{t=1}^n \log f(y_t|\phi), \nonumber\\
+& \sum_{t=1}^n s(y_t|\hat{\phi}) ~=~ 0, \nonumber
 \end{eqnarray}
 
-Assuming $\phi = (\theta, \sigma, \delta)$ is constant:
+\medskip
 
+Question: Is the assumption valid or do the $\phi_t$ vary over time?
 % under parameter stability
 \begin{eqnarray}
-& H_0: \phi_i = \phi_0 \; (i=1,...,n) \nonumber 
+& H_0: \phi_t = \phi_0 \quad (t=1,...,n) \nonumber 
 %\end{eqnarray}
 %
 %% parameters estimated by ML 
@@ -400,7 +356,8 @@ Assuming $\phi = (\theta, \sigma, \delta)$ is constant:
 %\begin{eqnarray}
 \end{eqnarray}
 
-Use empirical scores $s(y_t|\hat{\phi})$ for testing
+This can be assessed using the empirical scores $s(y_t|\hat{\phi})$ as
+measures of model deviation.
 % then we can apply a CLT (central limit theorem)
 
 %Under certain assumptions, a central limit theorem holds:
@@ -417,7 +374,7 @@ Use empirical scores $s(y_t|\hat{\phi})$ for testing
 % then we want to know if there is some change in our distribution via variations in the scores
 \frametitle{Scores}
 
-3 components $(s_{\theta}, s_{\sigma}, s_{\delta})$, with $\tilde{y} = \exp^{-\frac{y-\theta}{\sigma}}$
+Score function has 3 components $(s_{\theta}, s_{\sigma}, s_{\delta})$, with $\tilde{y} = \exp^{-\frac{y-\theta}{\sigma}}$
 % for the parameters (the derivatives of the log-likelihood) 
 % scores given in dp02_15 p.14
 
@@ -444,43 +401,55 @@ s_{\delta}(y|\theta, \sigma, \delta) & =  \frac{\delta \log f(y|\theta,\sigma, \
 % 3d BB: 3*n matrix; brownsche brücke: geht zu t=1 auf 0 zurück, als nebenbedingung 
 % similar to a cumulated sum of residuals
 % view as cumulative deviations where we are able to get test values 
-The empirical fluctuation process $efp(\cdot)$:
+The empirical fluctuation process $\mathit{efp}(\cdot)$ captures systematic deviations from zero over time:
 
 \begin{eqnarray}
-efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
-efp(\cdot) \overset{d}{\rightarrow} W^0(\cdot) \nonumber
+\mathit{efp}(t) ~=~ \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \quad (0 \leq t \leq 1), \nonumber
 \end{eqnarray}
 
-% with W^0 beeing a 3--dimensional brwonina motion W^0(t() = W(t) - tW(1)
+% with W^0 beeing a 3-dimensional brwonian motion W^0(t() = W(t) - tW(1)
 % brownian motion: zeitstetiger stochastischer Prozess, der normalverteilte, unabhängige Zuwächse E(W) = 0, Var=t; W(t) ~ N(0,t)
-\begin{itemize}
-\item Functional Central Limit Theorem (FCLT) for $efp(\cdot)$
-\item $W^0$ converges to a 3--dimensional Brownian Bridge
-\end{itemize}
+
+\medskip
+
+Functional central limit theorem (FCLT) for $\mathit{efp}(\cdot)$:
+$W^0$ converges to a 3-dimensional Brownian bridge:
+
+\begin{eqnarray}
+\mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot) \nonumber
+\end{eqnarray}
+
+
 \end{frame}
 
 
 \begin{frame}
 \frametitle{Test}
 
-Supremum of LM statistics:
+$\mathit{efp}(\cdot)$ could be aggregated to test statistic in various ways.
+
+\medskip
+
+Here: Employ Andrews' sup$LM$ test
 % aggregates values at te times t=1,2,....,n
 % explain with the graphics that shows residuals very clearly
 
 \begin{eqnarray}
-\underset{t \in [0.1, 0.9]}{sup} \frac{\Vert efp(t) \Vert_2^2}{t(1-t)} \nonumber
+\underset{t \in [0.1, 0.9]}{sup} \frac{\Vert \mathit{efp}(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 
 % optimal to test for a singel abrupt change of unknown timing
 % reject when fluctuation of the empirical process becomes improbably large compared to the fluctuation of the limiting process (i.e. when boundaries are crossed)
 
-p--values can be computed from:
+\medskip
+
+p-values can be computed from:
 
 \begin{eqnarray}
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert W^0(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 
-% with W^0 beeing a 3--dimensional brwonina motion W^0(t() = W(t) - tW(1)
+% with W^0 beeing a 3-dimensional brwonina motion W^0(t() = W(t) - tW(1)
 % brownian motion: zeitstetiger stochastischer Prozess, der normalverteilte, unabhängige Zuwächse E(W) = 0, Var=t; W(t) ~ N(0,t)
 % goodness of fit test H0 is not rejected 23-21 (44 periods in total) times, ie. in 52% of the cases
 
@@ -503,23 +472,27 @@ p--values can be computed from:
 
 % if instability is detected, natural to ask when
 % assumge segments in data, that are stable but change with every segment
-\begin{itemize}
-\item If instability detected, estimate B breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
+If instability detected, estimate $B$ breakpoints $\tau_1,...,\tau_B$ via maximization of full segmented likelihood:
 % partial since this is the log-likelihood for the specific time frame
 \begin{eqnarray}
 % \sum_{b=1}^B \sum_{t=\tau_{(b-1)}}^{\tau_b} loglik (y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
 % if m = 1 and n = 200, we have \tau_0= 0, \tau_1 = 100, \tau_2 = n
 % have to introduce \tau_0 = 0 and \tau_b+1 = n
-\sum_{b=1}^{B+1} \sum_{t=\tau_b + 1}^{\tau_b} \log f(y_t | \theta^{(b)}, \sigma^{(b)}, \delta^{(b)}) \nonumber
+\sum_{b=1}^{B+1} \sum_{t=\tau_b + 1}^{\tau_b} \log f(y_t | \phi^{(b)}) \nonumber
 \end{eqnarray}
 
+\medskip
 
+All parameters $\tau_1, \dots, \tau_B, \phi^{(1)}, \dots, \phi^{(B+1)}$ can be estimated jointly
+using dynamic programming.
 
+\medskip
 
-\item Estimate models with $B=1,...6$ breakpoints; select best via modified BIC 
+Model selection: Select best $B$ via a modified BIC from fitted models for $B = 1, \dots, 6$.
+
 % BIC: log(n) is the penalty term; in modified LWZ: 0.299*log(n)^2.1 (p.1701 Z(2010))
 % all breakpoints and all segments are simultaneously estimated
-\end{itemize}
+
 % search over all conceivable partitions can be cut shortly applying Bellman principle 
 % with systemspecific parameters \theta^{(b)}, \sigma^{(b)}, \delta^{(b) and breakpoints \tau_1,...\tau_B
 % simultaneously estimated
@@ -531,66 +504,22 @@ p--values can be computed from:
 \subsection{Example}
 
 \begin{frame}
-\frametitle{Slovenia}
-<<>>=
-i <- 18
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-%\section*{\Sexpr{nam}}
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-<<analysis>>
-}
-@
+\frametitle{Slovenia: Data}
+
+\vspace*{-0.9cm}
+
 \begin{center}
 <<fig=TRUE, height=4, width=8>>=
-<<plot1d>>
+x <- results$Slovenia
+plot(x$data, xlab = "Time", ylab = "100 * diff(log(HICP))", main = "")
 @
 \end{center}
 
-% does not work for all
-\invisible<1>{
-\small
-\begin{longtable}{|l|l|r|r|r|}
-\hline
-\textcolor{white}{Country} & \textcolor{white}{Segment} & \textcolor{white}{Mean} & \textcolor{white}{Variance} & \textcolor{white}{Skewness}  \\
-\hline
-<<echo=FALSE, results=tex>>=
-writeLines(unlist(lapply(c(18), format_moments)))
-@
-\end{longtable}
-}
+\vspace*{-0.5cm}
 
-\end{frame}
-
-
-\begin{frame}
-\frametitle{Slovenia}
-<<>>=
-i <- 18
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-%\section*{\Sexpr{nam}}
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-<<analysis>>
-}
-@
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1a>>
-@
-
-\end{center}
-
-\small
-\begin{longtable}{|l|l|r|r|r|}
+{
+\small \color{white}
+\begin{longtable}{llrrr}
 \hline
 Country & Segment & Mean & Variance & Skewness  \\
 \hline
@@ -598,52 +527,87 @@ Country & Segment & Mean & Variance & Skewness  \\
 writeLines(unlist(lapply(c(18), format_moments)))
 @
 \end{longtable}
+}
 
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Slovenia--Test}
-% the line is at the point where the LR ratio is maximal, but we estimate LM and LM is converging to LR asympotically
+\frametitle{Slovenia: Fitted Model}
 
-<<>>=
-i <- 18
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-%\section*{\Sexpr{nam}}
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-<<analysis>>
-}
-@
+\vspace*{-0.9cm}
+
 \begin{center}
 <<fig=TRUE, height=4, width=8>>=
-<<plot1b>>
+plot(x$data, xlab = "Time", ylab = "100 * diff(log(HICP))", main = "")
+lines(x$breakpoints, breaks = x$nbreaks)
+lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
 @
+\end{center}
+
+\vspace*{-0.5cm}
+
+{
+\small
+\begin{longtable}{llrrr}
+\hline
+Country & Segment & Mean & Variance & Skewness  \\
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(lapply(c(18), format_moments)))
+@
+\end{longtable}
+}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Slovenia: Test}
+% the line is at the point where the LR ratio is maximal, but we estimate LM and LM is converging to LR asympotically
+
+\vspace*{-0.9cm}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+plot(x$efp, functional = supLM(0.1), main = "supLM test", xaxt = "n", xlim = range(time(x$data)))
+Axis(time(x$data), side = 1)
+lines(x$breakpoints, breaks = x$nbreaks)
+@
+
+\vspace*{-0.5cm}
+
+{
+\small \color{white}
+\begin{longtable}{llrrr}
+\hline
+Country & Segment & Mean & Variance & Skewness  \\
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(lapply(c(18), format_moments)))
+@
+\end{longtable}
+}
 
 \end{center}
 \end{frame}
 
 
-% put supLM Test on singel file
-
-
 \begin{frame}
-\frametitle{Slovenia--Moment Changes}
+\frametitle{Slovenia: Moment Changes}
 % for a better understanding of the sources of the change (change in shape means that it is now less skewed to the right, so inflation is lower)
 % the lines are the max of the absolute value; 1. aggregate over time, 2. aggregate over components
 % "C:\Program Files\R\R-2.11.1-x64\bin\Rgui.exe
 % change languate to english: Sys.setlocale("LC_TIME", "English")
 
+\vspace*{-0.9cm}
 
-<<fig=TRUE, height=5.5, width=8>>=
-<<plot4>>
+<<fig=TRUE, height=5.5, width=7>>=
+trellis.par.set(theme = standard.theme(color = FALSE))
+print(xyplot(x$efp, aggregate = FALSE, ylim = c(-2.2, 2.2)))
 @
 % careful: the red lines are the doppelmax statistics not the supLM (just dont mention it:) 
-% doppelmax given by: max_i=1...n max_j=1...k |efp_j(i/n))| ; i.e. aggregated over both time and components
+% doppelmax given by: max_i=1...n max_j=1...k |\mathit{efp}_j(i/n))| ; i.e. aggregated over both time and components
 \end{frame}
 
 %
@@ -656,22 +620,25 @@ load(fnam)
 %% only if enough time
 %\end{frame}
 \begin{frame}
-\frametitle{Slovenia--Breakpoint Selection}
+\frametitle{Slovenia: Breakpoint Selection}
+
+\vspace*{-0.4cm}
+
 <<slovbpsel, fig=TRUE, height=5.5, width=8>>=
-<<plot2>>
+plot(x$breakpoints)
 @
 \end{frame}
 
 
 \begin{frame}
-\frametitle{Slovenia--Fitted Model}
+\frametitle{Slovenia: Fitted Model}
 
 Economic Interpretation: 
 
 \begin{itemize}
 \item had to reach Maastricht criteria 
 	\begin{itemize}
-	\item low inflation rate ($<1.5$ percentage points higher than average of 3 best performing)
+	\item low inflation rate ($<1.5$ percentage points higher than average of 3~best performing)
 	\item deficit no higher than 3\% of GDP
 	\item gross government debt $<60\%$ of GDP
 	\item no devaluation in ERM~II
@@ -722,8 +689,12 @@ Some countries follow very similar patterns
 \begin{frame}
 \frametitle{Belgium and Luxembourg}
 % could be looking much better
+
+\vspace*{-0.8cm}
+
 \begin{center}
 <<bellux, fig=TRUE, height=5, width=8>>=
+trellis.par.set(theme = standard.theme(color = FALSE))
 print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.omit(HICP[, "Luxembourg"])))), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg")), ylim=c(-2,2))
 @
 \end{center}
@@ -738,7 +709,7 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.om
 
 % heavy increase in variance both countries exactly around EURO introduction 
 % interesting thing: both were allready in a currency union (the belgish--luxembourg union)
-\begin{longtable}{|l|l|r|r|r|}
+\begin{longtable}{llrrr}
 \hline
 Country & Segment & Mean & Variance & Skewness  \\
 \hline
@@ -752,12 +723,15 @@ writeLines(unlist(lapply(c(2, 13), format_moments)))
 
 
 
-%xyplot(cbind(100*diff(log(na.omit(HICP[, "Belgium"]))), 100*diff(log(na.omit(HICP[, "Luxembourg"])))), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg"))
 \begin{frame}
 \frametitle{Italy and Spain}
-% could be looking much better
+
+\vspace*{-0.8cm}
+
+
 \begin{center}
 <<itaspa, fig=TRUE, height=5, width=8>>=
+trellis.par.set(theme = standard.theme(color = FALSE))
 print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Italy"]))), 100*diff(log(na.omit(HICP[, "Spain"])))), xlab="Time", ylab="", main="", screens=list("Italy", "Spain"), ylim=c(-2,2)))
 @
 \end{center}
@@ -772,7 +746,7 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Italy"]))), 100*diff(log(na.omit
 % now lower mean than in the 90s 
 % after Dec 2000, almost 2 years after EURO heavy increase in volatility (very similar to Belgium and Luxembourg)
 % Italy and Spain: commitment led to less frequent fiscal shocks 
-\begin{longtable}{|l|l|r|r|r|}
+\begin{longtable}{llrrr}
 \hline
 Country & Segment & Mean & Variance & Skewness \\
 \hline
@@ -790,14 +764,19 @@ writeLines(unlist(lapply(c(12, 19), format_moments)))
 \frametitle{Ireland}
 % deflationary effects of financial crisis clearly visible
 
+\vspace*{-0.9cm}
+
 \begin{center}
 <<ireland, fig=TRUE, height=4, width=8>>=
 plot(100*diff(log(na.omit(HICP[, "Ireland"]))), main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
 @
 \end{center}
 
+\vspace*{-0.6cm}
+
+{
 \small
-\begin{longtable}{|l|l|r|r|r|}
+\begin{longtable}{llrrr}
 \hline
 Country & Segment & Mean & Variance & Skewness \\
 \hline
@@ -805,6 +784,7 @@ Country & Segment & Mean & Variance & Skewness \\
 writeLines(unlist(lapply(c(11), format_moments)))
 @
 \end{longtable}
+}
 
 \end{frame}
 
@@ -812,8 +792,12 @@ writeLines(unlist(lapply(c(11), format_moments)))
 \begin{frame}
 \frametitle{No Change Countries}
 % could be looking much better
+
+\vspace*{-0.8cm}
+
 \begin{center}
 <<nochange, fig=TRUE, height=5, width=8>>=
+trellis.par.set(theme = standard.theme(color = FALSE))
 print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Finland"]))), 100*diff(log(na.omit(HICP[, "Greece"]))), 100*diff(log(na.omit(HICP[, "Netherlands"])))), xlab="Time", ylab="", main="", screens=list("Finland", "Greece", "Netherlands"), ylim=c(-2.7,2.7)))
 @
 \end{center}
@@ -823,7 +807,7 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Finland"]))), 100*diff(log(na.om
 \begin{frame}
 \frametitle{No Change Countries}
 % most interesting country: greece (extremely high variance, looks almost like a result of a random number seed 
-\begin{longtable}{|l|l|r|r|r|}
+\begin{longtable}{llrrr}
 \hline
 Country & Segment & Mean & Variance & Skewness  \\
 \hline
@@ -864,13 +848,13 @@ writeLines(unlist(lapply(c(9,14,6), format_moments)))
 \frametitle{HICP}
 % put at the end to be ready to show when asked but not include in beginning as to avoid confusion
 
-First step: local sub--index of a specific price collected item $R_{iy}^t$:
+First step: local sub-index of a specific price collected item $R_{iy}^t$:
 % for each city y from all its outlets j, by use of the geometric mean of all prices collected from the outlets
 \begin{eqnarray}
 R_{iy}^t & = & \frac{(\prod_{j=1}^n p_{iyj}^t)^{1/n}}{(\prod_{j=1}^n p_{iyj}^0)^{1/n}} \nonumber
 \end{eqnarray}
 
-Second step: sub--index for whole country $R_i^t$:
+Second step: sub-index for whole country $R_i^t$:
 % weighted mean of the subindices of this item for all cities
 \begin{eqnarray}
 R_i^t & = & \sum_{y=1}^m R_{iy}^t G_y \nonumber
@@ -895,7 +879,7 @@ HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T} \nonumber
 
 % to show left and right skewed gl - distribution
 \begin{frame}
-\frametitle{GL--right and left skewed}
+\frametitle{GL: Skewness}
 \begin{center}
 <<glrl, fig=TRUE, height=5, width=8>>=
 x <- -40:40/10
