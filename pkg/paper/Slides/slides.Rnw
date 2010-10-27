@@ -287,10 +287,10 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
   \item Did European Monetary Union (EMU) change inflation dynamics?
   \item Economic reasons
   	\begin{itemize}
-  	\item Former Council for Mutual Economic Assistance (COMECON) countries
+  	\item Former Council for Mutual Economic Assistance (COMECON) member states
   	% abkürzung für: Council for Mutual Economic Assistance
   	% stabilise inflation for EURO introduction or ERM II entry
-  	\item Ex--Yugoslavia
+  	\item Ex--Yugoslavia countries
   	% same as former comecon countries 
   	\item Southern European countries
   	% profit from a more credible central bank which is more inclined towards price stability
@@ -306,9 +306,9 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 	\item 3 groups
 		\begin{itemize}
 		\item EURO countries
-		\item EU members withouth Exchange Rate Mechanism~II (ERM~II) 
+		\item EU members without Exchange Rate Mechanism~II (ERM~II) 
 		% like Sweden, UK, poland, czech republic, Hungary, Romania, Bulgaria
-		\item Others
+		\item ERM~II countries
 		% Denmark: ERM~II but not EURO, Estonia, Latvia, Lithuania
 		\end{itemize}
 \end{itemize}
@@ -320,10 +320,12 @@ plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
 \frametitle{Model}
 
 \begin{itemize}
-\item Actually some alternatives
+\item Some alternatives
 	\begin{itemize}
 	\item ARIMA
 	\item GARCH
+	\item Multivariate models
+	% multivariate like palombas
 	% then test for a breakpoint in the parameters
 	% which does not work for short time series and it is doubtful if there are any effects
 	% also: arima and garch test for a corelation structure
@@ -398,7 +400,7 @@ Assuming $\phi = (\theta, \sigma, \delta)$ is constant:
 %\begin{eqnarray}
 \end{eqnarray}
 
-Compute empirical scores $s(y_t|\hat{\phi})$
+Use empirical scores $s(y_t|\hat{\phi})$ for testing
 % then we can apply a CLT (central limit theorem)
 
 %Under certain assumptions, a central limit theorem holds:
@@ -445,7 +447,7 @@ s_{\delta}(y|\theta, \sigma, \delta) & =  \frac{\delta \log f(y|\theta,\sigma, \
 The empirical fluctuation process $efp(\cdot)$:
 
 \begin{eqnarray}
-efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_t|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
+efp(t) = \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \; (0 \leq t \leq 1), \nonumber \\
 efp(\cdot) \overset{d}{\rightarrow} W^0(\cdot) \nonumber
 \end{eqnarray}
 
@@ -765,6 +767,7 @@ print(xyplot(cbind(100*diff(log(na.omit(HICP[, "Italy"]))), 100*diff(log(na.omit
 
 \begin{frame}
 \frametitle{Italy and Spain}
+% jesus explanation: less frequent fiscal shocks during consolidation period --> verify via government expenditures
 % identical break dates
 % now lower mean than in the 90s 
 % after Dec 2000, almost 2 years after EURO heavy increase in volatility (very similar to Belgium and Luxembourg)
@@ -786,6 +789,14 @@ writeLines(unlist(lapply(c(12, 19), format_moments)))
 \begin{frame}
 \frametitle{Ireland}
 % deflationary effects of financial crisis clearly visible
+
+\begin{center}
+<<ireland, fig=TRUE, height=4, width=8>>=
+plot(100*diff(log(na.omit(HICP[, "Ireland"]))), main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
+@
+\end{center}
+
+\small
 \begin{longtable}{|l|l|r|r|r|}
 \hline
 Country & Segment & Mean & Variance & Skewness \\
@@ -795,12 +806,8 @@ writeLines(unlist(lapply(c(11), format_moments)))
 @
 \end{longtable}
 
-\begin{center}
-<<ireland, fig=TRUE, height=4.7, width=8>>=
-plot(100*diff(log(na.omit(HICP[, "Ireland"]))), main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
-@
-\end{center}
 \end{frame}
+
 
 \begin{frame}
 \frametitle{No Change Countries}
@@ -845,7 +852,8 @@ writeLines(unlist(lapply(c(9,14,6), format_moments)))
 \item Stabilizing Effect of EURO?
 % mention eastern european countries like Slovenia
 \item Overall lowering in mean inflation rates
-\item Overall increase in volatility, possibly due to change in definitions or data collection
+\item Overall increase in volatility
+% possibly due to change in definitions or data collection
 % why? discuss with participants; some fluctuation is natural but is there any good reason for this?
 % delve into problematic of the countrries
 \end{itemize}
@@ -875,7 +883,7 @@ R_h^{t,T} = R_h^{12,T-1} \left[ \frac{\sum_{i=1}^q w_i^T R_i^t/R_i^{12,T-1}}{\su
 % where q is the number of collected items in the food basket
 
 
-Third step: weighted average of all included individual subindices:
+Third step: weighted average of all included individual subindexes:
 \begin{eqnarray}
 HICP_t & = & \sum_{i=1}^n \gamma_i R_h^{t,T} \nonumber
 \end{eqnarray}
