@@ -272,7 +272,7 @@ HICP <- HICP[, colnames(HICP) != "EU"]
 	\begin{itemize}
 	\item Track evolution of distribution over time for each country
 	\item Investigate changes in mean, variance, and skewness over time
-	\item Idea: Identify changes associated with intervetions, crises, etc.
+	\item Idea: Identify changes associated with interventions, crises, etc.
 	% not a problem with correlation of series, no change if estimated with HAC (heteroscedasticity and autocorrelation adjusted estimator)
 	\end{itemize}
 	% talk about multivariate models like the one from palomba with inflation convergence etc.
@@ -413,7 +413,7 @@ The empirical fluctuation process $\mathit{efp}(\cdot)$ captures systematic devi
 \medskip
 
 Functional central limit theorem (FCLT) for $\mathit{efp}(\cdot)$:
-$W^0$ converges to a 3-dimensional Brownian bridge:
+converges to a 3-dimensional Brownian bridge:
 
 \begin{eqnarray}
 \mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot) \nonumber
