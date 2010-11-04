@@ -193,19 +193,8 @@ x_rf <- refit(x_bp, breaks = x_nbreaks)
 save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(HICP)[i], ".rda", sep = ""))
 
 
-<<plotversuch, eval=FALSE>>=
-par(mfrow = c(2, 1))
-plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
-lines(x_bp, breaks = x_nbreaks)
-lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
-plot(xbel, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
-lines(xbel_bp, breaks = xbelnbreaks)
-lines(fitted(xbel_bp, breaks = xbelnbreaks, type = "mean"), col = 4)
-@
 
-
-
-% plot "macros" (assuming existence "x", "x_gf", ...)
+## plot "macros" (assuming existence "x", "x_gf", ...)
 <<plot1, eval=FALSE>>=
 par(mfrow = c(1, 2))
 plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
@@ -215,31 +204,11 @@ plot(x_efp, functional = supLM(0.1), main = "supLM test")
 lines(x_bp, breaks = x_nbreaks)
 @
 
-
-<<plot1d, eval=FALSE>>=
-plot(x, main = "Slovenia", ylab = "100 * diff(log(HICP))", xlab = "Time")
-@
-
-<<plot1b, eval=FALSE>>=
-plot(x_efp, functional = supLM(0.1), main = "supLM test")
-lines(x_bp, breaks = x_nbreaks)
-@
-
 <<plot2, eval=FALSE>>=
 par(mfrow = c(1, 1))
 plot(x_bp)
 @
 
-<<plot3, eval=FALSE>>=
-par(mfrow = c(1, x_nbreaks + 1))
-for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
-  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
-@
-
-<<plot4, eval=FALSE>>=
-par(mfrow = c(1, 1))
-plot(x_efp, aggregate = FALSE, ylim=c(-2.1,2.1))
-@
 
 \graphicspath{{Figures/}}
 
@@ -440,10 +409,13 @@ All parameters $\tau_1, \dots, \tau_B, \phi^{(1)}, \dots, \phi^{(B+1)}$ can be e
 \newpage
 \section{Results}
 
-To help with the interpretation, we give a short overview over the history of the EMU. Following the Delors Plan with his 3 stages, we have: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2002) the transition period, which ended with the introduction of the Euro as legal tender and started with the Exchange Rate Mechanism~II (ERM~II) for Non--members and the irrevocable fixing of exchange rates of Member States.
+To help with the interpretation, we give a short overview over the history of the EMU. Following the Delors Plan with his 3 stages, we have: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2002) the transition period, which ended with the introduction of the Euro as legal tender and started with the Exchange Rate Mechanism~II (ERM~II) for Non--members and the irrevocable fixing of exchange rates of Member States. \\
+It should be pointed out however, that these monthly series do still contain all the saisonality and that if we correct for this by using the lag of order 12 instead of order 1, we find somewhat less pronounced changes with the exception of the latest observations, with the financial crises and the overall lowering in inflation rates, which of course leads to a considerable increase in variance for more than half of our sample. 5 countries in our sample then show a break in October 2007, coinciding with the ongoing financial crises. 
+
+% interesting graph to financial crisis: http://de.wikipedia.org/wiki/Datei:Einlagefazilit%C3%A4t.PNG
+ 
 %If the EMU had a significant effect upon inflation rate dynamics, we would expect to find a break either in the 90ies, reflecting the various waves of integration or after the introduction of the Euro due to the popular argument that the introduction of Euro paper money led to a considerable price increase. \\
 %[some considerations: 1. necessary to include all the results? seems to me preferable to deal with them as groups of individual contries rather than all on one page; 2. show all the groups? 3. show example like in Slovenian case?]
-
 
 
 % http://en.wikipedia.org/wiki/European_Exchange_Rate_Mechanism#Replacement_with_the_euro_and_ERM_II
@@ -472,9 +444,12 @@ To help with the interpretation, we give a short overview over the history of th
 
 \subsection{Belgium and Luxembourg}
 
-On the basis of these results, we are able to trace out different groups. The first of this group consits of Belgium and Luxembourg. This may come as no surprise since both countries formed a monetary union prior even to the start of the Exchange Rate Mechanism (ERM). While both countries enjoyed very stable inflation rates with low values of both mean and variance, this changed around the timing of the irrevocable fixing of the exchange rates. A causal connection to this events seems likely.
+On the basis of these results, we are able to trace out different groups. The first of this group consits of Belgium and Luxembourg. This may come as no surprise since both countries formed a monetary union prior even to the start of the Exchange Rate Mechanism (ERM). While both countries enjoyed very stable inflation rates with low values of both mean and variance, this changed around the timing of the irrevocable fixing of the exchange rates. A causal connection to this events seems possible. However, according to an official of Statec Luxembourg\footnote{www.statec.lu}, these changes can be traced back  to the inclusion of sales (winter and summer) from january 1999 on according to a change in regulation. For Belgium we suspect similar change, but our suspicion is not yet confirmed.
+
+% Quelle: e-mail Verkehr mit Jérôme Hury, dem Chef der Statec Price Abteilung
 
 % interesting thing: both were allready in a currency union (the belgish--luxembourg union)
+% Luxembourg and probably in Belgium too, as  you find out sales prices were excluded before the regulation
 
 \small
 \begin{longtable}{|l|l|l|l|l|l|l|l|}
@@ -733,7 +708,8 @@ Slovenia did achieve this by two very important measures. First it liberalized t
 \clearpage
 \section{Conlcusion}
 
-We were able to outline changes in the dynamics of the inflation rates in various countries across Europe. However, we fail to find any clear pattern relating to the EURO introduction, but find clear evidence that the zeal of the Eastern European countries to join the European currency at the earliest possible date, clearly helped in reducing mean and variance of their inflation rates.
+We were able to outline changes in the dynamics of the inflation rates in various countries across Europe. However, we fail to find any clear pattern relating to the EURO introduction, but find clear evidence that the zeal of the Eastern European countries to join the European currency at the earliest possible date, clearly helped in reducing mean and variance of their inflation rates. \\
+Considering the severe increase in overall volatility of the European inflation rates, it should be pointed out however, that most of these increases can be traced back to the strong seasonality in our time series.
 
 
 
