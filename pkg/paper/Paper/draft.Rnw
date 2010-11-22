@@ -164,6 +164,25 @@ format_moments <- function(i, digits = 3) {
   return(rval)
 }
 
+get_data <- function(i) {
+  rval <- do.call("merge",
+    lapply(i, function(j) results[[j]]$data))
+  colnames(rval) <- names(results)[i]
+  rval
+}
+
+get_fitted <- function(i) {
+  rval <- do.call("merge",
+    lapply(i, function(j) fitted(results[[j]]$breakpoints, breaks=results[[j]]$nbreaks, type = "mean")))
+  colnames(rval) <- names(results)[i]
+  rval
+}
+
+get_xyplot <- function(i)
+  xyplot(merge(get_data(i), get_fitted(i)),
+    screen = rep(names(results)[i], 2),
+    col = rep(c(1, 4), each = length(i))) 
+    
 xyplot.gefp <- function(x, panel = NULL, ylim = NULL, ...)
 {
   cval <- maxBB$computeCritval(0.05, ncol(x$process))
@@ -243,6 +262,9 @@ plot(x_bp)
 @
 
 
+
+
+
 % all created dynamically
 %\graphicspath{{Figures/}}
 
@@ -313,7 +335,7 @@ The clear message here is that there is no clear message up to now. Most studies
 
 The data is obtained from the \citet{oecd}. Inflation is measured as the monthly change in the HICP rates from Jan. 1990---Mar. 2010. Countries included are Austria,	Belgium, the	Czech Republic,	Denmark, Estonia,	Finland,	France,	Germany,	Greece,	Hungary,	Ireland,	Italy,	Luxembourg,	the Netherlands,	Poland,	Portugal,	Slovakia, Slovenia,  Spain,	Sweden, and	the	United Kingdom (Latvia and Lithuania as well as Bulgaria and Romania are excluded due to data scarcity).  \\
 The countries can be divided into three different groups. First the euro countries (Austria, Belgium, Estonia (although Estonia has not yet introduced the euro, but in 2011), France, Finland, Germany, Greece, Ireland, Italy, Luxembourg, the Netherlands, Portugal, Slovakia, Slovenia and Spain). Cypria, Malta, Andorra, Monaco, San Marino and the Vatican are left out due their minor importance. Second, the EU members not participating in the ERM~II (Exchange Rate Mechanism): the Czech Republic, Hungary, Poland, the United Kingdom and Sweden. Denmark stands on its own as a member of the EU and the ERM~II, but not yet a member of the EMU. \\
-It should be pointed out however, that these monthly series do still contain all the seasonality.\footnote{We would like to mention that in the case of Belgium and Luxembourg, the seasonality patterns can be traced back to changes in HICP definition and legal  requirements. In addition to Belgium and Luxembourg, there are a number of other states, where the sales periods are regulated by law. France has an individual time span regulated by each department. This should pose no problem, since there is no global state level solution. In Greece there are also two set sales--periods in winter and summer. In Italy the sales periods are fixed each year by the Chambers of Commerce. Portugal has two set sales periods as well, but for two month (January and February as well as Mid--July to Mid--September. The source for this information is \citet{konseur}.} 
+It should be pointed out however, that these monthly series do still contain all the seasonality.\footnote{We would like to meantion that in the case of Belgium and Luxembourg, the seasonality patterns can be traced back to changes in HICP definition and legal  requirements. In addition to Belgium and Luxembourg, there are a number of other states, where the sales periods are regulated by law. France has an individual time span regulated by each department. This should pose no problem, since there is no global state level solution. In Greece there are also two set sales--periods in winter and summer. In Italy the sales periods are fixed each year by the Chambers of Commerce. Portugal has two set sales periods as well, but for two month (January and February as well as Mid--July to Mid--September. The source for this information is \citet{konseur}.} 
 
 \section{Model}
 
@@ -325,7 +347,7 @@ It should be pointed out however, that these monthly series do still contain all
 %allg. Motivation
 Our main question of interest is whether or not a country's decision to join one or all of the steps leading towards a common European currency changed its inflation rate dynamics. The economic reason why this should be so is rather clear cut for more than half of the countries in our sample. We would expect changes in the dynamics of all Eastern European countries due to their transition process away from previously centrally planned economies towards free market economies. All of these countries experienced some problems with very high inflation rates at the beginning and they all were successfull in eliminating excess inflation afterwards. We might also assume, that the former constituent republics of Yugoslavia follow a rather similar pattern. In the case of the Southern European countries, with a history of high inflation and less pronounced fiscal discipline, we would also expect inflation dynamics to change towards a regime of lower inflation. The case for the Central European countries of course is different. There is no reason why the European Central Bank (ECB) should actually  follow the rather stable monetary policies of the former German central bank in a one--to--one fashion. \\
 %explanation
-Our approach  follows one simple idea: we want to track the evolution of mean, variance and skewness of the inflation series over time. Thereby we hope to be able to find and estimate possible breakpoints in the data. These breakpoints -- where any breakpoint would suggest a change in dynamics -- are then examined for each country individually. We focus on countries rather then the whole euro--area due to the still large degree of heterogeneity in the sample. If a number of countries would have the same break dates, this would possibly indicate some common factor responsible for changes in the dynamics. We hope to be able to trace out similarities and differences in the countries and thereby improve our understanding of what the monetary union actually ment for the inflation rate dynamics. \\
+Our approach  follows one simple idea: we want to track the evolution of mean, variance and skewness of the inflation series over time. Thereby we hope to be able to find and estimate possible breakpoints in the data. These breakpoints -- where any breakpoint would suggest a change in dynamics -- are then examined for each country individually. We focus on countries rather then the whole euro--area due to the still large degree of heterogeneity in the sample. If a number of countries would have the same break dates, this would possibly indicate some common factor responsible for changes in the dynamics. We hope to be able to trace out similarities and differences in the countries and thereby improve our understanding of what the monetary union actually meant for the inflation rate dynamics. \\
 
 
 
@@ -348,7 +370,7 @@ In econometrics, the logistic distribution is often used in income distributions
 \subsection{Estimation}
 %Schätzung
 
-We apply the general framework, as developed in \citet{z07}, to a more specific model, in this case by means of a GL distribution.  An enhancement to the already existing \proglang{R} package \pkg{strucchange}, which currently does not support a GL distribution, is provided with this paper. The asymptotic testing theory still holds for this generalization. The first part of the results we are going to present here, i.e., the tests and the graphical illustration of the empirical fluctuation process werde developed in \citet{z07}, the second part of the results - the dating procedure and the illustration of the densities fitted for the subsamples (divided by the breaks) - can be found in \citet{z10}. \\
+We apply the general framework, as developed in \citet{z07}, to a more specific model, in this case by means of a GL distribution.  An enhancement to the already existing \proglang{R} package \pkg{strucchange}, which currently does not support a GL distribution, is provided with this paper. The asymptotic testing theory still holds for this generalization. The first part of the results we are going to present here, i.e., the tests and the graphical illustration of the empirical fluctuation process were developed in \citet{z07}, the second part of the results - the dating procedure and the illustration of the densities fitted for the subsamples (divided by the breaks) - can be found in \citet{z10}. \\
 In order to analyze our data, we first estimate the parameters of the GL--distribution by means of maximum likelihood, which is possible, if we assume that our parameter vector $\phi = (\theta, \sigma, \delta)$ is stable over time $t$, i.e. we estimate $\hat{\phi} ~=~ \underset{\phi}{argmax} \sum_{t=1}^n \log f(y_t|\phi)$. Our problem now simplifies to the following question: Is the assumption valid or do the $\phi_t$ change?
 
 %H0
@@ -403,7 +425,7 @@ Actually when we look at the data, this is precisely what we find, a breakpoint 
 
 <<fig=TRUE, height=4, width=8>>=
 x <- results$Slovenia
-plot(x$data, xlab = "Time", ylab = "100 * diff(log(HICP))", main = "")
+plot(x$data, xlab = "Time", ylab = "100 * diff(log(HICP))", main = "Slovenia")
 lines(x$breakpoints, breaks = x$nbreaks)
 lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
 @
@@ -434,7 +456,7 @@ Slovenia did achieve its goals by two very important measures. First, it liberal
 \newpage
 \section{Results}
 
-The results as we show them here are grouped according to patterns, which we think have some common properties. We present the breakdates and the parameter values of the segments as well as the dates of entry into the ERM/ERM~II or the date of euro introduction. To give a guidline for interpretation, we provide a short overview over the history of the EMU. It basically consisted of 3 stages: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2001) the transition period, which ended with the introduction of the euro as legal tender and started with the Exchange Rate Mechanism~II (ERM~II) for Non--members and the irrevocable fixing of the exchange rates of the Member States. \\
+The results as we show them here are grouped according to patterns, which we think have some common properties. We present the breakdates and the parameter values of the segments as well as the dates of entry into the ERM/ERM~II or the date of euro introduction. To give a guideline for interpretation, we provide a short overview over the history of the EMU. It basically consisted of 3 stages: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2001) the transition period, which ended with the introduction of the euro as legal tender and started with the Exchange Rate Mechanism~II (ERM~II) for Non--members and the irrevocable fixing of the exchange rates of the Member States. \\
 
 %
 %das package colortbl (\usepackege[dvips]{colortbl}) ermöglicht z.B. mit
@@ -500,7 +522,7 @@ writeLines(unlist(lapply(c(1,4,7,8,16), format_moments)))
 % Italian Statistics: Your request has been correctly inserted in the system with the reference number 13078/2010.
 % comment: the greek break is NOT sure, since they have not yet answered about sales periods
 
-The first  distinct group of contries consists of Belgium and Luxembourg. This may come as no surprise, since both countries formed a monetary union prior to the start of the ERM. In the past, they enjoyed very stable inflation rates with low values of both mean and variance, this changed around the timing of the irrevocable fixing of the exchange rates. But in the case of Belgium and Luxembourg, what we actually observe is an alternation due to the definition of the HICP. According to their national statistical offices, these changes can be traced back  to the inclusion of sales (winter and summer) in January 1999 for Belgium and January 2000 for Luxembourg which was demanded by a Commission regulation, details may be found in: \citet{eurlex} This lead to a 6 month seasonality pattern (January and July) afterwards (meaning after the breakpoints induced by sales inclusion), since sales periods in Belgium and Luxembourg are regulated by law and have to occur in the first two weeks of these months and therefor we observe this sharp price decreases in both month. Interestingly enough, both these price decreases are immediately followed by increases in February and August of even higher magnitude. \\
+The first  distinct group of countries consists of Belgium and Luxembourg. This may come as no surprise, since both countries formed a monetary union prior to the start of the ERM. In the past, they enjoyed very stable inflation rates with low values of both mean and variance, this changed around the timing of the irrevocable fixing of the exchange rates. But in the case of Belgium and Luxembourg, what we actually observe is an alternation due to the definition of the HICP. According to their national statistical offices, these changes can be traced back  to the inclusion of sales (winter and summer) in January 1999 for Belgium and January 2000 for Luxembourg which was demanded by a Commission regulation, details may be found in: \citet{eurlex} This lead to a 6 month seasonality pattern (January and July) afterwards (meaning after the breakpoints induced by sales inclusion), since sales periods in Belgium and Luxembourg are regulated by law and have to occur in the first two weeks of these months and therefor we observe this sharp price decreases in both month. Interestingly enough, both these price decreases are immediately followed by increases in February and August of even higher magnitude. \\
 The second of these groups are the Eastern European countries: the Czech Republic, Estonia, Hungary, Poland, Slovakia and Slovenia. In almost all of these countries, the mean and the variance of their inflation rates declined in the later part of the 90ies. Most of them experienced a break in 1997/1998, with Poland, Slovakia and Slovenia somewhat later. \\
 Another combination of countries with -- this time -- identical results are the two biggest southern European countries, Italy and Spain. Both of them experienced high rates of inflation in the early 90ies. Afterwards, in the phase leading up to the monetary union, mean and variance were significantly reduced. This trend changed drastically soon after the fixing of the exchange rates leading to higher mean and much higher variances then ever before since the beginning of the HICP series. \\
 Italy is quite a nice example to explain the usefulness of the skewness parameter. If we focus on the first two periods, with skewness lower than 1 (which indicates that the distribution is skewed to the right) we find that positive shocks are not normally neutralized by negative shocks. This changes in the last phase with skewness negative, indicating that the GL is now skewed to the left and that positive shocks will more likely be followed by negative shocks. \\
@@ -549,7 +571,7 @@ One interesting aspect we would like to focus on is the clear trend in means. Wh
 
 
 \clearpage
-\section{Conlcusion}
+\section{Conclusion}
 
 We were able to outline changes in the dynamics of the inflation rates in various countries across Europe. However, we fail to find any clear pattern relating to the euro introduction, but find convincing evidence, that the zeal of the Eastern European countries to join the European currency at the earliest possible date, clearly helped in reducing mean and variance of their inflation rates. \\
 Considering the severe increase in overall volatility of the European inflation rates, it should be pointed out however, that most of these increases could possibly be traced back to the strong seasonality in our time series. The economic reason for this however remains a riddle and should be subject to future research.
@@ -601,50 +623,73 @@ The scores of the parameters $\phi = (\theta, \sigma, \delta)$ sum up to 0: $\su
 
 % generate graphs in another fashion (a graph with data of results3) und zwar: results$Belgium$data
 % include fitted means --> still some work to do, not yet figured out due to xyplot and two lines...
-<<bellux, fig=TRUE, height=5, width=8>>=
-trellis.par.set(theme = standard.theme(color = FALSE))
-print(xyplot(cbind(results$Belgium$data, results$Luxembourg$data), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg")), ylim=c(-2,2))
+%<<bellux, fig=TRUE, height=5, width=8>>=
+%trellis.par.set(theme = standard.theme(color = FALSE))
+%print(xyplot(cbind(results$Belgium$data, results$Luxembourg$data), xlab="Time", ylab="", main="", screens=list("Belgium", "Luxembourg")), ylim=c(-2,2))
+%@
+
+Here we present the actual data where the blue lines in the graphs correspond to the estimated mean of the series.  
+
+<<bellux, fig=TRUE, height=8, width=8>>=
+print(get_xyplot(c(2, 13)))
 @
 
+%<<eastern, fig=TRUE, height=7, width=8>>=
+%trellis.par.set(theme = standard.theme(color = FALSE))
+%print(xyplot(cbind(results$CzechRepublic$data, results$Estonia$data, results$Hungary$data, results$Poland$data, results$Slovakia$data, results$Slovenia$data), xlab="Time", ylab="", main="", screens=list("Czech Republic", "Estonia", "Hungary", "Poland", "Slovakia", "Slovenia"), ylim=c(-2.7,2.7)))
+%@
 
-
-<<eastern, fig=TRUE, height=7, width=8>>=
-trellis.par.set(theme = standard.theme(color = FALSE))
-print(xyplot(cbind(results$CzechRepublic$data, results$Estonia$data, results$Hungary$data, results$Poland$data, results$Slovakia$data, results$Slovenia$data), xlab="Time", ylab="", main="", screens=list("Czech Republic", "Estonia", "Hungary", "Poland", "Slovakia", "Slovenia"), ylim=c(-2.7,2.7)))
+<<eastern, fig=TRUE, height=12, width=8>>=
+print(get_xyplot(c(3, 5,10,17,18)))
 @
 
+%<<itaspa, fig=TRUE, height=5, width=8>>=
+%trellis.par.set(theme = standard.theme(color = FALSE))
+%print(xyplot(cbind(results$Spain$data, results$Italy$data), xlab="Time", ylab="", main="", screens=list("Italy", "Spain"), ylim=c(-2,2)))
+%@
 
 
-<<itaspa, fig=TRUE, height=5, width=8>>=
-trellis.par.set(theme = standard.theme(color = FALSE))
-print(xyplot(cbind(results$Spain$data, results$Italy$data), xlab="Time", ylab="", main="", screens=list("Italy", "Spain"), ylim=c(-2,2)))
+<<itaspa, fig=TRUE, height=8, width=8>>=
+print(get_xyplot(c(19,12)))
 @
 
+%<<ireland, fig=TRUE, height=4, width=8>>=
+%plot(results$Ireland$data, main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
+%@
+<<ireland, fig=TRUE, height=8, width=8>>=
+x <- results$Ireland
+plot(x$data, xlab = "Time", ylab = "100 * diff(log(HICP))", main = "Ireland")
+lines(x$breakpoints, breaks = x$nbreaks)
+lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
+@
+%<<nochange, fig=TRUE, height=5, width=8>>=
+%trellis.par.set(theme = standard.theme(color = FALSE))
+%print(xyplot(cbind(results$Finland$data, results$Greece$data, results$Netherlands$data), xlab="Time", ylab="", main="", screens=list("Finland", "Greece", "Netherlands"), ylim=c(-2.7,2.7)))
+%@
 
-
-
-<<ireland, fig=TRUE, height=4, width=8>>=
-plot(results$Ireland$data, main="Ireland", ylab="", xlab ="Time", ylim=c(-2,2))
+<<nochange, fig=TRUE, height=12, width=8>>=
+print(get_xyplot(c(6,9,14)))
 @
 
+%<<sweuk, fig=TRUE, height=7, width=8>>=
+%print(xyplot(cbind(results$Sweden$data, results$UnitedKingdom$data), xlab="Time", ylab="", main="", screens=list("Sweden", "United Kingdom")), ylim=c(-2,2))
+%@
 
 
-<<nochange, fig=TRUE, height=5, width=8>>=
-trellis.par.set(theme = standard.theme(color = FALSE))
-print(xyplot(cbind(results$Finland$data, results$Greece$data, results$Netherlands$data), xlab="Time", ylab="", main="", screens=list("Finland", "Greece", "Netherlands"), ylim=c(-2.7,2.7)))
+<<sweuk, fig=TRUE, height=8, width=8>>=
+print(get_xyplot(c(20,21)))
 @
 
-
-
-<<sweuk, fig=TRUE, height=7, width=8>>=
-print(xyplot(cbind(results$Sweden$data, results$UnitedKingdom$data), xlab="Time", ylab="", main="", screens=list("Sweden", "United Kingdom")), ylim=c(-2,2))
-@
 
 %<<nopattern, fig=TRUE, height=7, width=8>>=
 %trellis.par.set(theme = standard.theme(color = FALSE))
-%print(xyplot(cbind(results$Austria$data, results$Demark$data, results$France$data, results$Germany$data, results$Portugal$data), xlab="Time", ylab="", main="", screens=list("Austria", "Denmark", "France", "Germany", "Portugal"), ylim=c(-2,2)))
+%print(xyplot(cbind(results$Austria$data, results$Denmark$data, results$France$data, results$Germany$data, results$Portugal$data), xlab="Time", ylab="", main="", screens=list("Austria", "Denmark", "France", "Germany", "Portugal"), ylim=c(-2,2)))
 %@
 
+
+<<nopattern, fig=TRUE, height=12, width=8>>=
+print(get_xyplot(c(1,4,7,8,16)))
+@
 
 
 
