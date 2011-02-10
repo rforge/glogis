@@ -34,6 +34,9 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 <<data>>=
 data("HICP", package = "glogis")
 HICP <- HICP[, colnames(HICP) != "EU"]
+names(HICP) <- c("Austria",  "Belgium", "CzechRepublic", "Denmark", "Estonia", 
+"Finland", "France",  "Germany", "Greece", "Hungary", "Ireland",  "Italy", "Luxemburg", "Netherlands",
+"Poland", "Portugal",  "Slovakia", "Slovenia",  "Spain", "Sweden", "UK")
 add_breaks <- structure(rep(0, ncol(HICP)), .Names = colnames(HICP))
 add_breaks[c("Germany", "Portugal", "Slovakia", "Spain")] <- 1
 @
@@ -101,7 +104,7 @@ x_bp <- breakpoints(x_gf, h = 24)
 ## had to be changed du to error 
 ## include breakpoint for italy
 
-if (i == 12) {x_nbreaks <- 2} else {x_nbreaks <- 1}
+if (i == 12) {x_nbreaks <- 2} else if (i==9) {x_nbreaks<-0} else {x_nbreaks <- 1}
 
 ## refit segmented model
 x_rf <- refit(x_bp, breaks = x_nbreaks)
@@ -159,6 +162,57 @@ for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Go
   format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
 @
 
+
+
+%-----------------------------------------------------------
+\newpage
+% Austria
+<<>>=
+i <- 1
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysisnorm>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
 %-----------------------------------------------------------
 \newpage
 % Belgium (Jan,Feb, Jul,Aug)
@@ -208,397 +262,6 @@ if ( mon[k] == 8) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0}
 }
 
 <<analysis>>
-}
-@
-
-\begin{verbatim}
-<<echo=FALSE, results=tex>>=
-coef(x_bp, breaks = x_nbreaks)
-@
-
-
-<<echo=FALSE, results=tex>>=
-moments(x_bp, breaks = x_nbreaks)
-@
-
-
-\end{verbatim}
-
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1>>
-@
-
-\setkeys{Gin}{width=0.5\textwidth}
-<<fig=TRUE, height=4.5, width=4.5>>=
-<<plot2>>
-@
-\setkeys{Gin}{width=\textwidth}
-
-<<fig=TRUE, height=4.5, width=9>>=
-<<plot3>>
-@
-\end{center}
-
-%-----------------------------------------------------------
-\newpage
-% Greece (Jan,Feb, March, Jul,Aug, Sept)
-<<>>=
-i <- 9
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-
-\section*{\Sexpr{nam}}
-
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
-## create numbers for dummy creation and mon creation
-n1 <- 73
-n2 <- 72
-
-<<analysisdum>>
-
-# regress on monthly dummies
-	reg <- lm(nx ~ dum1 + dum2 + dum3 +  dum7  + dum8 + dum9)
-
-# substract effect of dummies on series
-subs <- rep(0, length(mon))
-subs1 <- rep(0, length(mon))
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 2) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 3) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 7) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 8) {subs[k] <- reg$coefficients[6]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 9) {subs[k] <- reg$coefficients[7]} else {subs1[k] <- 0} 
-}
-<<analysis>>
-}
-@
-
-\begin{verbatim}
-<<echo=FALSE, results=tex>>=
-coef(x_bp, breaks = x_nbreaks)
-@
-
-
-<<echo=FALSE, results=tex>>=
-moments(x_bp, breaks = x_nbreaks)
-@
-
-
-\end{verbatim}
-
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1>>
-@
-
-\setkeys{Gin}{width=0.5\textwidth}
-<<fig=TRUE, height=4.5, width=4.5>>=
-<<plot2>>
-@
-\setkeys{Gin}{width=\textwidth}
-
-<<fig=TRUE, height=4.5, width=9>>=
-<<plot3>>
-@
-\end{center}
-
-%-----------------------------------------------------------
-\newpage
-% Italy ((Jan, March, Jul, Sept ?) --> not clear
-<<>>=
-i <- 12
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-
-\section*{\Sexpr{nam}}
-
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
-## create numbers for dummy creation and mon creation
-n1 <- 133
-n2 <- 132
-
-<<analysisdum>>
-
-# regress on monthly dummies
-	reg <- lm(nx ~ dum1 + dum3 +  dum7 + dum9)
-	
-
-# substract effect of dummies on series
-subs <- rep(0, length(mon))
-subs1 <- rep(0, length(mon))
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 3) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 7) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 9) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
-}
-
-<<analysis>>
-}
-@
-
-\begin{verbatim}
-<<echo=FALSE, results=tex>>=
-coef(x_bp, breaks = x_nbreaks)
-@
-
-
-<<echo=FALSE, results=tex>>=
-moments(x_bp, breaks = x_nbreaks)
-@
-
-
-\end{verbatim}
-
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1>>
-@
-
-\setkeys{Gin}{width=0.5\textwidth}
-<<fig=TRUE, height=4.5, width=4.5>>=
-<<plot2>>
-@
-\setkeys{Gin}{width=\textwidth}
-
-<<fig=TRUE, height=4.5, width=9>>=
-<<plot3>>
-@
-\end{center}
-
-
-%-----------------------------------------------------------
-\newpage
-% Luxembourg (Jan,Feb, Jul,Aug)
-<<>>=
-i <- 13
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-
-\section*{\Sexpr{nam}}
-
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
-## create numbers for dummy creation and mon creation
-n1 <- 73
-n2 <- 72
-
-<<analysisdum>>
-
-# regress on monthly dummies
-	reg <- lm(nx ~ dum1 + dum2 + dum7  + dum8)
-
-# substract effect of dummies on series
-subs <- rep(0, length(mon))
-subs1 <- rep(0, length(mon))
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 2) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 7) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 8) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
-}
-
-<<analysis>>
-}
-@
-
-\begin{verbatim}
-<<echo=FALSE, results=tex>>=
-coef(x_bp, breaks = x_nbreaks)
-@
-
-
-<<echo=FALSE, results=tex>>=
-moments(x_bp, breaks = x_nbreaks)
-@
-
-
-\end{verbatim}
-
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1>>
-@
-
-\setkeys{Gin}{width=0.5\textwidth}
-<<fig=TRUE, height=4.5, width=4.5>>=
-<<plot2>>
-@
-\setkeys{Gin}{width=\textwidth}
-
-<<fig=TRUE, height=4.5, width=9>>=
-<<plot3>>
-@
-\end{center}
-
-
-%-----------------------------------------------------------
-\newpage
-% Portugal (Jan,Feb, March, Jul,Aug, Sept)
-<<>>=
-i <- 16
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-
-\section*{\Sexpr{nam}}
-
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-## compute returns
-x <- 100 * diff(log(na.omit(HICP[,i])))
-## create numbers for dummy creation and mon creation
-n1 <- 97
-n2 <- 96
-
-<<analysisdum>>
-
-# regress on monthly dummies
-	reg <- lm(nx ~ dum1 + dum2 + dum3 +  dum7  + dum8 + dum9)
-
-# substract effect of dummies on series
-subs <- rep(0, length(mon))
-subs1 <- rep(0, length(mon))
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 2) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 3) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 7) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
-}
-
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 8) {subs[k] <- reg$coefficients[6]} else {subs1[k] <- 0} 
-}
-
-for(k in 1:length(mon)) {
-if ( mon[k] == 9) {subs[k] <- reg$coefficients[7]} else {subs1[k] <- 0} 
-}
-<<analysis>>
-}
-@
-
-\begin{verbatim}
-<<echo=FALSE, results=tex>>=
-coef(x_bp, breaks = x_nbreaks)
-@
-
-
-<<echo=FALSE, results=tex>>=
-moments(x_bp, breaks = x_nbreaks)
-@
-
-
-\end{verbatim}
-
-\begin{center}
-<<fig=TRUE, height=4, width=8>>=
-<<plot1>>
-@
-
-\setkeys{Gin}{width=0.5\textwidth}
-<<fig=TRUE, height=4.5, width=4.5>>=
-<<plot2>>
-@
-\setkeys{Gin}{width=\textwidth}
-
-<<fig=TRUE, height=4.5, width=9>>=
-<<plot3>>
-@
-\end{center}
-
-%-----------------------------------------------------------
-\newpage
-% Austria
-<<>>=
-i <- 1
-nam <- colnames(HICP)[i]
-fnam <- paste(nam, ".rda", sep = "")
-@
-
-\section*{\Sexpr{nam}}
-
-<<>>=
-if(file.exists(fnam)) {
-load(fnam)
-} else {
-<<analysisnorm>>
 }
 @
 
@@ -924,6 +587,55 @@ moments(x_bp, breaks = x_nbreaks)
 @
 \end{center}
 
+
+%-----------------------------------------------------------
+\newpage
+% Greece
+<<>>=
+i <- 9
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysisnorm>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
 %-----------------------------------------------------------
 \newpage
 % Hungary
@@ -1023,6 +735,136 @@ moments(x_bp, breaks = x_nbreaks)
 
 %-----------------------------------------------------------
 \newpage
+% Italy
+<<>>=
+i <- 12
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysisnorm>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Luxembourg (Jan,Feb, Jul,Aug)
+<<>>=
+i <- 13
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+## compute returns
+x <- 100 * diff(log(na.omit(HICP[,i])))
+## create numbers for dummy creation and mon creation
+n1 <- 73
+n2 <- 72
+
+<<analysisdum>>
+
+# regress on monthly dummies
+	reg <- lm(nx ~ dum1 + dum2 + dum7  + dum8)
+
+# substract effect of dummies on series
+subs <- rep(0, length(mon))
+subs1 <- rep(0, length(mon))
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
+}
+
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 2) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
+}
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 7) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
+}
+
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 8) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
+}
+
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+%-----------------------------------------------------------
+\newpage
 % Netherlands
 <<>>=
 i <- 14
@@ -1069,6 +911,94 @@ moments(x_bp, breaks = x_nbreaks)
 @
 \end{center}
 
+%-----------------------------------------------------------
+\newpage
+% Portugal (Jan,Feb, March, Jul,Aug, Sept)
+<<>>=
+i <- 16
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+## compute returns
+x <- 100 * diff(log(na.omit(HICP[,i])))
+## create numbers for dummy creation and mon creation
+n1 <- 97
+n2 <- 96
+
+<<analysisdum>>
+
+# regress on monthly dummies
+	reg <- lm(nx ~ dum1 + dum2 + dum3 +  dum7  + dum8 + dum9)
+
+# substract effect of dummies on series
+subs <- rep(0, length(mon))
+subs1 <- rep(0, length(mon))
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 1) {subs[k] <- reg$coefficients[2]} else {subs1[k] <- 0} 
+}
+
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 2) {subs[k] <- reg$coefficients[3]} else {subs1[k] <- 0} 
+}
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 3) {subs[k] <- reg$coefficients[4]} else {subs1[k] <- 0} 
+}
+
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 7) {subs[k] <- reg$coefficients[5]} else {subs1[k] <- 0} 
+}
+
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 8) {subs[k] <- reg$coefficients[6]} else {subs1[k] <- 0} 
+}
+
+for(k in 1:length(mon)) {
+if ( mon[k] == 9) {subs[k] <- reg$coefficients[7]} else {subs1[k] <- 0} 
+}
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
 
 %-----------------------------------------------------------
 \newpage
