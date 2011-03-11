@@ -34,7 +34,7 @@ if(!file.exists(file.path(root_dir, "Analysis", "Austria.rda"))) {
 setwd(file.path(root_dir, "Analysis"))
 ## run results3 (with dummy creation for sales periods)
 Sweave("results3.Rnw")
-setwd(file.path(root_dir, "Draft"))
+setwd(file.path(root_dir, "Paper"))
 }
 
 ## query result file names
@@ -248,7 +248,7 @@ if(!file.exists(file.path(root_dir, "Analysis", "glmean.rda"))) {
 
   setwd(file.path(root_dir, "Analysis"))
 	save(hicp, hicp_glmean, diff, file = "glmean.rda")
-	setwd(file.path(root_dir, "Draft"))
+	setwd(file.path(root_dir, "Paper"))
 	
 }
 
@@ -583,7 +583,7 @@ However, this is not the case for variance, where we find clear evidence of an i
 The results shown are computed with a new \proglang{R} package \pkg{glogis}, which is an enhancement to the already existing \proglang{R} package \pkg{strucchange}, which currently does not support a GL distribution. The tests and the graphical illustration of the empirical fluctuation process were developed in \citet{z07}, the second part of the results - the dating procedure and the illustration of the densities fitted for the subsamples (divided by the breaks) - can be found in \citet{z10}. \\
 
 % appendix HINTER reference
-\begin{appendix}\ref{app}
+\begin{appendix}\label{app}
 
 \section{GL Distribution}\label{glscore}
 
