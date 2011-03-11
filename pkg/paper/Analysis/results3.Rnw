@@ -47,7 +47,7 @@ add_breaks[c("Germany", "Portugal")] <- 1
 mon <- rep(seq(1,12),30)
 mon <- mon[n1:(length(x)+1)]
 
-%% generate monthly dummies for period AFTER inclusion of sales 
+## generate monthly dummies for period AFTER inclusion of sales 
 
 dum1 <- seq(n2,length(x))
 dum2 <- seq(n2, length(x))
@@ -86,8 +86,8 @@ if ( mon[j] == 9) {dum9[j] <- 1} else {dum9[j] <- 0}
 
 nx <- x[n2:length(x)]
 
-#### values for dummie regression of OLD values
-%% generate monthly dummies for period PRIOR to the inclusion of sales
+
+## generate monthly dummies for period PRIOR to the inclusion of sales
 mona <- rep(seq(1,12),30)
 mona <- mona[1:n2]
 
