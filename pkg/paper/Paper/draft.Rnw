@@ -18,9 +18,71 @@ if(Sys.getlocale() != "C") Sys.setlocale("LC_TIME", "English")
 library("glogis")
 library("fxregime")
 library("lattice")
+library("moments")
 
 
 ## additional functions
+momentgen <- function(flag=1,x, start=yearmon(c(1990,1998,2007)), end=yearmon(c(1998+11/12,2007+11/12,2010+11/12))) {
+# 1:mean, 2:variance, 3:skewness
+if(flag==1){
+mean = mat.or.vec(ncol(x),length(start))
+for(jj in 1:length(start)){
+x1 <- window(x, start=start[jj], end=end[jj])
+for(i in 1:ncol(x1)) {
+mean[i,jj] = mean(na.omit(x1[,i]))
+}
+}
+ret1 <- c(quantile(mean[,1], probs=.25), quantile(mean[,1], probs=.50), quantile(mean[,1], probs=.75))
+ret1 <- cbind(ret1)
+ret2 <- c(quantile(mean[,2], probs=.25), quantile(mean[,2], probs=.50), quantile(mean[,2], probs=.75))
+ret2 <- cbind(ret2)
+ret3 <- c(quantile(mean[,3], probs=.25), quantile(mean[,3], probs=.50), quantile(mean[,3], probs=.75))
+ret3 <- cbind(ret3)
+ret <- cbind(ret1,ret2,ret3)
+colnames(ret) <- c(start[1], start[2], start[3])
+rownames(ret) <- c("lower", "medium", "upper")
+return(ret)
+}
+if(flag==2){
+var = mat.or.vec(ncol(x),length(start))
+for(jj in 1:length(start)){
+x1 <- window(x, start=start[jj], end=end[jj])
+for(i in 1:ncol(x1)) {
+var[i,jj] = var(na.omit(x1[,i]))
+}
+}
+ret1 <- c(quantile(var[,1], probs=.25), quantile(var[,1], probs=.50), quantile(var[,1], probs=.75))
+ret1 <- cbind(ret1)
+ret2 <- c(quantile(var[,2], probs=.25), quantile(var[,2], probs=.50), quantile(var[,2], probs=.75))
+ret2 <- cbind(ret2)
+ret3 <- c(quantile(var[,3], probs=.25), quantile(var[,3], probs=.50), quantile(var[,3], probs=.75))
+ret3 <- cbind(ret3)
+ret <- cbind(ret1,ret2,ret3)
+colnames(ret) <- c(start[1], start[2], start[3])
+rownames(ret) <- c("lower", "medium", "upper")
+return(ret)
+}
+if(flag==3){
+skewness= mat.or.vec(ncol(x),length(start))
+for(jj in 1:length(start)){
+x1 <- window(x, start=start[jj], end=end[jj])
+for(i in 1:ncol(x1)) {
+skewness[i,jj] = skewness(na.omit(x1[,i]))
+}
+}
+ret1 <- c(quantile(skewness[,1], probs=.25), quantile(skewness[,1], probs=.50), quantile(skewness[,1], probs=.75))
+ret1 <- cbind(ret1)
+ret2 <- c(quantile(skewness[,2], probs=.25), quantile(skewness[,2], probs=.50), quantile(skewness[,2], probs=.75))
+ret2 <- cbind(ret2)
+ret3 <- c(quantile(skewness[,3], probs=.25), quantile(skewness[,3], probs=.50), quantile(skewness[,3], probs=.75))
+ret3 <- cbind(ret3)
+ret <- cbind(ret1,ret2,ret3)
+colnames(ret) <- c(start[1], start[2], start[3])
+rownames(ret) <- c("lower", "medium", "upper")
+return(ret)
+}
+}
+
 moments <- function(object, ...) UseMethod("moments")
 moments.glogisfit <- function(object, ...) object$moments
 moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
@@ -32,8 +94,8 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 root_dir <- do.call("file.path", as.list(head(strsplit(getwd(), .Platform$file.sep)[[1]], -1)))
 if(!file.exists(file.path(root_dir, "Analysis", "Austria.rda"))) {
 setwd(file.path(root_dir, "Analysis"))
-## run results3 (with dummy creation for sales periods)
-Sweave("results3.Rnw")
+## run results4 (with dummy creation for sales periods)
+Sweave("results4.Rnw")
 setwd(file.path(root_dir, "Paper"))
 }
 
@@ -149,6 +211,14 @@ for(i in seq_along(fnam)) {
     eur = eur[i])
 }
 
+table2<- vector(length = length(fnam), mode = "list")
+names(table2) <- sapply(strsplit(sapply(strsplit(fnam, "/", fixed = TRUE), tail, 1), ".", fixed = TRUE), head, 1)
+
+for(qq in seq_along(fnam)) {
+  load(file.path(root_dir, "Analysis", fnam[qq]))
+  table2[[qq]] <- x
+}
+
 ## compute moments
 mom <- lapply(results, function(obj) t(sapply(obj$model, moments)))
 
@@ -166,6 +236,20 @@ format_moments <- function(i, digits = 3) {
   return(rval)
 }
 
+format_momenteuro <- function(momeuro, digits = 6, name="Euro") {
+  rval <- format(round(momeuro, digits = digits), nsmall = digits)
+  rval <- cbind(name,"", matrix(paste("$", rval, "$", sep = ""), ncol = 3))
+  rval[1,1] <- name
+  rval[2,1] <- ""
+  rval[3,1] <- ""
+  rval[1,2] <- "lower"
+  rval[2,2] <- "medium"
+  rval[3,2] <- "upper"
+  rval <- apply(rval, 1, paste, collapse = " & ")
+  rval <- paste(rval, "\\\\")
+  rval[length(rval)] <- paste(rval[length(rval)], "\\hline")
+  return(rval)
+}
 get_data <- function(i) {
   rval <- do.call("merge",
     lapply(i, function(j) results[[j]]$data))
@@ -295,50 +379,42 @@ if(!file.exists(file.path(root_dir, "Analysis", "glmean.rda"))) {
 \section{Introduction}
 
 
-%(... Jesus: journals, EE (empirical economics): mehr EMU, weniger Methode, Journal of Applied Econometrics: genau umgekehrt...)
-%(... economic story, big transition ...) \\
-Ever since the beginning of the European Union, the topic of a common currency was a controversial issue. Although the Economic and Monetary Union (EMU) is now a fact, the discussion about the economic effects of the Euro is far from being settled. The controversial topics range from the question of whether or not the Euro--zone is indeed an optimal currency area (OCA) all the way to the very survival of the Euro in light of the budgetary problems of a number of its member states. The effects of monetary unions on a number of macroeconomic indicators, with inflation being the most important one in this context is in the center of an ongoing debate, for instance the question about short-run and steady-state inflation uncertainty dealt with in \citet{cap}, or the structural convergence of the inflation rates in EU countries which is the topic of an investigation by \citet{palomba}. \\
-%(... big transition continued, our contribution...) \\
-The way towards the EMU basically consisted of 3 stages: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2001) the transition period, which ended with the introduction of the euro as legal tender. Any new countries who want to join the EMU are first obliged to fulfill the Maastricht which, besides setting rules for government debts and interest rates, also requires the participation in the ERM~II for two years, while the exchange rates towards the euro are not allowed to cross the nominal band. These criteria acknowledge, that a stable inflation rate is one of the key goals of every good macroeconomic policy. \cite{emerson} makes it clear, that a high inflation rate is also more variable and uncertain and thus causes more relative price variability, leading to a less efficient price mechanism.  Failing to stabilize inflation leads to severe economic problems. Throughout the literature, there is still a considerable degree of uncertainty as to what extent the introduction of the euro, or monetary unions in general, affect the inflation rate. There are a number of reasons for suspecting changes. Given that a country experienced quite volatile inflation rates, its efforts to meet the convergence criteria were likely to lead to an alteration at least in the mean (since this was required for a number of countries) and possibly in the volatility of their respective inflation rates as well. The EMU requires a country to possibly change a number of economic policies, which can only be achieved by big transitionally efforts. \\
-%(...introduction needs to include the value added of this paper, why is it better, how does it compare to others...) \\
-We contribute to this debate by developing a new method for testing for structural breaks in the dynamics of the inflation rates, which focuses on these changes and thereby upon the effect of the EMU on a number of European countries both within and without the Euro--zone. The framework developed in this paper allows testing for any significant changes of a countries inflation dynamics and thus helps interpreting the effects of the EMU. For this purpose, we developed a new estimation approach building on previous research by \citet{z07}. \\
-%(...effects of monetary unions, literature overview (more literature in discussion of results)...) \\
-Two of the three most important channels that change inflation, the money supply and the degree of openness  are subject to fundamental changes once a country joins a monetary union. The original countries participating in the Exchange Rate Mechanism (ERM) had to synchronize money supply growth and interest rates in order to fix exchanges rates or otherwise risk the chance of severe disequilibria. Any new country willing to join must first participate in the second exchange rate mechanism (ERM~II) with their currencies floating in a rather narrow band against the euro, which basically requires the same synchronization tools. \\
-Openness, i.e. the inflow of new goods and services or the abolishment of tariffs and capital restraint and regulations, is more likely to generate deflationary pressure, due to the substitution of cheaper goods for more expensive ones. Since deflation is rather unusual, with general price increases being the norm, the logical conclusion is that the most important inflationary channel are changes in money supply.
-%\footnote{Indeed, a general rise in prices is impossible without a simultaneous increase in money supply.}. 
-These changes in turn are influenced by a countries monetary policy and the credit behavior of its banking industry. External shocks, like the spillover effects of a hike in oil prices or the financial crisis may be important as well. \\
-Economic theory unfortunately does not provide any clear foundation for a proper answer whether or not the creation of a monetary union between two or more states is likely to reduce or increase the variability or even the level of the inflation rate.  
-%\citet{cooper} points out, that ``a central bank under a monetary union will internalize the interdependence between countries and optimally choose a lower inflation rate" and he argues that a ``central Bank governing the growth of money supply will optimally choose zero inflation." This is not the case with the ECB which targets at 2\% so as to avoid the alleged risk of deflation. It is thus not quite clear how a monetary union will affect the volatility and the level of the inflation rate.\\
-An interesting approach to this question is taken by \citet{holte}. 
-%He creates a two country model for monetary policy analysis along the line of two models by \citet{mc1} and \citet{mc2} as well as \citet{gali}. The inflation is modeled by a hybrid Phillips curve  specification and there are a number of different home country interest rate rules, like strict inflation targeting, flexible targeting, pegging to a currency and --  monetary union. 
-What he finds out via simulations of  different interest rate rules is that the standard deviation of the home CPI inflation rate can be substantially reduced by joining a monetary union. The effects of joining a monetary union on inflation variability in his framework depend on structural parameters like risk aversion, price flexibility, export demand elasticity, openness and shock correlations. However, due to the fact that not all of these parameters are known and that their interaction as well has to be estimated, the whole model is very dependent on a variety of assumptions. \\
-The remainder of this paper is structured as follows: section \ref{s2} presents the data, section \ref{s3} presents the model and the estimation techniques used, section \ref{s4} illustrates our approach using Slovenia as an example, section \ref{s5} presents the results and section \ref{s6} concludes. 
+Ever since the beginning of the European Union, the topic of a common currency was a controversial issue. Although the Economic and Monetary Union (EMU) is now a fact, the discussion about the economic effects of the Euro is far from being settled. The controversial topics range from the question of whether or not the Eurozone is indeed an optimal currency area (OCA) all the way to the very survival of the Euro in light of the budgetary problems of some of its member states. The effects of monetary unions on a number of macroeconomic indicators, with inflation being the most important one in this context, is in the center of an ongoing debate: this regards the question about short-run and steady-state inflation uncertainty dealt with in \citet{cap}, or the structural convergence of the inflation rates in EU countries, which is the topic of an investigation by \citet{palomba}. \\
+The way towards the EMU basically consisted of 3 stages: stage I (1990-1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2001) the transition period, which ended with the introduction of the euro as legal tender. A possible fourth stage is the continuing integration of new member states, mostly former communist countries. Any new state that wants to join the EMU is first obliged to fulfill the Maastricht criteria, which, besides setting rules for government debts and interest rates, also requires the participation in the ERM~II (Exchange Rate Mechanism~II) for two years, while the exchange rates towards the euro are not allowed to cross the nominal band.\\
+\cite{emerson} put emphasize on the fact that a high inflation rate is also more variable and uncertain and thus causes more relative price variability, leading to a less efficient price mechanism.  Failing to stabilize inflation leads to severe economic problems. Throughout the literature, there is still a considerable degree of uncertainty as to what extent the introduction of the euro, or monetary unions in general, affect the inflation rate. The EMU requires a country to possibly alter a number of economic policies and institutions, which may demand for significant short term adjustments to take place. 
+\clearpage
+Given that a country experienced quite volatile inflation rates, its efforts to meet the convergence criteria are likely to lead to an alteration at least in the mean (since this was one of the requirements) and possibly in the volatility of their respective inflation rates as well. \\
+%(...too short: need: methodological ideas and main questions..., value added: schiefe, schwere ränder)\\
+% http://home.iitk.ac.in/~kundu/paper152.pdf  (gl-beschreibung in unterlagen), p.4 more peaked in center, but heavier tails
+However, a deeper inquiry into this problem is in need of a method able to capture changes in the inflation dynamics. We contribute to this debate by developing a new method for testing for structural breaks in the dynamics of the inflation rates, which focuses on these changes and thereby upon the effect of the EMU on a number of European countries both within and without the Eurozone. The framework developed in this paper makes it possible to test for any significant changes of a countries inflation dynamics and thus helps interpreting the effects of the EMU. We focus on changes in the first three moments of these inflation rates, which we assume to be distributed according to a generalized logistic distribution (GL), as defined in Section \ref{s3}. The GL distribution is a suitable one due to its flexibility to capture nonsymmetry and because of its fatter tails. For this purpose, we developed a new estimation approach building on previous research by \citet{z07}. \\
+%(... am Schluss so enden, dass nun interessant, wie sich die Momente so genau verändert haben; auf Basis der theorie--> suche nach brüchen, schiefe noch hinein/besser hinein; 3 saha simultan aschoa...)\\
+This framework allows us to observe the evolution of mean, variance and skewness over time. 
+%Considering the prior knowledge available about the timing of a countries participation in any of the aforementioned steps towards monetary union, an exact timing of breakpoints in the moments of the respective inflation series enables us to draw conclusions about the exact effects of the EMU the inflation rates of its members. 
+Our estimation technique enables the simultaneous estimation of breaks in the mean (which is important in the context of the Maastricht criteria), the variance (which should be low for the price mechanism to be efficient) and the skewness (where a change in skewness is evidence of a shift of the distribution towards a new ``center of gravity'') of the inflation rates of interest. This than can be used to search for answers regarding the question about the effect of the EMU on the inflation dynamics of its member states or more general to investigate the effects of external shocks.\\
+The remainder of this paper is structured as follows: Section \ref{s2} presents the data, Section \ref{s3} presents the model and the estimation techniques used, Section \ref{s4} illustrates our approach using Slovenia as an example, Section \ref{s5} presents the results and Section \ref{s6} concludes. 
 
 
 \clearpage
 \section{Data}\label{s2}
 
-%(... Jesus would present data later, first describe what we are going to to do...) \\
-HICP series\footnote{seasonally unadjusted} from Jan.1990--Mar.2010 are obtained for 21 countries the \citet{oecd}. Countries included are Austria,	Belgium, Czech Republic,	Denmark, Estonia,	Finland,	France,	Germany,	Greece,	Hungary,	Ireland,	Italy,	Luxembourg,	Netherlands,	Poland,	Portugal,	Slovakia, Slovenia,  Spain,	Sweden, and	United Kingdom. Latvia and Lithuania as well as Bulgaria and Romania are excluded due to data scarcity. Cypria and Malta are not included since they are very small economies. \\
-The countries in this sample can be divided into three different groups. First the euro countries (Austria, Belgium, Estonia, France, Finland, Germany, Greece, Ireland, Italy, Luxembourg, the Netherlands, Portugal, Slovakia, Slovenia and Spain).  Second, the EU members not participating in the ERM~II: Czech Republic, Hungary, Poland, United Kingdom, and Sweden. Denmark stands on its own as a member of the EU and the ERM~II, but not yet a member of the EMU. \\
-
+We employ seasonally unadjusted HICP series of 21 countries ranging from January 1990 to December 2010 that are obtained from the \citet{oecd}. Countries included are Austria,	Belgium, Czech Republic,	Denmark, Estonia,	Finland,	France,	Germany,	Greece,	Hungary,	Ireland,	Italy,	Luxembourg,	Netherlands,	Poland,	Portugal,	Slovakia, Slovenia,  Spain,	Sweden, and	United Kingdom. Latvia and Lithuania as well as Bulgaria and Romania are excluded due to data scarcity. Cypria and Malta are not included since they are very small economies. \\
+The countries in this sample can be divided into three different groups. First the euro countries (Austria, Belgium, Estonia, France, Finland, Germany, Greece, Ireland, Italy, Luxembourg, Netherlands, Portugal, Slovakia, Slovenia and Spain).  Second, the EU members not participating in the ERM~II: Czech Republic, Hungary, Poland, United Kingdom, and Sweden. Denmark stands on its own as a member of the EU and the ERM~II, but not yet a member of the EMU. \\
+%(... schlussverkäufe schon hier erwähnen, einfach cool, ja das gibts, wir haben die aber weggeschätzt; generell viel angelsächsischer/präpotenter schreiben; nur 1 weg der richtige und zwar unserer; nicht erwähnen, dass andere dinge auch noch möglich; so nach motto: mich interessierts, ich machs, andere erst am ende erwähnen...)
 % greece: -for winter discounts: First 10 days of January-end of February; -for summer discounts: First 10 days of July -end od August; but has always been included
+In the case of Belgium and Luxembourg, we dealt with the inclusion of the sales periods effects\footnote{This was demanded by a Commission regulation, details may be found in: \citet{eurlex} and in the Appendix \ref{dataprobs}.} into the HICP series (January 2000 for Belgium and January 1999 for Luxembourg) by estimating dummies for these month\footnote{There are two month with a significant decrease in prices (January and July), followed by significant price increases in the following months} and subtracting them from the original time series.
+
+
+
+
+
 
 \clearpage
 \section{Model}\label{s3}
 
-% generell strategie: estimate, test parameter stability, breaks model 
-
-%neuer Titel
-%Strukturbruch
-%slowenisches Beispiel
-
-% laut achim noch zuviel bla bla im text --> weniger als anektode, präziser
-%(...less anectodic, more precise...) \\
-To monitor changes in the dynamics of the inflation rates, we follow the usual strategy employed when testing for structural breaks. First, the model is fitted for the whole sample using the generalized logistic distribution. This then enables testing for the stability of the parameter estimates. If there is evidence of significant changes, one proceeds by computing the number and the timing of the break points. \\
+To monitor changes in the dynamics of the inflation rates, we follow the usual strategy employed when testing for structural breaks. First, the model is fitted for the whole sample using the generalized logistic distribution. This then enables testing for the stability of the parameter estimates. If there is evidence of significant changes, the number and the timing of the break points are computed. \\
 This framework allows to trace the evolution of mean, variance and skewness of the inflation series and thus interpreting deviations in any of these parameters as possibly due to a change in monetary policy, is made feasible. Any huge intervention or change is captured by fluctuations in the parameter stability of the series and can be quantified and related to a distinct time frame. \\
 %(...discuss correlation...) \\
-The correlation dynamics of the series is of less importance to this framework, which concentrates on changes in mean, variance and skewness and does not focus on autocorrelation. 
+The correlation dynamics of the series is of less importance to this framework, which concentrates on changes in mean, variance and skewness and does not focus on autocorrelation, the use of alternative testes, as described in \cite{andreou}, is also hindered by the low number of observations, due to the monthly frequencies.\footnote{In some years the Billion Prices Project of the \cite{bpp}, which provides a much higher data frequency, could solve this problem.} 
 %To provide consistent estimates of the parameter vector $\hat{\phi}$, the covariance matrix $\hat{V}^{-1/2}$ is estimated using a heteroskedasticity and autocorrelation consistent covariance estimator. 
 
 % korrelation besser herausarbeiten
@@ -347,9 +423,6 @@ The correlation dynamics of the series is of less importance to this framework, 
 
 \subsection{Generalized Logistic Distribution}\label{s31}
 
-%(... formulation problems ...) \\
-%(...Jesus: GL not standard, explain why it is worth using it, what makes it better than ARIMA?...) \\
-%Motivation Verteilung
 The data suggested that the use of a normal distribution might cause some estimation problems, since most of the time series exhibit asymmetric properties (with sometimes rather strong skewness) and -- compared to the normal distribution -- a fatter tail. To accommodate for this fact, the use of the generalized logistic distribution (GL) with its relative low degree of complexity, seemed appropriate. On the one hand, it is a simple distribution and on the other hand, it is flexible enough to capture essential properties of the data. For the inflation series $y_t = 100\cdot log(HICP_t/HICP_{t-1})$ we therefore assume a GL distribution as defined in \citet{johnson}:
 
 \begin{eqnarray}
@@ -360,17 +433,13 @@ f(y | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\fr
 % ie. negative skew (delta <1: rechtssteil, in englisch: skewed to the left 
 % (psigamma(0.5, deriv = 2) - psigamma(1, deriv = 2))/(psigamma(1, deriv = 1) + psigamma(0.5, deriv = 1))^(3/2)
 
-with location $\theta$, scale $\sigma$ and shape $\delta$. For $\delta=1$ the distribution simplifies to the logistic distribution, for $\delta<1$ it is skewed to the left and for $\delta$$>$1 it is skewed to the right (see appendix \ref{glscore} for more details). \\
-In econometrics, the logistic distribution is often used in income distributions and growth models. This is due to  its fatter tail, which fit these kind of data somewhat better. \citet{won} employ a GL distribution in a regression model with autocorrelated errors. They use this type of distribution rather than a Student's t-distribution, as to model the fact that these are oftentimes  non symmetric and severely left or right skewed. A similar GL distribution is also used in \citet{tolikas} who analyze extreme risk and value--at--risk in the German stock market, although they do not use a shape parameter. Regarding inflation rates, the GL distribution is --- to our best knowledge --- only used in context to expected inflation. \citet{batchelor} use a logistic distribution (not its generalization) to model the distribution of mean expected inflation rates. \\
+with location $\theta$, scale $\sigma$ and shape $\delta$. For $\delta=1$ the distribution simplifies to the logistic distribution, for $\delta<1$ it is skewed to the left and for $\delta$$>$1 it is skewed to the right (see Appendix \ref{glscore} for more details). \\
+In econometrics, the logistic distribution is often used in income distributions and growth models. This is due to  its fatter tails, which fit these kind of data somewhat better. \citet{won} employ a GL distribution in a regression model with autocorrelated errors. They use this type of distribution rather than a Student's t-distribution, as to model the fact that these are oftentimes  non symmetric and severely left or right skewed. A similar GL distribution is also used in \citet{tolikas} who analyze extreme risk and value--at--risk in the German stock market, although they do not use a shape parameter. Regarding inflation rates, the GL distribution is --- to our best knowledge --- only used in context with expected inflation. \\
+\citet{batchelor} use a logistic distribution (not its generalization) to model the distribution of mean expected inflation rates. \\
 
 \subsection{Estimation}
 
-% anders erzählen: um ein Modell zu anzupassen, dann den restlichen teil
-%Schätzung
-%obiger teil erst später; den verweis auf R erst am Ende in den computational details; auch das zeug ab an enhancement... in die computatinal details aufnehmen
-%(... better separation between estimation and test, rest to computational details...) \\
-
-Under the assumption, that $y_t$ is distributed according to the generalized logistic distribution, we test for the hypothesis that the parameter vector $\hat{\phi}$ stays stable over time:
+Under the assumption that $y_t$ is distributed according to the generalized logistic distribution, we test for the hypothesis that the parameter vector $\hat{\phi}$ stays stable over time:
 
 \begin{eqnarray}
 & H_0: \phi_t = \phi_0 \quad (t=1,...,n) \nonumber 
@@ -383,7 +452,7 @@ against the $H_1$ of changes in at least one of the parameters. We first estimat
 \label{eqn2}
 \end{eqnarray}
 
-where $\hat{V}^{-1/2}$ is some consistent estimator of the variance of the scores, which is used to decorrelate the series as to avoid problems due to serial correlation. Then a functional central limit theorem (FCLT) for $\mathit{efp}(\cdot)$ is employed, which converges to a 3-dimensional Brownian bridge:
+where $\hat{V}$ is some consistent estimator of the variance of the scores, which is used to decorrelate the series as to avoid problems due to serial correlation. Then a functional central limit theorem (FCLT) for $\mathit{efp}(\cdot)$ is employed, which converges to a 3-dimensional Brownian bridge:
 
 \begin{eqnarray}
 \mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot) \nonumber
@@ -391,9 +460,11 @@ where $\hat{V}^{-1/2}$ is some consistent estimator of the variance of the score
 
 
 \subsection{Test}
-%(.. Jesus would cite a paper by Andrews and Ploberger 1993 that provided the key for creating confidence intervals around the estimates...) \\
 
-After the empirical fluctuation process is computed, it conveys information about departures from the $H_0$ of parameter stability over time. For a precise quantification of the actual deviation from its hypothesized zero--mean path, the main idea of the test statistics presented here is to aggregate the $\mathit{efp}(\cdot)$ in such a way as to be able to construct a test statistics so that critical values and p values can be derived. In this paper, we employ the Supremum of LM (supLM) test by \citet{andrews}. This test is well suited for single break alternatives and performs better if more than just one of the distribution parameters change. It is given by:
+After the empirical fluctuation process is computed, it conveys information about departures from the $H_0$ of parameter stability over time. For a precise quantification of the actual deviation from its hypothesized zero--mean path, the main idea of the test statistics presented here is to aggregate the $\mathit{efp}(\cdot)$ in such a way as to be able to construct a test statistics so that critical values and p values can be derived. In this paper, we employ the Supremum of LM (supLM) test by \citet{andrews}. This test is well suited for single break alternatives and performs better if more than just one of the distribution parameters change. 
+
+\clearpage
+It is given by:
 
 \begin{eqnarray}
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert \mathit{efp}(t) \Vert_2^2}{t(1-t)} \nonumber
@@ -409,8 +480,8 @@ The supLM test computes a test statistics for all possible change points in a gi
 
 
 \subsection{Breakpoint Estimation}
-
-If a break is detected via the supLM test, the next step is estimating the number and the timing of these break points. Breakpoints $\tau_1,...,\tau_B$ are estimated via maximization of the full segmented likelihood:
+%(...cite bai and perron 2003 paper here, nachlesen, findet achim super, bei slowenien will er noch konfidenzintervalle dazu...)\\
+The dating of structural breaks builds upon the work of \cite{bp03}. If a break is detected via the supLM test, the next step is estimating the number and the timing of these break points. Breakpoints $\tau_1,...,\tau_B$ are estimated via maximization of the full segmented likelihood:
 
 \begin{eqnarray}
 \sum_{b=1}^{B+1} \sum_{t=\tau_b + 1}^{\tau_b} \log f(y_t | \phi^{(b)}) \nonumber
@@ -419,15 +490,16 @@ If a break is detected via the supLM test, the next step is estimating the numbe
 If the test statistics is significant, at least one break is estimated. In principle, the optimal segmentation (i.e. the concrete dates of a break) can be computed once B (the number of breakpoints) is known. However, B needs to be based on the observed data as well. The solution is to compute the timing of the breaks for a number of different values for B and then choose B by means of an information criterion, in this case the LWZ (Liu, Wu and Zidek) as developed in \citet{liu}.
 All parameters $\tau_1, \dots, \tau_B, \phi^{(1)}, \dots, \phi^{(B+1)}$ can be estimated jointly using dynamic programming.\footnote{More details for this estimation technique are provided in \cite{z10}.} 
 
-% noch mehr dazu: finds 0 wenn nicht signifikant, 1 wenn signifikant, dann auswahl über das lwz criterion
 
 \clearpage
 \section{An Example}\label{s4}
-
-% anders: the data encompasses, thus not included....
-%(... shortend, changed formulation...) \\
-For an illustration of the method, consider the case of Slovenia. The data collected encompasses the period from Jan 1996 onwards. During the beginning of this period, Slovenia experienced very high inflation rates but was successfull in continually decreasing them. A glance at the data suggests a break around 2003/04, with an evident change in the mean. 
-
+%(...more text: 1. motivation, 2.clear methodological steps, 3.interpretation...) \\
+<<echo=FALSE>>=
+        x <- results$Slovenia
+        slovpval <- sctest(x$efp, functional = supLM(0.1))$p.value
+@
+To illustrate our method, we consider the case of Slovenia. After a period of relative instability following the independence from Yugoslavia, Slovenia was successfull in realigning its economy and introduced a number of reforms leading to a stable growth in the past years. The good economic performance made it possible for Slovenia to enter the ERM~II in June 2004 and later on to introduce the Euro in January 2007. The data collected contains the period from January 1996 onwards. In the first few years, Slovenia experienced very high inflation rates, but was successfull in reducing inflation to a much lower level. \\
+A glance at the time series depicted in Figure \ref{fig1} of the monthly inflation rates reveals a decline in the mean around the middle of the observed time period. The $efp(\cdot)$ starts to significantly deviate as early as 2001 and reaches the peak somewhere between 2003 and 2004. The p--value of the supLM test is \Sexpr{round(slovpval, 5)} and clearly indicates at least one break.  The number of breaks is calculated by means of the LWZ criteria, which chooses one break in August 2003. In this year, Slovenia introduced a number of financial reforms and severely decreased the year on year growth in the M3 monetary aggregate. Combined, these actions were enough to ensure the successfull participation in the ERM~II a year later and the introduction of the Euro two years later. 
 
 \begin{figure}[h!tp]
 <<fig=TRUE, height=4, width=8>>=
@@ -440,35 +512,31 @@ plot(x$efp, functional = supLM(0.1), main = "supLM test")
 lines(x$breakpoints, breaks = x$nbreakss)
 @
 \caption{Slovenia: breakpoint estimate and supLM test}
+\label{fig1}
 \end{figure}
 
-The supLM test confirms this belief by picturing a hike of the $efp(\cdot)$ around 2003. The LWZ criterion suggests one break point, which is estimated at August 2003. \\
-In this year, Slovenia introduced a number of financial reforms and severely decreased the year on year growth of money supply. Combined, these actions were enough to ensure the succesfull participation in the ERM~II a year later. 
 
 
-%\section{Power Analysis}
-%
-%(...Jesus would not do this ...) \\
-%
-%Basis idea: show that with a GL instead of a Normal, the probability of detecting minimal effects in the series (which is GL--distributed) is higher. If for example, just the skewness parameter changes, is a test build on the normality assumption able to capture this? (...more to come if we decide to include this. In principle, we could then argue in section \ref{s31} that a power analysis suggested that we might miss changes in the third moment or so, i.e. normal has lower power if series is GL--distributed)...) 
 
 
 \newpage
 \section{Results}\label{s5}
 
-% besser formulieren
-
-
-%
-%das package colortbl (\usepackege[dvips]{colortbl}) ermöglicht z.B. mit
+% das package colortbl (\usepackege[dvips]{colortbl}) ermöglicht z.B. mit
 %\rowcolor[gray]{0.90} in einer Tabellenzeile diese farbig (bzw. hier grau) zu unterlegen.
 
 \footnotesize
 \begin{longtable}{|l|l|r|r|r|l|l|l|}
 \hline
-\multicolumn{8}{|c|}{The Eastern Countries} \\
+\multicolumn{8}{|c|}{Austria and Belgium} \\
 \hline
 Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & Euro \\
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(lapply(c(1, 2), format_moments)))
+@
+\hline
+\multicolumn{8}{|c|}{The Eastern countries} \\
 \hline
 <<echo=FALSE, results=tex>>=
 writeLines(unlist(lapply(c(3,5,10,15,17,18), format_moments)))
@@ -492,49 +560,50 @@ writeLines(unlist(lapply(c(11), format_moments)))
 writeLines(unlist(lapply(c(9,14,7,6), format_moments)))
 @
 \hline
-\multicolumn{8}{|c|}{Non participating countries} \\
+\multicolumn{8}{|c|}{The 90s} \\
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(lapply(c(20, 21), format_moments)))
+writeLines(unlist(lapply(c(16,20, 21), format_moments)))
 @
 \hline
-\multicolumn{8}{|c|}{The other countries} \\
+\multicolumn{8}{|c|}{Former DM--zone} \\
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(lapply(c(1,2,4,8,13,16), format_moments)))
+writeLines(unlist(lapply(c(4,8,13), format_moments)))
 @
 \caption{Break point and parameter estimates and ERM information}
+\label{resulttable}
 \end{longtable}
-% results3 hier einbauen
 % warning: the groups then change; Italy and Greece have not yet answered
 % Italian Statistics: Your request has been correctly inserted in the system with the reference number 13078/2010.
 % comment: the greek break is NOT sure, since they have not yet answered about sales periods
 
-% resultate: besser ordnen; mit paragraph oder subsection*{}; text über sales do inne; indicate implications in mean and discuss changes in var and skewness
-
 \clearpage
 \normalsize
-%(... results on one page, more focus on sales effects and parameter changes indicate implications of these changes ...) \\
-The table above presents the break dates and the parameter values of the segments as well as the dates of entry into the ERM/ERM~II and the date of euro introduction. \\
-%The first  distinct group of countries consists of Austria and Belgium. This may come as some surprise, since originally Belgium and Luxembourg formed a monetary union. \\
-%(... perhaps put the data problems into appendix? Presently I deal with this in $results3.rnw$ in the following fashion: I do assume that for Belgium, Luxembourg and Portugal (the countries where the exact time and date of inclusion of sales effects is definitely known) the seasonality in these months follows this logic: DECREASE in prices in January, almost offset by an increase in February and another DECREASE in July followed by an increase in August. So the series AFTER the inclusion of the sales periods should take into account that the seasonal effects of these month are now HIGHER than before. I do this by substracting the difference between the seasonal dummy in January (prior to inclusion) and the seasonal dummy in January (after the inclusion) from the original series. If this is the best way to deal with that, I do not know ...) \\
-In a prior inspection, Belgium and Luxembourg were very similar. However, this degree of similarity in the original series as provided by the OECD, actually could be traced back -- according to their national statistical offices -- to the inclusion of sales (winter and summer) in January 1999 for Belgium and January 2000 for Luxembourg which was demanded by a Commission regulation, details may be found in: \citet{eurlex}.\footnote{In addition to Belgium and Luxembourg, there are a number of other countries, where the sales periods are regulated by law. France has an individual time span regulated by each department. This should pose no problem, since there is no global state level solution. In Greece there are also two set sales--periods in winter and summer. In Italy the sales periods are fixed each year by the Chambers of Commerce. Portugal has two set sales periods as well, but for two month (January and February as well as Mid--July to Mid--September. The source for this information is \citet{konseur}. Dummies were estimated for Belgium, Luxembourg and Portugal. Italy and Greece were not estimated, since -- as in the case of France -- these periods do not seem to be set for the whole country at once.} This lead to a 6 month seasonality pattern (January and July) after the inclusion of sales periods into the HICP. We corrected for this by estimating dummies for these month and subtracting them from the original time series. In the case of Belgium, the estimated break was postponed to late 2007, coinciding with the Austrian break. The time after the break is characterized by an increase in mean and a severe increase in the variance and can be traced back to two major influences: the beginning of the financial crisis and potentially some spillover effects of higher oil prices. \\
-The first of these groups are the Eastern European countries: the Czech Republic, Estonia, Hungary, Poland, Slovakia and Slovenia. In almost all of these countries, the mean and the variance of their inflation rates declined in the later part of the 90ies. Most of them experienced a break in 1997/1998, with Poland, Slovakia and Slovenia somewhat later. The break during the late 90ies is a result of these countries efforts to curb in inflation by decreasing money supply and indicates the time when these countries actually overcame the biggest transitionary shocks on their way towards free market economies. The case of Slovenia was already described. Slovakia is very similar, as its inflation dynamics too changed roughly one year prior to ERM~II entry. \\
-Another combination of countries with rather identical results are the two biggest southern European countries, Italy and Spain. Both of them experienced high rates of inflation in the early 90ies. Afterwards, in the phase leading up to the monetary union, mean and variance were greatly reduced. This trend changed significantly soon after the fixing of the exchange rates leading to higher mean and much higher variances then ever before since the beginning of the HICP series. \\
-Ireland can be considered a rather special case. It is the only economy where the effects of the ongoing financial crisis of 2008 are visible. We find a structural break in 2008 following the strong contraction triggered by the bursting of the Irish housing bubble and a beginning deflation. \\
-Another interesting group consists of 4 economically rather different countries. In none of them do we find any evidence of a change in inflation dynamics. Whereas France, Finland and the Netherlands are on the lower side of the inflation margin, the Greek inflation rate exhibits some very strange behaviour. It has by far the highest variance of all series and seems to be completely different from them.\footnote{This suggested some possible data problems, but unfortunately numerous efforts of communication failed with official sources failed.} \\
-The last group with clear patterns consists of the two countries that decided not to be part of any European Monetary System\footnote{If we ignore the short participating time of both countries in the EMS.}, the United Kingdom and Sweden. Both have a clear break in the early 90ies, and both of these breaks can be traced back to crisis, the currency crisis of the United Kingdom cumulating into the ``Black Wednesday'' in 1992 and the run on the Swedish currency in the same year. \\
-No clear interpretation is available for: Austria, Belgium, Denmark,  Germany, Luxembourg and Portugal. For Austria, we observe a change in 2007, possibly explained by the oil price shock, which is the official explanation of the Statistics Austria. Belgium changed in 2000 with a clear reduction in mean and an increase in variance. In the case of Denmark we observe a increase in variance after 2000 with a very distinct change in skewness. Germany saw an increase in its inflation mean and volatility after 2000. Luxembourg suffered a severe increase in variance, similar to Italy and Spain. Portugal on the other hand was successfull in reducing its very high inflation rate substantially following the participation in the ERM arrangement. 
-\\
-A disturbing trend seems to be the rise in inflation volatility in almost half of the euro countries. A very volatile inflation rate is unlikely to contribute to greater macroeconomic stability. Although \cite{grier} find no evidence, that higher inflation uncertainty raises the average inflation rate -- at least in the case of the USA --  \cite{jaro} finds a positive correlation between the level and the standard deviation of inflation. This finding might be still more problematic if we take into account that on average the skewness parameter has decreased substantially in most of the euro--zone countries indicating that in future higher inflation rates are more likely. 
 
-% finland  changes in skewness (but only 0.055) not significantly
-% slovenia around 2006
+%(...3 punkte darstellung noch einbauen...) \\
+%(...andere struktur: 1.short introduction, 2. countries in detail (6.1), 3. summary (6.2) ...) \\
+Table \ref{resulttable} presents the break dates and the parameter values of the segments as well as the dates of entry into the ERM/ERM~II and the date of the euro introduction. We formed seven groups of countries according to the observed pattern of break points. These seven groups consist of Austria and Belgium, the Eastern European countries, the two big southern European countries, Italy and Spain, Ireland, the countries with no change in the inflation dynamics, the countries with breaks in the early 90s and the member countries of the former DM--zone (excluding Belgium). \\
 
 
+\subsection{The countries in detail}
 
+Regarding Austria and Belgium, the time after the break is characterized by an increase in the mean and a severe increase in the variance of the inflation rates. The skewness is now negative for both series, which indicates that the distribution has shifted to the right, implying that overall inflation is likely to increase. This change can be traced back to two major influences: the financial crisis and potentially some spillover effects of higher oil prices in late 2007. \\
+The second group consists of the Eastern European countries: Czech Republic, Estonia, Hungary, Poland, Slovakia and Slovenia. In almost all of these countries, the mean and the variance of their inflation rates declined in the later part of the 90s (Slovenia is an exception with an increase in variance after the break). Most of them experienced a break in 1997/1998, with Poland, Slovakia and Slovenia somewhat later. The break during the late 90s is a result of these countries efforts to curb in inflation by decreasing money supply and indicates the time when these countries actually overcame the biggest transitionally shocks on their way towards free market economies. Slovakia is very similar to Slovenia, as its inflation dynamics too changed roughly one year prior to its entry into ERM~II. \\
+Another combination of countries with rather identical results are the two biggest southern European countries, Italy and Spain. Both of them experienced high rates of inflation in the early 90s. Afterwards, in the phase leading up to the monetary union, mean and variance were greatly reduced. Soon after the fixing of the exchange rates, this trend changed significantly, leading to a higher mean and a much higher variance. A possible reason for this is that the fiscal responsibility that was required for an entry into the Eurozone was softened after this goal was achieved. This hypothesis gains some credibility considering the huge government deficits of these countries after 1999. \\
+%(... in irland der schock schon persistenter als in anderen ländern, bei der grauen graphik zeigen (greyplot...)\\
+Ireland can be considered a rather special case. It is the only economy where the effects of the ongoing financial crisis of 2008 are visible.  In Ireland, compared to other countries, the deflationary effect of the financial crises was more persistent. This deflationary trend, which for a time affected all countries, can be seen in Figure \ref{greyplot}, which depicts a rolling mean estimation, where the mean is calculated using the first moment of a fitted GL distribution. There is evidence of a decline in mean inflation, which returns to its previous path roughly a year later. The break in 2008 can be attributed to the strong contraction triggered by the bursting of the Irish housing bubble and a beginning deflation in concert with the massive costs of the bailout of the countries banking system. Surprisingly, this deflationary pressure is not visible in Spain, which was affected by a housing bubble of roughly the same size as Ireland.  \\
+%(...change formulation for greece...) \\
 \clearpage
-\subsection{Inflation Differentials}
+Another interesting group consists of four economically rather different countries. In none of them do we find any evidence of a change in inflation dynamics. Whereas France, Finland and Netherlands are on the lower side of the inflation margin, the Greek inflation rate is among the highest.  \\
+The next group consists of two countries that decided not to be part of any European Monetary System\footnote{If we ignore the short participating time of both countries in the EMS.}, the United Kingdom and Sweden. Portugal is included due to the same break point behavior. All three show a clear break in the early 90s. Two of them can be traced back to economic crisis, the currency crisis of the United Kingdom cumulating into the ``Black Wednesday'' in 1992 and the run on the Swedish currency in the same year. In the case of Portugal, the inflation rate after 1992 was much more stable, showing that the inflationary problems of Portugal were less severe thereafter.\\
+The last group consists of the former DM--zone countries Denmark, Germany and Luxembourg.  In the case of Denmark we observe an increase in variance after 2000 with a very distinct change in skewness. In Germany, the inflation rate increased both on average and in its variability. Luxembourg suffered a severe increase in variance, similar to Italy and Spain. All of these countries, which profited from the stability of the previous German currency, still have a very low inflation rate.
+
+\subsection{Overview over the general trend}
+
+The disparity of the national inflation rates is still an issue, many researchers, like \citet{hofmann}  find a considerable amount of inflation differentials. \citet{cap} estimate short-run and steady-state inflation uncertainty in 12 EMU countries and find a considerable degree of heterogeneity across EMU countries in terms of average inflation and its degree of persistence. In a paper examining structural convergence of the inflation rates in EU countries, \citet{palomba} try to answer the question if during the 1990s the inflation rate dynamics of EU countries become more similar. They find that convergence over time of inflation dynamics was only partly observable. 
+In a paper studying core inflation and using an aggregated euro area inflation rate, \citet{morana} finds three regimes (roughly 1980---1984, 1984---1993 and 1993---2000) governing the core inflation rate.  \\
+Concerning inflation differentials, Figure \ref{greyplot} depicts the inflation rates and a rolling mean estimation, where the mean is calculated using the first moment of a fitted GL distribution.\footnote{If more countries have the same inflation rate in a given month, the lines are overlapped and thus get darker. We wold see one black line if all countries would show the same month--on--month increase at any one time. The red lines depict the means.} We do see that many of these countries follow a rather similar path. One event clearly visible is the financial crises and the short deflationary phase starting somewhere around the autumn of 2007 and lasting a few months. Over the time, there is clear evidence, that the inflation rates converged towards some common -- albeit broad -- mean level.
 
 
 \begin{figure}[h!tp]
@@ -544,38 +613,97 @@ A disturbing trend seems to be the rise in inflation volatility in almost half o
   plot(hicp, plot.type = "single", lwd = 1.5, col = gray_red[1], xlab="Time", ylab="Series")
   for(i in 1:ncol(hicp)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
 @
-\caption{Inflation rates and mean inflation rates over time}
+\caption{Inflation rates and estimated GL mean over time}
+\label{greyplot}
 \end{figure}
 
 
 
-The disparity of the national inflation rates is still an issue, many researchers, like \citet{hofmann} still find a considerable amount of inflation differentials. \citet{cap} estimate short-run and steady-state inflation uncertainty in 12 EMU countries and find a considerable degree of heterogeneity across EMU countries in terms of average inflation and its degree of persistence. In a paper examining structural convergence of the inflation rates in EU countries, \citet{palomba} try to answer the question if during the 1990s the inflation rate dynamics of EU countries become more similar. They find that convergence over time of inflation dynamics was only partly observable. 
-In a paper studying core inflation and using an aggregated euro area inflation rate, \citet{morana} finds three regimes (roughly 1980---1984, 1984---1993 and 1993---2000) governing the core inflation rate.  \\
-Concerning inflation differentials, we present a graph depicting the inflation rates and a rolling mean estimation, where the mean is calculated using the first moment of a fitted GL distribution. If more countries have the same inflation rate in a given month, the lines are overlapped and thus get darker.\footnote{We wold see one black line if all countries would show the same month--on--month increase at any one time.} We do see that many of these countries follow a rather similar path. One event clearly visible is the financial crises and the short deflationary phase starting somewhere around the autumn of 2007 and lasting a few months. However, only a small number of countries exhibits a break around this time (Austria and Ireland). 
+\clearpage
+
+Regarding the general trend, Table \ref{resulttable} presents lower, medium and upper (25, 50, 75) percentiles of the first three moments of the inflation series during the convergence phase (January 1990 until December 1998), the Euro phase (January 1999 until August 2008) and the time after the financial crisis (since September 2008\footnote{After the insolvency of the Lehman Brothers in September 2008.} until now), for the countries in the ``core'' of the Eurozone (Austria, Belgium, Finland, France, Germany, Greece, Ireland, Italy, Luxembourg, Netherlands, Portugal and Spain) and all the others. \\
+Regarding the mean, we see a clear evolution towards a lower mean in both groups, where the core countries show much lower values. Almost the opposite is true concerning the variance of the inflation rates of the core countries, that has increased to a much higher value than at the start of the sample, with the upper percentile during the 90s now almost equaling the lower percentile for the time after the financial crisis; the variance for the other countries has declined significantly. Concerning skewness, we see a clear trend in the core countries for skewness to become negative, indicating that the bulk of the values now lies right to the mean. The same is true -- although to a lesser extent -- for the other countries. \\
 
 
-\begin{figure}[h!tp]
-<<diffmean, fig=TRUE, height=8, width=8>>=
-	plot(diff)
+\begin{longtable}{|l|l|l|l|l|}
+\hline
+\multicolumn{5}{|c|}{Mean} \\
+\hline
+Zone & Percentile & 1990(1)--1998(12) & 1999(1)--2008(8) & 2008(9)--2010(12)\\
+\hline
+<<echo=FALSE, results=tex>>=
+euro <- cbind(table2[[1]], table2[[2]],table2[[6]],table2[[7]],table2[[8]],table2[[9]],table2[[11]],table2[[12]],table2[[13]],table2[[14]],table2[[16]],table2[[19]])
+noneuro <- cbind(table2[[3]],table2[[4]],table2[[5]],table2[[10]],table2[[15]],table2[[17]],table2[[18]],table2[[20]],table2[[21]])
+writeLines(unlist(format_momenteuro(momentgen(1,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
 @
-\caption{Differences in Euro excluding Estonia, Slovenia and Slovakia}
-\end{figure}
-
-Concerning the mean of the inflation rates, we see a clear convergence pattern. This result is reinforced by plotting the difference between the highest and the lowest mean inflation rate in the euro subsample, excluding the new Euro--member states Estonia, Slovakia and Slovenia.\footnote{Including them blurs the clear result somewhat by driving the difference up, since at the beginning, these countries still had very high inflation rates.} After a short hike at the beginning of the convergence phase in 1995, the difference declined clearly to a fraction of its previous value. However, the financial crisis clearly contributed to widening of the convergence gap. Our finding contradicts \citet{busetti} who find that from 1980---1997 there was convergence of inflation rates, but afterwards there is some diverging behavior. This does not quite go along with the depicted means,  that do not indicate stronger divergence after 1997 but a continuing decrease of inflation differentials until the hikes after 2008. \\
-However, this is not the case for variance, where we find clear evidence of an increase. Doing the same thing for volatility, we see the second moment almost tripling after 1995.\footnote{Due to a very low volatility of countries like Spain and Luxembourg at the beginning.} This of course does make some economic sense, since the convergence criteria and the ECB focus on mean inflation only and do not take volatility into account. \\
-
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(format_momenteuro(momentgen(1,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+@
+\hline
+\multicolumn{5}{|c|}{Variance} \\
+\hline
+Zone & Quantil & 1990(1)--1998(12) & 1999(1)--2007(12) & 2008(1)--2010(12)\\
+\hline
+<<echo=FALSE, results=tex>>=
+euro <- cbind(table2[[1]], table2[[2]],table2[[6]],table2[[7]],table2[[8]],table2[[9]],table2[[11]],table2[[12]],table2[[13]],table2[[14]],table2[[16]],table2[[19]])
+noneuro <- cbind(table2[[3]],table2[[4]],table2[[5]],table2[[10]],table2[[15]],table2[[17]],table2[[18]],table2[[20]],table2[[21]])
+writeLines(unlist(format_momenteuro(momentgen(2,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
+@
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(format_momenteuro(momentgen(2,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+@
+\hline
+\multicolumn{5}{|c|}{Skewness} \\
+\hline
+Zone & Quantil & 1990(1)--1998(12) & 1999(1)--2007(12) & 2008(1)--2010(12)\\
+\hline
+<<echo=FALSE, results=tex>>=
+euro <- cbind(table2[[1]], table2[[2]],table2[[6]],table2[[7]],table2[[8]],table2[[9]],table2[[11]],table2[[12]],table2[[13]],table2[[14]],table2[[16]],table2[[19]])
+noneuro <- cbind(table2[[3]],table2[[4]],table2[[5]],table2[[10]],table2[[15]],table2[[17]],table2[[18]],table2[[20]],table2[[21]])
+writeLines(unlist(format_momenteuro(momentgen(3,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
+@
+\hline
+<<echo=FALSE, results=tex>>=
+writeLines(unlist(format_momenteuro(momentgen(3,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+@
+\hline
+\caption{Development of first three moments}
+\label{resulttable}
+\end{longtable}
 
 
 \clearpage
 \section{Conclusion}\label{s6}
 
-%(... write when rest is finished, talk about method and empirical findings...)
 
-%We were able to outline changes in the dynamics of the inflation rates in various countries across Europe. However, we fail to find any clear pattern relating to the euro introduction, but find convincing evidence, that the zeal of the Eastern European countries to join the European currency at the earliest possible date, clearly helped in reducing mean and variance of their inflation rates. \\
-%Considering the severe increase in overall volatility of the European inflation rates, it should be pointed out however, that most of these increases could possibly be traced back to the strong seasonality in our time series. The economic reason for this however remains a riddle and should be subject to future research.
+Contrary to economic theory, which unfortunately does not provide any clear foundation for a proper answer to the question of whether or not the creation of a monetary union between two or more states is likely to reduce or increase the variability or even the level of the inflation rate, we were able to circumvent these problems by looking directly at the data and testing for breaks in the inflation rates dynamics. \\
+An interesting approach to this question -- using a theoretical framework -- is taken by \citet{holte}. What he finds out via simulations of  different interest rate rules is that the standard deviation of the home CPI inflation rate can be substantially reduced by joining a monetary union. The effects of joining a monetary union on inflation variability in his framework depend on structural parameters like risk aversion, price flexibility, export demand elasticity, openness and shock correlations. However, due to the fact that not all of these parameters are known and that their interaction as well has to be estimated, the whole model is very dependent on a variety of assumptions. \\
+Regarding our results, it is safe to say, that the Eastern European countries were greatly successfull in decreasing inflation in both mean and variance. This is due to the fact that two of the most important inflationary channels, the money supply and the degree of openness, had to be arranged according to the criteria necessary for EMU entry. To achieve convergence in inflation rates, the growth in money supply had to be in concert with the M3 growth rate as decided by the European Central Bank (ECB). The opening of the economies made cheaper goods available and thus contributed to lower prices. Like the original countries participating in the ERM, the Eastern European countries had to synchronize money supply growth and interest rates in order to fix exchanges rates or otherwise risk the chance of severe disequilibria. \\
+%Any new country willing to join must first participate in the second exchange rate mechanism (ERM~II) with their currencies floating in a rather narrow band against the euro, which basically requires the same synchronization tools. 
+For the countries in the core of the Eurozone, the most disturbing trend seems to be the rise in inflation volatility in almost half of the euro countries. A very volatile inflation rate will likely  contribute to greater macroeconomic instability. Although \cite{grier} find no evidence that higher inflation uncertainty raises the average inflation rate -- at least in the case of the USA --  \cite{jaro} finds a positive correlation between the level and the standard deviation of inflation. This finding might be still more problematic if we take into account that on average the skewness parameter has decreased substantially in most of the euro--zone countries indicating that in future higher inflation rates are more likely. This will put pressure on the ECB to achieve its inflation target of 2\%.
 
 
-% füge noch cpmputatinal details hinzu
+
+
+
+
+
+%\begin{figure}[h!tp]
+%<<diffmean, fig=TRUE, height=8, width=8>>=
+%	plot(diff)
+%@
+%\caption{Differences in Euro excluding Estonia, Slovenia and Slovakia}
+%\end{figure}
+%
+%Concerning the mean of the inflation rates, we see a clear convergence pattern. This result is reinforced by plotting the difference between the highest and the lowest mean inflation rate in the euro subsample, excluding the new Euro--member states Estonia, Slovakia and Slovenia.\footnote{Including them blurs the clear result somewhat by driving the difference up, since at the beginning, these countries still had very high inflation rates.} After a short hike at the beginning of the convergence phase in 1995, the difference declined clearly to a fraction of its previous value. However, the financial crisis clearly contributed to widening of the convergence gap. Our finding contradicts \citet{busetti} who find that from 1980---1997 there was convergence of inflation rates, but afterwards there is some diverging behavior. This does not quite go along with the depicted means,  that do not indicate stronger divergence after 1997 but a continuing decrease of inflation differentials until the hikes after 2008. \\
+%However, this is not the case for variance, where we find clear evidence of an increase. Doing the same thing for volatility, we see the second moment almost tripling after 1995.\footnote{Due to a very low volatility of countries like Spain and Luxembourg at the beginning.} This of course does make some economic sense, since the convergence criteria and the ECB focus on mean inflation only and do not take volatility into account. \\
+
+
+
+
+
 
 \clearpage
 \section*{Computational Details}
@@ -595,13 +723,12 @@ Var(y)  & = & \sigma^2(\gamma'(\delta)+\gamma'(1)) \\
 Skew(y) & = & \frac{\gamma''(\delta)-\gamma''(1)}{(\gamma'(\delta)+\gamma'(1))^{3/2}}
 \end{eqnarray}
 
-where $\gamma(\cdot)'$ and $\gamma(\cdot)''$ are its first and second derivatives, respectively. \\
+where $\gamma'(\cdot)$ and $\gamma''(\cdot)$ are the first and the second derivatives of the GL distribution, respectively. \\
 The log-likelihood is:
 
 \begin{eqnarray}
-\log f(y|\theta,\sigma, \delta) & = & \log(\delta) - \log(\sigma)   \\
-& - &  \frac{1}{\sigma} (y-\theta) - (\delta+1) \nonumber \\
-& \times & \log (1+\exp^{-\frac{y-\theta}{\sigma}}) \nonumber
+\log f(y|\theta,\sigma, \delta) & = & \log(\delta) - \log(\sigma) - \frac{1}{\sigma} (y-\theta) - (\delta+1) \nonumber \\
+& \times & \log (1+\exp^{-\frac{y-\theta}{\sigma}}) \nonumber 
 \end{eqnarray}
 
 The resulting score function, where the scores are the derivatives of the log--likelihood function, has three components $(s_{\theta}, s_{\sigma}, s_{\delta})$, with $\tilde{y} = \exp^{-\frac{y-\theta}{\sigma}}$. These are employed in equation \ref{eqn2} for the construction of the test statistics and are a means of measuring the estimation error in a maximum likelihood framework.
@@ -625,12 +752,17 @@ The scores of the parameters $\phi = (\theta, \sigma, \delta)$ sum up to 0: $\su
 \sum_{i=1}^n s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) = 0
 \end{eqnarray}
 
+
+\section{Data and Sales Periods}\label{dataprobs}
+
+In addition to Belgium and Luxembourg, there are a number of other countries, where the sales periods are regulated by law. France has an individual time span regulated by each department. This should pose no problem, since there is no global state level solution. In Greece there are also two set sales--periods in winter and summer. In Italy the sales periods are fixed each year by the Chambers of Commerce. Portugal has two set sales periods as well, but for two month (January and February as well as Mid--July to Mid--September. The source for this information is \citet{konseur}. According to information by their national statistical offices, the official dates of the inclusion of these sales periods are: January 2000 for Belgium and January 1999 for Luxembourg. Italy, Greece and Portugal were not estimated, since -- as in the case of France -- these periods either do not seem to be set for the whole country at once, or information about the treatment of sales periods in the HICP was not provided by the national statistical offices upon  request.
+
+
 \end{appendix}
 
 \clearpage
 \section{Graphs}
 
-(... less space, more on one page ...)\\
 Here we present the actual data where the blue lines in the graphs correspond to the estimated mean of the series.  
 
 \begin{figure}[h!tp]
