@@ -716,6 +716,7 @@ The results shown are computed with a new \proglang{R} package \pkg{glogis}, whi
 \section{GL Distribution}\label{glscore}
 
 The moments of the GL distribution as given in equation \ref{eqn1} are:
+%Quelle: "C:\Dissertation\Paper-1-Z\Unterlagen\GL-ml-estimation.pdf"
 
 \begin{eqnarray}
 E(y) & = & \theta + \sigma (\gamma(\delta) - \gamma(1)) \\
@@ -723,7 +724,7 @@ Var(y)  & = & \sigma^2(\gamma'(\delta)+\gamma'(1)) \\
 Skew(y) & = & \frac{\gamma''(\delta)-\gamma''(1)}{(\gamma'(\delta)+\gamma'(1))^{3/2}}
 \end{eqnarray}
 
-where $\gamma'(\cdot)$ and $\gamma''(\cdot)$ are the first and the second derivatives of the GL distribution, respectively. \\
+where $\gamma'(\cdot)$ and $\gamma''(\cdot)$ are the first and the second derivatives of the digamma function, respectively. \\
 The log-likelihood is:
 
 \begin{eqnarray}
