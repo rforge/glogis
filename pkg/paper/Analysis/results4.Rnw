@@ -1,0 +1,1175 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\renewcommand{\rmdefault}{phv}
+\textwidth14cm
+\textheight28cm
+\oddsidemargin1cm
+\topmargin-2cm
+
+%% need no \usepackage{Sweave}
+\SweaveOpts{engine=R, eps=FALSE, keep.source = TRUE, echo=FALSE, results=hide}
+\setkeys{Gin}{width=\textwidth}
+
+\begin{document}
+
+%% options for display
+<<options>>=
+options(prompt = "R> ", continue = "+  ", width = 70,
+  digits = 4, show.signif.stars = FALSE, useFancyQuotes = FALSE)
+@
+
+%% packages and additional code
+<<package-code>>=
+Sys.setlocale("LC_TIME", "English")
+library("glogis")
+library("fxregime")
+
+  sales_adjust <- function(x, start = yearmon(2000), months = c(1, 2, 7, 8)) {
+
+  ## create dummy series for sales effects plus intercept
+  ## before and after sales introduction
+  dummy <- zoo(matrix(0, nrow = length(x), ncol = 2 * (length(months) + 1)), time(x), freq = 12)
+
+  ## separate intercept dummies (before/after)
+  dummy[,1] <- as.numeric(time(x) < start)
+  dummy[,2] <- as.numeric(time(x) >= start)
+
+  ## sales months dummies
+  for(i in 1:length(months)) {
+    dummy[, 2 * i + 1] <- -as.numeric(cycle(x) == months[i] & time(x) <  start)
+    dummy[, 2 * i + 2] <-  as.numeric(cycle(x) == months[i] & time(x) >= start)
+  }
+ 
+  ## auxiliary regression
+  reg <- lm.fit(coredata(dummy), coredata(x))
+  
+  ## compute difference in sales month deviations (after introduction only)
+  seffect <- (dummy[,2] * abs(dummy[, -(1:2)]) %*% reg$coefficients[-(1:2)])
+  
+  ## substract sales effect
+  x - seffect
+}
+
+moments <- function(object, ...) UseMethod("moments")
+moments.glogisfit <- function(object, ...) object$moments
+moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
+  t(sapply(refit(object, breaks = breaks), "[[", "moments"))
+@
+
+
+%% load and preprocess data
+<<data>>=
+data("HICP", package = "glogis")
+HICP <- HICP[, colnames(HICP) != "EU"]
+add_breaks <- structure(rep(0, ncol(HICP)), .Names = colnames(HICP))
+add_breaks[c("Germany")] <- 1
+@
+
+%% analysis "macro" (assumes existence of "i", "HICP", and "add_breaks")
+<<analysis, eval=FALSE>>=
+## compute returns
+x <- 100 * diff(log(na.omit(HICP[,i])))
+
+## adjust for sales effects in Belgium (2000) and Luxembourg (1999) and Spain and Italy (both 2001)
+if(i==2){
+bla <- sales_adjust(x, start=yearmon(2000), months=c(1,2,7,8))
+for(jj in 1:length(x)) {
+x[jj] <- bla[jj]
+}
+}
+
+if(i==13){
+bla <- sales_adjust(x, start=yearmon(1999), months=c(1,2,7,8))
+for(jj in 1:length(x)) {
+x[jj] <- bla[jj]
+}
+}
+
+if(i==12){
+bla <- sales_adjust(x, start=yearmon(2001), months=c(1,2,7,8))
+for(jj in 1:length(x)) {
+x[jj] <- bla[jj]
+}
+}
+
+if(i==19){
+bla <- sales_adjust(x, start=yearmon(2001), months=c(1,2,7,8))
+for(jj in 1:length(x)) {
+x[jj] <- bla[jj]
+}
+}
+
+
+
+
+## fit full-sample model
+x_gf <- glogisfit(x)
+
+## assess stability of full-sample model
+x_efp <- gefp(x_gf, fit = NULL)
+
+## estimate breakpoints (with minimal segment size of 2 years)
+x_bp <- breakpoints(x_gf, h = 24)
+
+## (minimal) number of breaks
+x_nbreaks <- if(sctest(x_efp, functional = supLM(0.1))$p.value > 0.05) {
+  0
+} else {
+  max(1, length(breakdates(x_bp))) + add_breaks[i]
+}
+
+## refit segmented model
+x_rf <- refit(x_bp, breaks = x_nbreaks)
+
+## save everything
+save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(HICP)[i], ".rda", sep = ""))
+@
+
+%% plot "macros" (assuming existence "x", "x_gf", ...)
+<<plot1, eval=FALSE>>=
+par(mfrow = c(1, 2))
+plot(x, main = "Series with Fitted Mean", ylab = "100 * diff(log(HICP))", xlab = "Time")
+lines(x_bp, breaks = x_nbreaks)
+lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
+plot(x_efp, functional = supLM(0.1), main = "supLM test")
+lines(x_bp, breaks = x_nbreaks)
+@
+
+<<plot2, eval=FALSE>>=
+par(mfrow = c(1, 1))
+plot(x_bp)
+@
+
+<<plot3, eval=FALSE>>=
+par(mfrow = c(1, x_nbreaks + 1))
+for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
+  format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
+@
+
+%-----------------------------------------------------------
+% Austria
+<<>>=
+i <- 1
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+%-----------------------------------------------------------
+\newpage
+% Belgium
+<<>>=
+i <- 2
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% CzechRepublic
+<<>>=
+i <- 3
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Denmark
+<<>>=
+i <- 4
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+%-----------------------------------------------------------
+\newpage
+% Estonia
+<<>>=
+i <- 5
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Finland (EU not part of this HICP)
+<<>>=
+i <- 6
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% France
+<<>>=
+i <- 7
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Germany
+<<>>=
+i <- 8
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Greece
+<<>>=
+i <- 9
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Hungary
+<<>>=
+i <- 10
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Ireland
+<<>>=
+i <- 11
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Italy
+<<>>=
+i <- 12
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Luxemburg
+<<>>=
+i <- 13
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Netherlands
+<<>>=
+i <- 14
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Poland
+<<>>=
+i <- 15
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Portugal
+<<>>=
+i <- 16
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Slovakia
+<<>>=
+i <- 17
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Slovenia
+<<>>=
+i <- 18
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Spain
+<<>>=
+i <- 19
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% Sweden
+<<>>=
+i <- 20
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% United Kingdom
+<<>>=
+i <- 21
+nam <- colnames(HICP)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+\end{document}
