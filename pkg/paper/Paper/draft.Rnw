@@ -40,7 +40,7 @@ ret3 <- c(quantile(mean[,3], probs=.25), quantile(mean[,3], probs=.50), quantile
 ret3 <- cbind(ret3)
 ret <- cbind(ret1,ret2,ret3)
 colnames(ret) <- c(start[1], start[2], start[3])
-rownames(ret) <- c("lower", "medium", "upper")
+rownames(ret) <- c("lower", "median", "upper")
 return(ret)
 }
 if(flag==2){
@@ -59,7 +59,7 @@ ret3 <- c(quantile(var[,3], probs=.25), quantile(var[,3], probs=.50), quantile(v
 ret3 <- cbind(ret3)
 ret <- cbind(ret1,ret2,ret3)
 colnames(ret) <- c(start[1], start[2], start[3])
-rownames(ret) <- c("lower", "medium", "upper")
+rownames(ret) <- c("lower", "median", "upper")
 return(ret)
 }
 if(flag==3){
@@ -78,7 +78,7 @@ ret3 <- c(quantile(skewness[,3], probs=.25), quantile(skewness[,3], probs=.50), 
 ret3 <- cbind(ret3)
 ret <- cbind(ret1,ret2,ret3)
 colnames(ret) <- c(start[1], start[2], start[3])
-rownames(ret) <- c("lower", "medium", "upper")
+rownames(ret) <- c("lower", "median", "upper")
 return(ret)
 }
 }
@@ -243,7 +243,7 @@ format_momenteuro <- function(momeuro, digits = 6, name="Euro") {
   rval[2,1] <- ""
   rval[3,1] <- ""
   rval[1,2] <- "lower"
-  rval[2,2] <- "medium"
+  rval[2,2] <- "median"
   rval[3,2] <- "upper"
   rval <- apply(rval, 1, paste, collapse = " & ")
   rval <- paste(rval, "\\\\")
@@ -471,7 +471,7 @@ It is given by:
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert \mathit{efp}(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 
-where the appropriate p--values can be computed using:
+where the appropriate $p$~values can be computed using:
 
 \begin{eqnarray}
 \underset{t \in [0.1, 0.9]}{sup} \frac{\Vert W^0(t) \Vert_2^2}{t(1-t)} \nonumber
@@ -501,7 +501,7 @@ All parameters $\tau_1, \dots, \tau_B, \phi^{(1)}, \dots, \phi^{(B+1)}$ can be e
         slovpval <- sctest(x$efp, functional = supLM(0.1))$p.value
 @
 To illustrate our method, we consider the case of Slovenia. After a period of relative instability following the independence from Yugoslavia, Slovenia was successfull in realigning its economy and introduced a number of reforms leading to a stable growth in the past years. The good economic performance made it possible for Slovenia to enter the ERM~II in June 2004 and later on to introduce the euro in January 2007. The data collected contains the period from January 1996 onwards. In the first few years, Slovenia experienced very high inflation rates, but was successfull in reducing inflation to a much lower level. \\
-A glance at the time series depicted in Figure \ref{fig1} of the monthly inflation rates reveals a decline in the mean around the middle of the observed time period. The $efp(\cdot)$ starts to cross the border as early as 2001 and reaches the peak somewhere between 2003 and 2004. The p--value of the supLM test is \Sexpr{round(slovpval, 5)} and clearly indicates at least one break.  The number of breaks is calculated by means of the LWZ criteria, which chooses one break in August 2003.\footnote{For the changes in the parameters, see Table \ref{resulttable}.} In this year, Slovenia introduced a number of financial reforms and severely decreased the year on year growth in the M3 monetary aggregate. Combined, these actions were enough to ensure the successfull participation in the ERM~II a year later and the introduction of the euro two years later. 
+A glance at the time series depicted in Figure \ref{fig1} of the monthly inflation rates reveals a decline in the mean around the middle of the observed time period. The $efp(\cdot)$ starts to cross the border as early as 2001 and reaches the peak somewhere between 2003 and 2004. The $p$~value of the supLM test is \Sexpr{round(slovpval, 5)} and clearly indicates at least one break.  The number of breaks is calculated by means of the LWZ criteria, which chooses one break in August 2003.\footnote{For the changes in the parameters, see Table \ref{resulttable}.} In this year, Slovenia introduced a number of financial reforms and severely decreased the year on year growth in the M3 monetary aggregate. Combined, these actions were enough to ensure the successfull participation in the ERM~II a year later and the introduction of the euro two years later. 
 
 
 \begin{figure}[h!tp]
@@ -625,8 +625,16 @@ euhis3 <- skewness(window(euhi, start=yearmon(2008+8/10), end=yearmon(2010+11/12
 @
 
 The disparity of the national inflation rates is still an issue. Many researchers, like \citet{hofmann}  find a considerable amount of inflation differentials. \citet{cap} estimate short-run and steady-state inflation uncertainty in 12 EMU countries and find a considerable degree of heterogeneity across EMU countries in terms of average inflation and its degree of persistence. In a paper examining structural convergence of inflation rates in EU countries, \citet{palomba} try to answer the question if during the 1990s the inflation rate dynamics of EU countries become more similar. They find that convergence over time of inflation dynamics was only partly observable. 
-In a paper studying core inflation and using an aggregated euro area inflation rate, \citet{morana} finds three regimes (roughly 1980---1984, 1984---1993 and 1993---2000) governing the core inflation rate.  \\
-Concerning inflation differentials, Figure \ref{greyplot} depicts the inflation rates and a rolling mean estimation, where the mean is calculated using the first moment of a fitted GL distribution.\footnote{If more countries have the same inflation rate in a given month, the lines are overlapped and thus get darker. We wold see one black line if all countries would show the same month--on--month increase at any one time. The red lines depict the means.} We do see that many of these countries follow a rather similar path. One event clearly visible is the financial crises and the short deflationary phase starting somewhere around the autumn of 2007 and lasting a few months. Over time, there are hints, that the inflation rates converged towards some common -- albeit broad -- mean level. For the inflation series of the whole EMU, as published by the \citet{oecd}, we see an increase in mean from \Sexpr{round(euhim1, 5)} (1990(1)--1998(12)) to \Sexpr{round(euhim2, 5)} (1999(1)--2008(8)) with a strong decrease to \Sexpr{round(euhim3, 5)} (2008(9)--2010(12)) following the financial crises. Whereas variance has increased over time from    \Sexpr{round(euhiv1, 5)} to \Sexpr{round(euhim3, 5)}. Regarding skewness, we see a clear change towards a negative skewness from \Sexpr{round(euhis1, 5)} to \Sexpr{round(euhis3, 5)}. 
+In a paper studying core inflation and using an aggregated euro area inflation rate, \citet{morana} finds three regimes (roughly 1980--1984, 1984--1993 and 1993--2000) governing the core inflation rate.  \\
+Concerning inflation differentials, Figure \ref{greyplot} depicts the inflation rates and a rolling mean estimation, where the mean is calculated using the
+first moment of a fitted GL distribution.\footnote{If more countries have the same inflation rate in a given month, the lines are overlapped and thus get
+darker. We wold see one black line if all countries would show the same month--on--month increase at any one time. The red lines depict the means.} We do
+see that many of these countries follow a rather similar path. One event clearly visible is the financial crises and the short deflationary phase starting
+somewhere around the autumn of 2007 and lasting a few months. Over time, there are hints, that the inflation rates converged towards some common -- albeit
+broad -- mean level. For the inflation series of the whole EMU, as published by the \citet{oecd}, we see an increase in mean from \Sexpr{round(euhim1, 3)}
+(1990(1)--1998(12)) to \Sexpr{round(euhim2, 3)} (1999(1)--2008(8)) with a strong decrease to \Sexpr{round(euhim3, 3)} (2008(9)--2010(12)) following the
+financial crises. Whereas variance has increased over time from    \Sexpr{round(euhiv1, 3)} to \Sexpr{round(euhim3, 3)}. Regarding skewness, we see a clear
+change towards a negative skewness from \Sexpr{round(euhis1, 3)} to $\Sexpr{round(euhis3, 3)}$. 
 
 
 
@@ -650,12 +658,12 @@ Concerning inflation differentials, Figure \ref{greyplot} depicts the inflation 
 
 \clearpage
 
-Regarding the general trend, Table \ref{grouptable} presents lower, medium and upper (25, 50, 75) percentiles of the first three moments of the inflation series during the convergence phase (January 1990 until December 1998), the euro phase (January 1999 until August 2008) and the time after the financial crisis (since September 2008\footnote{After the insolvency of the Lehman Brothers in September 2008.} until now), for the countries in the ``core'' of the eurozone (Austria, Belgium, Finland, France, Germany, Luxembourg and Netherlands), the PIIGS countries (Portugal, Italy, Ireland, Greece and Spain) and all the others. \\
+Regarding the general trend, Table \ref{grouptable} presents lower, median and upper (25\%, 50\%, 75\%) percentiles of the first three moments of the inflation series during the convergence phase (January 1990 until December 1998), the euro phase (January 1999 until August 2008) and the time after the financial crisis (since September 2008\footnote{After the insolvency of Lehman Brothers in September 2008.} until now), for the countries in the ``core'' of the eurozone (Austria, Belgium, Finland, France, Germany, Luxembourg and Netherlands), the PIIGS countries (Portugal, Italy, Ireland, Greece and Spain) and all the others. \\
 %(... jesus would further differentiate between core and southeren core (or PIIGS)...)\\
 
 
 
-\begin{longtable}{|l|l|l|l|l|}
+\begin{longtable}{|l|l|r|r|r|}
 \hline
 \multicolumn{5}{|c|}{Mean} \\
 \hline
@@ -665,30 +673,30 @@ Zone & Percentile & 1990(1)--1998(12) & 1999(1)--2008(8) & 2008(9)--2010(12)\\
 euro <- cbind(table2[[1]], table2[[2]],table2[[6]],table2[[7]],table2[[8]],table2[[13]],table2[[14]])
 noneuro <- cbind(table2[[3]],table2[[4]],table2[[5]],table2[[10]],table2[[15]],table2[[17]],table2[[18]],table2[[20]],table2[[21]])
 piigs <- cbind(table2[[9]], table2[[11]],table2[[12]], table2[[16]],table2[[19]])
-writeLines(unlist(format_momenteuro(momentgen(1,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
+writeLines(unlist(format_momenteuro(momentgen(1,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Core euro")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(1,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="PIIGS")))
+writeLines(unlist(format_momenteuro(momentgen(1,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="PIIGS")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(1,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+writeLines(unlist(format_momenteuro(momentgen(1,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Others")))
 @
 \multicolumn{5}{|c|}{Variance} \\
 \hline
 Zone & Quantil & 1990(1)--1998(12) & 1999(1)--2007(12) & 2008(1)--2010(12)\\
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(2,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
+writeLines(unlist(format_momenteuro(momentgen(2,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Core euro")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(2,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="PIIGS")))
+writeLines(unlist(format_momenteuro(momentgen(2,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="PIIGS")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(2,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+writeLines(unlist(format_momenteuro(momentgen(2,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Others")))
 @
 \hline
 \multicolumn{5}{|c|}{Skewness} \\
@@ -696,15 +704,15 @@ writeLines(unlist(format_momenteuro(momentgen(2,noneuro,start=yearmon(c(1990,199
 Zone & Quantil & 1990(1)--1998(12) & 1999(1)--2007(12) & 2008(1)--2010(12)\\
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(3,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Coreeuro")))
+writeLines(unlist(format_momenteuro(momentgen(3,euro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Core euro")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(3,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="PIIGS")))
+writeLines(unlist(format_momenteuro(momentgen(3,piigs,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="PIIGS")))
 @
 \hline
 <<echo=FALSE, results=tex>>=
-writeLines(unlist(format_momenteuro(momentgen(3,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=6, name="Others")))
+writeLines(unlist(format_momenteuro(momentgen(3,noneuro,start=yearmon(c(1990,1998,2008+8/10)), end=yearmon(c(1998+11/12,2008+7/12,2010+11/12))), digits=3, name="Others")))
 @
 \hline
 \caption{Development of first three moments}
@@ -738,7 +746,7 @@ For the countries in the core of the eurozone, the most disturbing trend seems t
 %\caption{Differences in Euro excluding Estonia, Slovenia and Slovakia}
 %\end{figure}
 %
-%Concerning the mean of the inflation rates, we see a clear convergence pattern. This result is reinforced by plotting the difference between the highest and the lowest mean inflation rate in the euro subsample, excluding the new Euro--member states Estonia, Slovakia and Slovenia.\footnote{Including them blurs the clear result somewhat by driving the difference up, since at the beginning, these countries still had very high inflation rates.} After a short hike at the beginning of the convergence phase in 1995, the difference declined clearly to a fraction of its previous value. However, the financial crisis clearly contributed to widening of the convergence gap. Our finding contradicts \citet{busetti} who find that from 1980---1997 there was convergence of inflation rates, but afterwards there is some diverging behavior. This does not quite go along with the depicted means,  that do not indicate stronger divergence after 1997 but a continuing decrease of inflation differentials until the hikes after 2008. \\
+%Concerning the mean of the inflation rates, we see a clear convergence pattern. This result is reinforced by plotting the difference between the highest and the lowest mean inflation rate in the euro subsample, excluding the new Euro--member states Estonia, Slovakia and Slovenia.\footnote{Including them blurs the clear result somewhat by driving the difference up, since at the beginning, these countries still had very high inflation rates.} After a short hike at the beginning of the convergence phase in 1995, the difference declined clearly to a fraction of its previous value. However, the financial crisis clearly contributed to widening of the convergence gap. Our finding contradicts \citet{busetti} who find that from 1980--1997 there was convergence of inflation rates, but afterwards there is some diverging behavior. This does not quite go along with the depicted means,  that do not indicate stronger divergence after 1997 but a continuing decrease of inflation differentials until the hikes after 2008. \\
 %However, this is not the case for variance, where we find clear evidence of an increase. Doing the same thing for volatility, we see the second moment almost tripling after 1995.\footnote{Due to a very low volatility of countries like Spain and Luxembourg at the beginning.} This of course does make some economic sense, since the convergence criteria and the ECB focus on mean inflation only and do not take volatility into account. \\
 
 
