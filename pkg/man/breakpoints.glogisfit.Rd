@@ -3,6 +3,12 @@
 \alias{coef.breakpoints.glogisfit}
 \alias{fitted.breakpoints.glogisfit}
 \alias{refit.breakpoints.glogisfit}
+\alias{index.breakpoints.glogisfit}
+
+\alias{confint.breakpoints.glogisfit}
+\alias{breakdates.confint.breakpoints.glogisfit}
+\alias{print.confint.breakpoints.glogisfit}
+\alias{lines.confint.breakpoints.glogisfit}
 
 \title{Segmented Fitting of the Generalized Logistic Distribution}
 
@@ -20,6 +26,9 @@
 \method{coef}{breakpoints.glogisfit}(object, log = TRUE, \dots)
 
 \method{fitted}{breakpoints.glogisfit}(object, type = c("mean", "variance", "skewness"), \dots)
+
+\method{confint}{breakpoints.glogisfit}(object, parm = NULL, level = 0.95, breaks = NULL, 
+  meat. = NULL, \dots)
 }
 
 \arguments{
@@ -42,6 +51,13 @@
     levels.}
   \item{type}{character specifying which moments of the segmented fitted distribution
     should be extracted.}
+  \item{parm}{integer. Either \code{parm} or \code{breaks} may be set, see below.}
+  \item{level}{numeric. The confidence level to be used.}
+  \item{breaks}{integer. The number of breaks to be extracted from \code{object} for
+    which confidence intervals should be computed.}
+  \item{meat.}{function. A function for extracting the meat of a sandwich estimator
+    from a fitted object. By default, the inverse of \code{\link[sandwich]{bread}}
+    is used, i.e., a correctly specified model is assumed.}
   \item{\dots}{arguments passed to methods.}
 }
 
@@ -96,11 +112,13 @@ plot(gf_bp)
 summary(gf_bp)
 breakdates(gf_bp)
 coef(gf_bp)
+confint(gf_bp)
 
 ## fitted model
 plot(x)
 lines(gf_bp)
 lines(fitted(gf_bp, type = "mean"), col = 4)
+lines(confint(gf_bp))
 }
 }
 

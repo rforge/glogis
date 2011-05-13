@@ -12,7 +12,8 @@ export(
   "glogisfit",
   "glogisfit.default",
   "breakpoints.glogisfit",
-  "refit.breakpoints.glogisfit"
+  "refit.breakpoints.glogisfit",
+  "breakdates.confint.breakpoints.glogisfit"
 )
 
 S3method("glogisfit", "formula")
@@ -32,6 +33,10 @@ S3method("vcov", "glogisfit")
 
 S3method("coef", "breakpoints.glogisfit")
 S3method("fitted", "breakpoints.glogisfit")
+S3method("index", "breakpoints.glogisfit")
+S3method("confint", "breakpoints.glogisfit")
+S3method("print", "confint.breakpoints.glogisfit")
+S3method("lines", "confint.breakpoints.glogisfit")
 
 # S3method("model.frame", "glogisfit")
 # S3method("model.matrix", "glogisfit")
