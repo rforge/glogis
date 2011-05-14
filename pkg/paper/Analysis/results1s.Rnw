@@ -34,7 +34,7 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 load("hicps.rda")
 hicps <- hicps[, colnames(hicps) != "EU"]
 add_breaks <- structure(rep(0, ncol(hicps)), .Names = colnames(hicps))
-## add_breaks[c("Germany", "Portugal", "Slovakia", "Spain")] <- 1
+add_breaks[c("Portugal", "Spain")] <- 1
 @
 
 %% analysis "macro" (assumes existence of "i", "hicp", and "add_breaks")
@@ -69,7 +69,7 @@ save(x, x_gf, x_efp, x_bp, x_nbreaks, x_rf, file = paste(colnames(hicps)[i], ".r
 <<plot1, eval=FALSE>>=
 par(mfrow = c(1, 2))
 plot(x, main = "Series with Fitted Mean", ylab = "hicps", xlab = "Time")
-lines(x_bp, breaks = x_nbreaks)
+if(x_nbreaks > 0) lines(confint(x_bp, breaks = x_nbreaks))
 lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
 plot(x_efp, functional = supLM(0.1), main = "supLM test")
 if(x_nbreaks > 0) lines(confint(x_bp, breaks = x_nbreaks))
