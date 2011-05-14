@@ -72,7 +72,7 @@ plot(x, main = "Series with Fitted Mean", ylab = "hicps", xlab = "Time")
 lines(x_bp, breaks = x_nbreaks)
 lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
 plot(x_efp, functional = supLM(0.1), main = "supLM test")
-lines(confint(x_bp, breaks = x_nbreaks))
+if(x_nbreaks > 0) lines(confint(x_bp, breaks = x_nbreaks))
 @
 
 <<plot2, eval=FALSE>>=
