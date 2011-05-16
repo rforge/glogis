@@ -31,7 +31,7 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 
 %% load and preprocess data
 <<data>>=
-load("hicps.rda")
+data("hicps", package = "glogis")
 hicps <- hicps[, colnames(hicps) != "EU"]
 add_breaks <- structure(rep(0, ncol(hicps)), .Names = colnames(hicps))
 add_breaks[c("Portugal", "Spain")] <- 1
@@ -72,7 +72,7 @@ plot(x, main = "Series with Fitted Mean", ylab = "hicps", xlab = "Time")
 if(x_nbreaks > 0) lines(confint(x_bp, breaks = x_nbreaks))
 lines(fitted(x_bp, breaks = x_nbreaks, type = "mean"), col = 4)
 plot(x_efp, functional = supLM(0.1), main = "supLM test")
-if(x_nbreaks > 0) lines(confint(x_bp, breaks = x_nbreaks))
+lines(x_bp, breaks = x_nbreaks)
 @
 
 <<plot2, eval=FALSE>>=
@@ -82,7 +82,8 @@ plot(x_bp)
 
 <<plot3, eval=FALSE>>=
 par(mfrow = c(1, x_nbreaks + 1))
-for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
+for(i in 1:(x_nbreaks+1)) plot(x_rf[[i]], moments = TRUE,
+  xlab = paste(names(x_rf)[i], "\n", "Goodness-of-fit p-value: ",
   format.pval(summary(x_rf[[i]])$chisq.test$p.value, digits = 4), sep = ""))
 @
 

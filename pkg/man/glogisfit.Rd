@@ -30,7 +30,8 @@ glogisfit(x, \dots)
 \method{glogisfit}{formula}(formula, data, subset, na.action, weights, x = TRUE, \dots)
 
 \method{plot}{glogisfit}(x, main = "", xlab = NULL, fill = "lightgray",
-  col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", \dots)
+  col = "blue", lwd = 1, lty = 1, xlim = NULL, ylim = NULL,
+  legend = "topright", moments = FALSE, \dots)
 
 \method{summary}{glogisfit}(object, log = TRUE, breaks = NULL, \dots)
 \method{coef}{glogisfit}(object, log = TRUE, \dots)
@@ -44,7 +45,7 @@ glogisfit(x, \dots)
   \item{start}{optional vector of starting values. The parametrization has to be
     in terms of \code{location}, \code{log(scale)}, \code{log(shape)} where the
     original parameters (without logs) are as in \code{\link{dglogis}}. Default
-    is to use \code{c(mean(x), log(sd(x)), 0)}.}
+    is to use \code{c(0, 0, 0)} (i.e., standard logistic). For details see below.}
   \item{fixed}{specification of fixed parameters (see description of \code{start}).
     \code{NA} signals that the corresponding parameter should be estimated.
     A standard logistic distribution could thus be fitted via \code{fixed = c(NA, NA, 0)}.}
@@ -58,11 +59,14 @@ glogisfit(x, \dots)
     supported.}
   \item{data, subset, na.action}{arguments controlling formula processing
     via \code{\link[stats]{model.frame}}.}
-  \item{main, xlab, fill, col, lwd, lty, ylim}{standard graphical parameters, see
+  \item{main, xlab, fill, col, lwd, lty, xlim, ylim}{standard graphical parameters, see
     \code{\link[graphics]{plot}} and \code{\link[graphics]{par}}.}
   \item{legend}{logical or character specification where to place a legend.
     \code{legend = FALSE} suppresses the legend.
     See \code{\link[graphics]{legend}} for the character specification.}
+  \item{moments}{logical. If a legend is produced, it can either show the parameter
+    estimates (\code{moments = FALSE}, default) or the implied moments of the
+    distribution.}
   \item{object}{a fitted \code{glogisfit} object.}
   \item{log}{logical option in some extractor methods indicating whether scale and
     shape parameters should be reported in logs (default) or the original
@@ -75,7 +79,7 @@ glogisfit(x, \dots)
 
 \details{
   \code{glogisfit} estimates the generalized logistic distribution (Type I: skew-logistic)
-  as given by \code{\link{dglogis}}. Optimization is performed by numerically by
+  as given by \code{\link{dglogis}}. Optimization is performed numerically by
   \code{\link[stats]{optim}} using analytical gradients. For obtaining numerically more
   stable results the scale and shape parameters are specified in logs. Starting values
   are chosen as \code{c(0, 0, 0)}, i.e., corresponding to a standard (symmetric) logistic
@@ -108,6 +112,7 @@ glogisfit(x, \dots)
   \item{loglik}{log-likelihood of the fitted model,}
   \item{df}{number of estimated parameters,}
   \item{n}{number of observations,}
+  \item{nobs}{number of observations with non-zero weights,}
   \item{weights}{the weights used (if any),}
   \item{optim}{output from the \code{optim} call for maximizing the log-likelihood,}
   \item{method}{the method argument passed to the \code{optim} call,}

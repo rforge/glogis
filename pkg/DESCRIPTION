@@ -1,6 +1,6 @@
 Package: glogis
-Version: 0.0-5
-Date: 2011-05-13
+Version: 0.0-6
+Date: 2011-05-16
 Title: Fitting and Testing Generalized Logistic Distributions
 Author: Achim Zeileis, Thomas Windberger
 Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
@@ -11,5 +11,5 @@ Description: Tools for the generalized logistic distribution (Type I,
 LazyLoad: yes
 Depends: R (>= 2.10.0), stats, zoo
 Suggests: strucchange, fxregime, lattice
-Imports: graphics, stats, sandwich
+Imports: graphics, stats, sandwich, zoo
 License: GPL-2

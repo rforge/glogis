@@ -125,6 +125,7 @@ glogisfit.default <- function(x, weights = NULL,
     loglik = -opt$value,
     df = length(cf),
     n = length(x),
+    nobs = sum(w > 0),
     weights = if(isTRUE(all.equal(as.vector(w), rep.int(1L, length(x))))) NULL else w,
     optim = opt,
     method = method,
@@ -158,7 +159,7 @@ vcov.glogisfit <- function(object, log = TRUE, ...) {
   }
   return(vc)
 }
-logLik.glogisfit <- function(object, ...) structure(object$loglik, df = object$df, nobs = object$n, class = "logLik")
+logLik.glogisfit <- function(object, ...) structure(object$loglik, df = object$df, nobs = object$nobs, class = "logLik")
 estfun.glogisfit <- function(x, ...) {
   rval <- t(t(sglogis(x$x, x$parameters[1], x$parameters[2], x$parameters[3])) * c(1, x$parameters[2], x$parameters[3]))[, is.na(x$fixed)]
   colnames(rval) <- names(coef(x))
@@ -167,7 +168,7 @@ estfun.glogisfit <- function(x, ...) {
   return(rval)
 }
 bread.glogisfit <- function(x, log = TRUE, ...) {
-  vcov(x, log = log) * x$n
+  vcov(x, log = log) * x$nobs
 }
 residuals.glogisfit <- function(object, ...) object$x - object$moments[1]
 
@@ -247,39 +248,50 @@ print.summary.glogisfit <- function(x, digits = max(3, getOption("digits") - 3),
 
 ## visualization
 plot.glogisfit <- function(x, main = "", xlab = NULL, fill = "lightgray",
-  col = "blue", lwd = 1, lty = 1, ylim = NULL, legend = "topright", ...)
+  col = "blue", lwd = 1, lty = 1, xlim = NULL, ylim = NULL, legend = "topright", moments = FALSE, ...)
 {
   if(is.null(x$x)) stop("Data not stored in 'glogisfit' object.")
   if(is.null(ylim)) {
     aux1 <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
-    aux2 <- hist(x$x, plot = FALSE)$density
+    aux2 <- hist(x$x, plot = FALSE, ...)$density
     ylim <- range(c(dglogis(aux1, x$parameters[1], x$parameters[2], x$parameters[3]), aux2))
   }
   if(is.null(xlab)) {
     xlab <- if(is.null(x$x)) deparse(x$call) else paste(deparse(x$call),
       "\nGoodness-of-fit p-value: ", format.pval(summary(x)$chisq.test$p.value, digits = max(3, getOption("digits") - 3)), sep = "")
   }
-  rval <- hist(x, main = main, xlab = xlab, col = fill, ylim = ylim, ...)
-  lines(x, col = col, lwd = lwd, lty = lty)
+  rval <- hist(x, main = main, xlab = xlab, col = fill, xlim = xlim, ylim = ylim, ...)
+  lines(x, xlim = xlim, col = col, lwd = lwd, lty = lty)
   if(identical(legend, TRUE)) legend <- "topleft"
-  if(!identical(legend, FALSE)) legend(legend,
-    paste(c("location", "scale", "shape"), ": ", format(round(x$parameters, pmax(getOption("digits") - 4, 1))),
-      ifelse(is.na(x$fixed), "", " (fixed)"), sep = ""),
-    bty = "n")
+  if(!identical(legend, FALSE)) {
+    if(moments) {
+      legend(legend,
+        paste(c("mean", "variance", "skewness"), ": ",
+	format(round(x$moments, pmax(getOption("digits") - 4, 1))),
+        sep = ""), bty = "n")
+    } else {
+      legend(legend,
+        paste(c("location", "scale", "shape"), ": ",
+	format(round(x$parameters, pmax(getOption("digits") - 4, 1))),
+        ifelse(is.na(x$fixed), "", " (fixed)"), sep = ""),
+        bty = "n")
+    }
+  }
 
   invisible(rval)
 }
 
-hist.glogisfit <- function(x, main = "", xlab = deparse(x$call),
+hist.glogisfit <- function(x, main = "", xlab = deparse(x$call), xlim = NULL,
   col = "lightgray", freq = FALSE, ...)
 {
   if(is.null(x$x)) stop("Data not stored in 'glogisfit' object.")
-  hist(x$x, main = main, xlab = xlab, col = col, freq = freq, ...)
+  if(is.null(xlim)) hist(x$x, main = main, xlab = xlab, col = col, freq = freq, ...)
+    else hist(x$x, main = main, xlab = xlab, xlim = xlim, col = col, freq = freq, ...)
 }
 
 
-lines.glogisfit <- function(x, ...)
+lines.glogisfit <- function(x, xlim = NULL, ...)
 {
-  aux <- seq(min(x$x) - 3 * x$parameters[2], max(x$x) + 3 * x$parameters[2], length = 100)
+  aux <- seq(min(c(x$x, xlim)) - 3 * x$parameters[2], max(c(x$x, xlim)) + 3 * x$parameters[2], length = 100)
   lines(aux, dglogis(aux, x$parameters[1], x$parameters[2], x$parameters[3]), ...)
 }

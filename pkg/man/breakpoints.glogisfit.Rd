@@ -53,8 +53,6 @@
     should be extracted.}
   \item{parm}{integer. Either \code{parm} or \code{breaks} may be set, see below.}
   \item{level}{numeric. The confidence level to be used.}
-  \item{breaks}{integer. The number of breaks to be extracted from \code{object} for
-    which confidence intervals should be computed.}
   \item{meat.}{function. A function for extracting the meat of a sandwich estimator
     from a fitted object. By default, the inverse of \code{\link[sandwich]{bread}}
     is used, i.e., a correctly specified model is assumed.}

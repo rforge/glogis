@@ -2,6 +2,7 @@ import("graphics", "stats")
 
 importFrom("sandwich", "estfun")
 importFrom("sandwich", "bread")
+importFrom("zoo", "index")
 
 export(
   "dglogis",
