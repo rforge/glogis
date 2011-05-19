@@ -73,7 +73,7 @@ glogisfit.default <- function(x, weights = NULL,
     -colSums(w * t(t(sglogis(x, location = p1, scale = exp(p2), shape = exp(p3))) * c(1, exp(p2), exp(p3)))[, is.na(fixed)])
   }
 
-  ## choose starting values
+  ## choose the starting values
   if(is.null(start)) start <- c(0, 0, 0)[is.na(fixed)]
   
   ## call optim
