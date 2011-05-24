@@ -164,27 +164,39 @@ and also between the countries. See \cite{pltm} for a detailed discussion.
 \clearpage
 \section{Model}\label{sec:model}
 
-To monitor changes in the dynamics of the inflation rates, we follow the usual
-strategy employed when testing for structural breaks. First, the model is fitted
-for the whole sample using the generalized logistic distribution. This then
-enables testing for the stability of the parameter estimates. If there is
-evidence of significant changes, the number and the timing of the break points
-are estimated. 
+The goal of the modeling strategy, that is subsequently introduced, is the
+following: detection of structural changes in the distributional properties of
+the inflation rates over time, e.g., as potentially caused by interventions.
+However, unlike many standard least squares approaches \citep[such as][]{bp03},
+not only changes in the mean level should be addressed but also changes in
+variance and potential skewness.
 
-This framework allows to trace the evolution of mean, variance and skewness of
-the inflation series and thus interpreting deviations in any of these parameters
-as possibly due to a change in monetary policy, is made feasible. Any huge
-intervention or change is captured by fluctuations in the parameter stability of
-the series and can be quantified and related to a distinct time frame. 
+Hence, a likelihood-based model is adopted that can also incorporate stylized
+facts for return data, such as heavy tails and skewness. Here, the seasonally
+adjusted returns $y_t$ ($t = 1, \dots, n$) are assumed to come from a
+generalized logistic (GL) distribution \citep[see][]{johnson} with
+three-dimensional parameter $\phi_t = (\theta_t, \sigma_t, \delta_t)^\top$ (for
+location~$\theta_t$, scale~$\sigma_t$, and shape~$\delta_t$ at time $t$). Structural change
+techniques are then employed to check whether the parameter vector $\phi_t$
+remains constant over time and, if that is not the case, when and how the
+parameters change. This framework allows to trace breaks in the
+evolution of mean, variance and skewness of the inflation series which may
+possibly be linked to underlying regime changes, e.g., in monetary policy.
 
-The correlation \fixme{Jesus: yes, but a DGP needs to be assumed, it would need
-to take care of any autororrelation, wouldn't it?} dynamics of the series is of
-less importance to this framework, which concentrates on changes in mean,
-variance and skewness and does not focus on autocorrelation, the use of
-alternative tests, as described in \cite{andreou}, is also hindered by the low
-number of observations, due to the monthly frequencies.\footnote{In some years
-the Billion Prices Project of the \cite{bpp}, which provides a much higher data
-frequency, could solve this problem.} 
+For estimation of the parameters, a (quasi-)maximum likelihood framework is
+adopted and the observations are assumed to be (approximately) independent,
+i.e., potential autocorrelation is treated as a nuisance parameter and not
+explicitly incorporated in the model. The motivation for this is to focus on the
+shifts in mean, variance, and skewness -- and it turns out to be a useful model
+for the data under investigation because only negligible amounts of residual
+autocorrelation remain after incorporation of the structural breaks. If the
+focus of the analysis were the dynamics in the autocorrelation, higher frequency
+data would be required, e.g., in order to apply techniques such as those
+expounded by \cite{andreou}.\footnote{For example, it would be conceivable to
+obtain high-frequency data for certain years from the Billion Prices Project of
+the \cite{bpp}; however, this is not pursued here.} 
+
+\fixme{Z: potentially say something about the subsequent subsections}
 
 
 \subsection{Generalized logistic distribution}\label{sec:gld}
