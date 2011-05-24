@@ -51,20 +51,78 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 
 \section{Introduction}
 
-Ever since the beginning of the European Union, the topic of a common currency was a controversial issue. Although the Economic and Monetary Union (EMU) is now a fact, the discussion about the economic effects of the euro is far from being settled. The controversial topics range from the question of whether or not the eurozone is indeed an optimal currency area (OCA) all the way to the very survival of the euro in light of the budgetary problems of some of its member states. The effects of monetary unions on a number of macroeconomic indicators, with inflation being the most important one in this context, is in the center of an ongoing debate: this regards the question about short-run and steady-state inflation uncertainty (in context to inflation expectations) dealt with in \citet{cap}, or the structural convergence of the inflation rates in EU countries, which is the topic of an investigation by \citet{palomba}. 
+Ever since the beginning of the European Union, the topic of a common currency
+was a controversial issue. Although the Economic and Monetary Union (EMU) is now
+a fact, the discussion about the economic effects of the euro is far from being
+settled. The controversial topics range from the question of whether or not the
+eurozone is indeed an optimal currency area (OCA) \fixme{Z: include a citation for
+OCA or is this completely common knowledge?} all the way to the very
+survival of the euro in light of the budgetary problems of some of its member
+states. The effects of monetary unions on a number of macroeconomic indicators,
+with inflation being the most important one in this context, is in the center of
+an ongoing debate: this regards the question about short-run and steady-state
+inflation uncertainty (in context to inflation expectations) dealt with in
+\citet{cap}, or the structural convergence of the inflation rates in EU
+countries, which is the topic of an investigation by \citet{palomba}. 
 
-The way towards the EMU basically consisted of 3 stages: stage I (1990--1994) as a phase of liberalization, stage II (1995-1998) a phase of convergence and stage III (1999-2001) the transition period, which ended with the introduction of the euro as legal tender. A possible fourth stage is the continuing integration of new member states, mostly former communist countries. Any new state that wants to join the EMU is first obliged to fulfill the Maastricht criteria, which, besides setting rules for government debts and interest rates, also requires the participation in the ERM~II (Exchange Rate Mechanism~II) for two years, while the exchange rates towards the euro are not allowed to cross the nominal band.
+The way towards the EMU basically consisted of three stages: stage~I
+(1990--1994) as a phase of liberalization, stage~II (1995--1998) a phase of
+convergence and stage~III (1999--2001) the transition period, which ended with
+the introduction of the euro as legal tender. A possible fourth stage is the
+continuing integration of new member states, mostly former communist countries.
+Any new state that wants to join the EMU is first obliged to fulfill the
+Maastricht criteria, which, besides setting rules for government debts and
+interest rates, also requires the participation in the ERM~II (Exchange Rate
+Mechanism~II) for two years, while the exchange rates towards the euro are not
+allowed to cross the nominal band.
 
-\cite{emerson} put emphasize on the fact that a high inflation rate is also more variable and uncertain and thus causes more relative price variability, leading to a less efficient price mechanism.  Failing to stabilize inflation leads to severe economic problems. Throughout the literature, there is still a considerable degree of uncertainty as to what extent the introduction of the euro, or monetary unions in general, affect the inflation rate. The EMU requires a country to possibly alter a number of economic policies and institutions, which may demand for significant short term adjustments to take place. 
+\cite{emerson} put emphasize on the fact that a high inflation rate is also more
+variable and uncertain and thus causes more relative price variability, leading
+to a less efficient price mechanism.  Failing to stabilize inflation leads to
+severe economic problems. Throughout the literature, there is still a
+considerable degree of uncertainty as to what extent the introduction of the
+euro, or monetary unions in general, affect the inflation rate. The EMU requires
+a country to possibly alter a number of economic policies and institutions,
+which may demand for significant short term adjustments to take place. 
 
-Given that a country experienced quite volatile inflation rates, its efforts to meet the convergence criteria are likely to lead to an alteration at least in the mean (since this was one of the requirements) and possibly in the volatility of their respective inflation rates as well. 
+Given that a country experienced quite volatile inflation rates, its efforts to
+meet the convergence criteria are likely to lead to an alteration at least in
+the mean (since this was one of the requirements) and possibly in the volatility
+of their respective inflation rates as well. 
 
-However, a deeper inquiry into this problem is in need of a method able to capture changes in inflation dynamics. We contribute to this debate by developing a new method for testing for structural breaks in the dynamics of the inflation rates and thereby upon the effect of the EMU on a number of European countries both within and without the eurozone. The framework developed in this paper makes it possible to test for any significant changes of a countries inflation dynamics and thus helps interpreting the effects of the EMU. We focus on changes in the first three moments of these inflation rates, which we assume to be distributed according to a generalized logistic distribution (GL). The GL distribution is a suitable one due to its flexibility to capture nonsymmetry and because of its fatter tails. For this purpose, we develop a new estimation approach building on previous research by \citet{z07}. 
+However, a deeper inquiry into this problem is in need of a method able to
+capture changes in inflation dynamics. We contribute to this debate by
+developing a new method for testing for structural breaks in the dynamics of the
+inflation rates and thereby upon the effect of the EMU on a number of European
+countries both within and outside the eurozone. The framework developed in this
+paper makes it possible to test for any significant changes of a countries
+inflation dynamics and thus helps interpreting the effects of the EMU. We focus
+on changes in the first three moments of these inflation rates, which we assume
+to be distributed according to a generalized logistic distribution (GL). The GL
+distribution is a suitable one due to its flexibility to capture nonsymmetry and
+because of its fatter tails. For this purpose, we develop a new estimation
+approach building on previous research by \citet{z07}. 
 
-This \fixme{Jesus: sell method better, why this one and not another} framework allows us to assess the evolution of mean, variance and skewness over time. The skewness parameter turns out to be quite important to measure changes in the long run inflation dynamics, as it changes considerably over the time of the analysis. This trend would be all but invisible using a normal distribution.  
-Our estimation technique enables the simultaneous estimation of breaks in the mean (which is important in the context of the Maastricht criteria), the variance (which should be low for the price mechanism to be efficient) and the skewness (where a change in skewness is evidence of a shift of the distribution towards a new ``center of gravity'') of the inflation rates of interest. This than can be used to search for answers regarding the question about the effect of the EMU on the inflation dynamics of its member states or more general to investigate the effects of external shocks.
+This \fixme{Jesus: sell method better, why this one and not another} framework
+allows us to assess the evolution of mean, variance and skewness over time. The
+skewness parameter turns out to be quite important to measure changes in the
+long run inflation dynamics, as it changes considerably over the time of the
+analysis. This trend would be all but invisible using a normal distribution.  
+Our estimation technique enables the simultaneous estimation of breaks in the
+mean (which is important in the context of the Maastricht criteria), the
+variance (which should be low for the price mechanism to be efficient) and the
+skewness (where a change in skewness is evidence of a shift of the distribution
+towards a new ``center of gravity'') of the inflation rates of interest. This
+than can be used to search for answers regarding the question about the effect
+of the EMU on the inflation dynamics of its member states or more general to
+investigate the effects of external shocks.
 
-The \fixme{Jesus: maybe comment on results here} remainder of this paper is structured as follows: Section~\ref{sec:data} presents the data, Section~\ref{sec:model} presents the model and the estimation techniques used, Section~\ref{sec:slovenia} illustrates our approach using Slovenia as an example, Section~\ref{sec:results} presents the results and Section~\ref{sec:conclusion} concludes. 
+The \fixme{Jesus: maybe comment on results here} remainder of this paper is
+structured as follows: Section~\ref{sec:data} presents the data,
+Section~\ref{sec:model} presents the model and the estimation techniques used,
+Section~\ref{sec:slovenia} illustrates our approach using Slovenia as an
+example, Section~\ref{sec:results} presents the results and
+Section~\ref{sec:conclusion} concludes. 
 
 
 \clearpage
@@ -76,32 +134,30 @@ eu <- na.omit(hicps[, "EU"])
 hicps <- hicps[, colnames(hicps) != "EU"]
 @
 
-We \fixme{Jesus: yearly inflation rates better; don't start with data in paper}
-employ seasonally unadjusted HICP series of 21 countries ranging from January
-1990 to December 2010 that are obtained from the \citet{oecd}. Countries
-included are Austria,	Belgium, Czech Republic,	Denmark, Estonia,
-Finland,	France,	Germany,	Greece,	Hungary,	Ireland,
-Italy,	Luxembourg,	Netherlands,	Poland,	Portugal,	Slovakia,
-Slovenia,  Spain,	Sweden, and	United Kingdom. Latvia and Lithuania as
-well as Bulgaria and Romania are excluded due to data scarcity. Cypria and Malta
-are not included since they are very small economies. 
+All empirical analyses are based on seasonally adjusted inflation rates (in percent)
+for \Sexpr{ncol(hicps)}~countries
+(\Sexpr{gsub("UK", "United Kingdom", gsub("CzechRep", "Czech Rep", paste(colnames(hicps), collapse = ", "), fixed = TRUE), fixed = TRUE)})
+in the time period from the early or mid-1990s to the end of 2010.
+The original data source are seasonally unadjusted HICP series provided by the
+\citet{oecd} from January~1990 (if available) to December~2010, that were transformed
+to inflation rates using log-returns and subsequent seasonal adjustment
+via X-12-ARIMA \citep{Findley+Monsell+Bell:1998}.
 
-The countries in this sample can be divided into three different groups. First
-the euro countries (Austria, Belgium, Estonia, France, Finland, Germany, Greece,
-Ireland, Italy, Luxembourg, Netherlands, Portugal, Slovakia, Slovenia and
-Spain).  Second, the EU members not participating in the ERM~II: Czech Republic,
-Hungary, Poland, United Kingdom, and Sweden. Denmark stands on its own as a
-member of the EU and the ERM~II, but not yet a member of the EMU. 
+The countries in this sample can be divided into three different groups: (1)~euro
+countries -- Austria, Belgium, Estonia, France, Finland, Germany, Greece,
+Ireland, Italy, Luxembourg, Netherlands, Portugal, Slovakia, Slovenia,
+Spain; (2)~EU members not participating in the ERM~II -- Czech Republic,
+Hungary, Poland, United Kingdom, Sweden; (3)~Denmark which stands on its own as a
+member of the EU and the ERM~II, but not yet of the EMU. 
+Latvia, Lithuania, Bulgaria, Romania are excluded due to data scarcity.
+Cyprus and Malta are not included since they are very small economies. 
 
-As  shown in a paper by \cite{pltm}, the harmonization of the treatment of sales
-prices led to considerable changes in some countries (Germany, Portugal,
-Ireland, Luxembourg, Belgium, Italy and Spain); failing to take this into
-account may lead to considerable distortions in the estimation. We dealt with
-the inclusion of sales periods\footnote{This was demanded by a Commission
-regulation, details may be found in: \citet{eurlex} and in the
-Appendix~\ref{sec:sales}.} and all the other seasonality in the data by using
-the X-12-ARIMA method for desaisonalization, as described in \cite{X-12-ARIMA}
-and \cite{Findley+Monsell+Bell:1998}.
+Seasonal adjustment is necessary due to the harmonization of the treatment
+of sales prices\footnote{Inclusion of sales prices in the HICP was demanded by
+a Commission regulation \citep[see][for details]{eurlex}.} in the HICP, resulting in
+changes of the seasonal inflation patters over time within several countries
+and also between the countries. See \cite{pltm} for a detailed discussion.
+
 
 
 
@@ -154,7 +210,7 @@ skewed to the left and for $\delta$$>$1 it is skewed to the right (see
 Appendix~\ref{sec:gld2} for more details). 
 
 In econometrics, the logistic distribution is often used in income distributions
-and growth models. This is due to  its fatter tails, which fit these kind of
+and growth models. This is due to its fatter tails, which fit these kind of
 data somewhat better. \citet{won} develop a maximum likelihood \fixme{Jesus: is
 this not better than what you do here: answer: no, they use completely other
 framework} estimator if the underlying distribution is a GL distribution. A
@@ -216,7 +272,7 @@ It is given by:
 \end{eqnarray}
 %
 where the appropriate $p$~values can be computed using from the corresponding
-limiting distribution -- with $\mathit{efp}(t)$ replaced by  $W^0(t)$.
+limiting distribution -- with $\mathit{efp}(t)$ replaced by $W^0(t)$.
 The sup$\mathit{LM}$ test computes a test statistics for all possible change points in a
 given time frame and rejects the null of no change if the maximum is too high.
 
