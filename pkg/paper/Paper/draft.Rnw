@@ -475,7 +475,7 @@ lines(x$breakpoints, breaks = x$nbreakss)
 with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
 from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
 with sequence of $\mathit{LM}$~statistics,
-critical value at 5\% level (vertical dashed line), and maximum (vertical dashed line).}
+critical value at 5\% level (horizontal red line line), and estimated breakpoint (vertical dashed line).}
 
 <<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
 par(mfrow = c(1, 2))
