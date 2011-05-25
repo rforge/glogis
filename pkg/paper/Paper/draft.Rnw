@@ -101,7 +101,7 @@ on changes in the first three moments of these inflation rates, which we assume
 to be distributed according to a generalized logistic distribution (GL). The GL
 distribution is a suitable one due to its flexibility to capture nonsymmetry and
 because of its fatter tails. For this purpose, we develop a new estimation
-approach building on previous research by \citet{z07}. 
+approach building on previous research by \citet{Zeileis+Hornik:2007}. 
 
 This \fixme{Jesus: sell method better, why this one and not another} framework
 allows us to assess the evolution of mean, variance and skewness over time. The
@@ -173,11 +173,11 @@ variance and potential skewness.
 
 Hence, a likelihood-based model is adopted that can also incorporate stylized
 facts for return data, such as heavy tails and skewness. Here, the seasonally
-adjusted returns $y_t$ ($t = 1, \dots, n$) are assumed to come from a
+adjusted returns $y_i$ ($i = 1, \dots, n$) are assumed to come from a
 generalized logistic (GL) distribution \citep[see][]{johnson} with
-three-dimensional parameter $\phi_t = (\theta_t, \sigma_t, \delta_t)^\top$ (for
-location~$\theta_t$, scale~$\sigma_t$, and shape~$\delta_t$ at time $t$). Structural change
-techniques are then employed to check whether the parameter vector $\phi_t$
+three-dimensional parameter $\phi_i = (\theta_i, \sigma_i, \delta_i)^\top$ for
+location~$\theta_i$, scale~$\sigma_i$, and shape~$\delta_i$ at time $i$. Structural change
+techniques are then employed to check whether the parameter vector $\phi_i$
 remains constant over time and, if that is not the case, when and how the
 parameters change. This framework allows to trace breaks in the
 evolution of mean, variance and skewness of the inflation series which may
@@ -196,121 +196,141 @@ expounded by \cite{andreou}.\footnote{For example, it would be conceivable to
 obtain high-frequency data for certain years from the Billion Prices Project of
 the \cite{bpp}; however, this is not pursued here.} 
 
-\fixme{Z: potentially say something about the subsequent subsections}
+In the following, details are provided about (1)~the GL distribution and its properties,
+(2)~how it can be estimated (under parameter stability), (3)~how parameter stability
+can be assesed, and (4)~how breakpoints can be estimated in the presence of parameter
+instability.
 
 
 \subsection{Generalized logistic distribution}\label{sec:gld}
 
-The data suggested that the use of a normal distribution might cause some
-estimation problems, since most of the time series exhibit asymmetric properties
-(with sometimes rather strong skewness) and -- compared to the normal
-distribution -- a fatter tail. To accommodate for this fact, the use of the
-generalized logistic distribution (GL) with its relative low degree of
-complexity, seemed appropriate. On the one hand, it is a simple distribution and
-on the other hand, it is flexible enough to capture essential properties of the
-data. For the inflation series $y_t = 100\cdot log(HICP_t/HICP_{t-1})$ we
-therefore assume a GL distribution as defined in \citet{johnson}:
+The logistic distribution is often used in econometrics in the
+context of income and growth models due to its fatter tails compared to the 
+normal distribution -- it has also been applied to the modeling of
+inflation rates by \citet{batchelor}. Its generalization -- which additionally
+allows for asymmetries -- has been applied to analyze risk \citep[e.g., by][]{tolikas}
+but has not yet been applied -- to the best of our knowledge -- to inflation rates.
+However, it will prove to be a rather simple model that fits HICP inflation rates
+quite well.
 
+The type~I GL distribution (also known as skew-logistic distribution), as defined in \citet{johnson},
+has the log-density function
+%
 \begin{eqnarray}
-f(y | \theta, \sigma, \delta) & = & \frac{\frac{\delta}{\sigma} \cdot \exp^{-\frac{y-\theta}{\sigma}}}{(1+\exp^{-\frac{y-\theta}{\sigma}})^{(\delta+1)}} 
+%% f(y ~|~ \theta, \sigma, \delta) & = &
+%% \frac{\frac{\delta}{\sigma} \cdot \exp\{-\frac{y - \theta}{\sigma}\}}{(1+\exp\{-\frac{y - \theta}{\sigma}\})^{(\delta+1)}} 
+\ell(y ~|~ \theta, \sigma, \delta) & = & \log(\delta) - \log(\sigma) - \frac{y - \theta}{\sigma} -
+                                         (\delta + 1) \cdot \log\left(1 + \exp\left\{-\frac{y - \theta}{\sigma}\right\}\right)
 \label{eq:dglogis}
 \end{eqnarray}
+%
+with location~$\theta$, scale~$\sigma > 0$ and shape~$\delta > 0$. For $\delta = 1$ the
+distribution simplifies to the logistic distribution, for $\delta < 1$ or $> 1$ it is
+left- or right-skewed, respectively. The corresponding first three moments are
+%
+\begin{eqnarray}
+\mathrm{E}(y) & = & \theta + \sigma (\gamma(\delta) - \gamma(1)) \\
+\mathrm{Var}(y)  & = & \sigma^2(\gamma'(\delta)+\gamma'(1)) \\
+\mathrm{Skew}(y) & = & \frac{\gamma''(\delta)-\gamma''(1)}{(\gamma'(\delta)+\gamma'(1))^{3/2}}
+\end{eqnarray}
+%
+where $\gamma(\cdot)$, $\gamma'(\cdot)$, and $\gamma''(\cdot)$ are the digamma function and its
+first and second derivative, respectively.
 
-with location $\theta$, scale $\sigma$ and shape $\delta$. For $\delta=1$ the
-distribution simplifies to the logistic distribution, for $\delta<1$ it is
-skewed to the left and for $\delta$$>$1 it is skewed to the right (see
-Appendix~\ref{sec:gld2} for more details). 
-
-In econometrics, the logistic distribution is often used in income distributions
-and growth models. This is due to its fatter tails, which fit these kind of
-data somewhat better. \citet{won} develop a maximum likelihood \fixme{Jesus: is
-this not better than what you do here: answer: no, they use completely other
-framework} estimator if the underlying distribution is a GL distribution. A
-similar GL distribution is also used in \citet{tolikas} who analyze extreme risk
-and value-at-risk in the German stock market, although they do not use a shape
-parameter. Regarding inflation rates, the GL distribution is -- to our best
-knowledge -- only used in context with expected inflation. 
-
-\citet{batchelor} use a logistic distribution (not its generalization) to model
-the distribution of mean expected inflation rates. 
+The corresponding score function, i.e., the derivative of the log-density with respect
+to the parameter vector, is given by
+%
+\begin{equation}
+s(y ~|~ \phi) ~=~ \frac{\partial \ell(y ~|~ \phi)}{\partial \phi}  ~=~ \left(
+  \begin{gathered}
+    \frac{1}{\sigma} - \frac{(\delta + 1) \tilde{y}}{\sigma (1 + \tilde{y})} \\
+    \left\{ \frac{1}{\sigma} - \frac{(\delta + 1) \tilde{y}}{\sigma (1 + \tilde{y})} \right\} \cdot \frac{y - \theta}{\sigma} -\frac{1}{\sigma} \\
+    \frac{1}{\delta} - \log(1 + \tilde{y})
+  \end{gathered} \right)
+\end{equation}
+%
+where $\phi = (\theta, \sigma, \delta)^\top$ and
+$\tilde{y} = \exp\{- (y - \theta)/\sigma\}$.
 
 
 \subsection{Estimation}
 
-Under the assumption that $y_t$ is distributed according to the generalized
-logistic distribution, we test for the hypothesis that the parameter vector
-$\hat{\phi}$ stays stable over time:
+Under the assumption that $y_i \sim \mathit{GL}(\theta, \sigma, \delta)$
+for $i = 1, \dots, n$ independently -- i.e., are independent realizations from
+a GL distribution with parameter vector $\phi = (\theta, \sigma, \delta)^\top$ --
+the parameters can be estimated as usual by maximum likelihood (ML):
+$\hat \phi ~=~ \argmax_\phi \sum_{i = 1}^n \ell(y_i | \phi)$. The corresponding
+first order condition is $\sum_{i = 1}^n s(y_i | \hat \phi) = 0$.
 
-\begin{eqnarray}
-& H_0: \phi_t = \phi_0 \quad (t=1,...,n) \nonumber 
-\end{eqnarray}
+To guard the inference against potential misspecification, e.g., autocorrelation or
+misspecification of higher moments of the distribution, one can treat $\hat \phi$
+as the quasi-maximum-likelihood (QML) estimator and adjust the inference by using
+heteroskedasticity and autocorrelation consistent (HAC) covariance matrix
+estimators \citep[see e.g.,][]{Andrews:1991}.
 
-against the $H_1$ of changes in at least one of the parameters. We first
-estimate the parameters of the GL-distribution by means of maximum likelihood
-$\hat{\phi} ~=~ \argmax_\phi \sum_{t=1}^n \log f(y_t|\phi)$. The parameter
-stability is assessed using the empirical scores $s(y_t|\hat{\phi})$ as measures
-of model deviation.\footnote{for details see Appendix~\ref{sec:gld2} and
-\citet{z07}}  The empirical fluctuation process $\mathit{efp}(\cdot)$ captures
-deviations from a hypothesized zero mean over time and is given by
+If the parameters are potentially varying over time --
+$y_i \sim \mathit{GL}(\theta_i, \sigma_i, \delta_i)$ -- then $\hat \phi$ is the (Q)ML
+estimator under the null hypothesis of parameter stability
 %
-\begin{eqnarray}
-\mathit{efp}(t) ~=~ \hat{V}^{-1/2} n^{-1/2} \sum_{i=1}^{\lfloor nt \rfloor} s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) \quad (0 \leq t \leq 1), \nonumber
-\label{eq:efp}
-\end{eqnarray}
+\begin{equation} \label{eq:h0}
+  H_0:~ \phi_i ~=~ \phi_0 \quad (i = 1, \dots, n)
+\end{equation}
 %
-where $\hat{V}$ is some consistent estimator of the variance of the scores,
-which is used to decorrelate the series as to avoid problems due to serial
-correlation. Then a functional central limit theorem (FCLT) for
-$\mathit{efp}(\cdot)$ is employed, which converges to a 3-dimensional Brownian
-bridge: $\mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot)$.
+which should be tested against the alternative $H_1$ that at least one of the
+parameters changes over time.
 
+\subsection{Test for structural change}
 
-\subsection{Test}
+The null hypothesis of parameter stability (\ref{eq:h0}) can be assessed using the empirical
+scores $s(y_i | \hat \phi)$ as measures of model deviation \citep{Zeileis+Hornik:2007} from the
+model fit under $H_0$. Systematic deviations over time from the full sample estimates $\hat \phi$
+can then be captured by cumulative sums of the empirical scores in an empirical fluctuation
+process $\mathit{efp}(t)$:
+%
+\begin{equation} \label{eq:efp}
+\mathit{efp}(t) ~=~ \hat V^{-1/2} n^{-1/2} \sum_{i = 1}^{\lfloor nt \rfloor}
+  s(y_i | \hat \phi) \quad (0 \leq t \leq 1),
+\end{equation}
+%
+where $\hat V$ is some consistent estimator of the variance of the scores. Below,
+we use the outer product of gradients $s(y_i | \hat \phi)$ to estimate $\hat V$.
+Alternatively, HAC estimators could be used leading to the same qualitative
+results for the data under investigation.
 
-After the $\mathit{efp}(\cdot)$ is computed, it conveys information about
-departures from the $H_0$ of parameter stability over time. For a precise
-quantification of the actual deviation from its hypothesized zero-mean path, the
-main idea of the test statistics presented here is to aggregate the
-$\mathit{efp}(\cdot)$ in such a way as to be able to construct a test statistics
-so that critical values and p values can be derived. In this paper, we employ
-the sup$\mathit{LM}$ test of \citet{andrews}. This test is well suited for
-single break alternatives and performs better if more than just one of the
-distribution parameters change. 
-
-It is given by:
+As usual in structural change analysis, a functional central limit theorem holds for
+$\mathit{efp}(\cdot)$, which converges to a 3-dimensional Brownian
+bridge: $\mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot)$. Based on
+this various types of test statistics can be computed
+(see \citealp{Zeileis:2005} for details). In the following, the 
+sup$\mathit{LM}$ test of \cite{Andrews:1993} is employed, which performs particularly
+well for single shift alternatives and if several of the three distribution
+parameters change simultaneously. The test statistic with 10\% trimming is given by
 %
 \begin{eqnarray}
 \sup_{t \in [0.1, 0.9]} \frac{\Vert \mathit{efp}(t) \Vert_2^2}{t(1-t)} \nonumber
 \end{eqnarray}
 %
-where the appropriate $p$~values can be computed using from the corresponding
+and the appropriate $p$~values can be computed using from the corresponding
 limiting distribution -- with $\mathit{efp}(t)$ replaced by $W^0(t)$.
-The sup$\mathit{LM}$ test computes a test statistics for all possible change points in a
-given time frame and rejects the null of no change if the maximum is too high.
 
 
 \subsection{Breakpoint estimation}
 
-The dating of structural breaks builds upon the work of \cite{bp03}. If a break
-is detected via the sup$\mathit{LM}$ test, the next step is estimating the number and the
-timing of these break points. Breakpoints $\tau_1, \dots,\tau_B$ are estimated
-via maximization of the full segmented likelihood
+If the null hypothesis of parameter stability (\ref{eq:h0}) is rejected, a natural
+strategy is to assume that there are $B$ breakpoints with stable parameters within
+each of the resulting segments. \cite{bp03} have established a rigorous inference
+framework in this situation for least squares estimation which has been extended by
+\cite{Zeileis+Shah+Patnaik:2010} to (Q)ML estimation. Here, we follow the same ideas
+and maximize the full segmented log-likelihood
 %
-\begin{eqnarray}
-\sum_{b=1}^{B+1} \sum_{t=\tau_b + 1}^{\tau_b} \log f(y_t | \phi^{(b)}) \nonumber
-\end{eqnarray}
+\begin{equation*}
+  \sum_{b = 1}^{B+1} \sum_{i = \tau_b + 1}^{\tau_b} \ell(y_i ~|~ \phi^{(b)})
+\end{equation*}
 %
-If the test statistics is significant (in this case the sup$\mathit{LM}$ test), at least
-one break is estimated. In principle, the optimal segmentation (i.e. the
-concrete dates of a break) can be computed once B (the number of breakpoints) is
-known. However, B needs to be based on the observed data as well. The solution
-is to compute the timing of the breaks for a number of different values for B
-and then choose B by means of an information criterion, in this case the LWZ
-(Liu, Wu and Zidek) as developed in \citet{liu}. All parameters $\tau_1, \dots,
-\tau_B, \phi^{(1)}, \dots, \phi^{(B+1)}$ can be estimated jointly using dynamic
-programming.\footnote{More details for this estimation technique are provided in
-\cite{z10}.} 
-
+for joint estimation of the breakpoints $\tau_1, \dots, \tau_B$ and the segment-specific
+GL parameters $\phi^{(b)}$ ($b = 1, \dots, B + 1$). Following the recommendations
+of \cite{bp03}, a modified Bayes information criterion \citep[LWZ, proposed by][]{liu}
+is employed selecting the number of breakpoints $B$.
 
 <<analysis-results>>=
 ## run analysis (for seasonally adjusted data)
@@ -426,35 +446,20 @@ for(i in seq_along(fnam)) {
 
 <<slovenia>>=
 x <- results$Slovenia
-spval <- sctest(x$efp, functional = supLM(0.1))$p.value
+x$efp2 <- gefp(x$model0, fit = NULL, vcov = kernHAC)
+spval <- c(sctest(x$efp, functional = supLM(0.1))$p.value,
+  sctest(x$efp2, functional = supLM(0.1))$p.value)
+spval <- ifelse(spval < 0.001, "$< 0.001$", format(round(spval, digits = 4), nsmall = 4))
 @
 
-To illustrate our method, we consider the case of Slovenia. After a period of
+To illustrate the proposed strategy, the case of Slovenia is considered. After a period of
 relative instability following the independence from Yugoslavia, Slovenia was
 successfull in realigning its economy and introduced a number of reforms leading
-to a stable growth in the past years. The good economic performance made it
-possible for Slovenia to enter the ERM~II in June 2004 and later on to introduce
-the euro in January 2007. The data collected contains the period from January
-1996 onwards. In the first few years, Slovenia experienced very high inflation
-rates, but was successfull in reducing inflation to a much lower level.
-
-A glance at the time series depicted in Figure~\ref{fig:slovenia1} of the monthly inflation
-rates reveals a decline in the mean around the middle of the observed time
-period. The $efp(\cdot)$ starts to cross the border as early as 2001 and reaches
-the peak somewhere between 2003 and 2004. The $p$~value of the sup$\mathit{LM}$ test is
-\Sexpr{round(spval, 8)} and clearly indicates at least one break.  The number of
-breaks is calculated by means of the LWZ criteria, which chooses one break in
-August 2003. The goodness-of-fit test depicted in Figure~\ref{fig:slovenia2} confirms
-the choice of the GL distribution. The mean inflation rate was cut to only a
-third of its previous value, whereas variance increased slightly and the
-distribution slightly skewed to the left, but peaking at a lower value than
-previously.
-
-In this year, Slovenia introduced a number of financial reforms
-and severely decreased the year on year growth in the M3 monetary aggregate.
-Combined, these actions were enough to ensure the successfull participation in
-the ERM~II a year later and the introduction of the euro two years later. 
-
+to a stable growth in recent years. The good economic performance made it
+possible for Slovenia to enter the ERM~II in June~2004 and later on to introduce
+the euro in January~2007. The seasonally adjusted inflation series for Slovenia encompasses
+the time from \Sexpr{start(x$data)} to \Sexpr{end(x$data)} and is depicted in the left
+panel of Figure~\ref{fig:slovenia1}.
 
 \begin{figure}[t!]
 <<slovenia-plots1, fig=TRUE, height=4.2, width=9.6>>=
@@ -487,17 +492,57 @@ along with fitted generalized logistic probability density function, associated
 moments, and $\chi^2$ goodness-of-fit test.}
 \end{figure}
 
+Assuming a single stable set of parmaters (\ref{eq:h0}) is clearly not valid, as the
+sequence of $\mathit{LM}$~statistics (see right panel of Figure~\ref{fig:slovenia1}) clearly
+exceeds its 5\% critical value (red horizontal line), leading to a highly significant
+$p$-value \Sexpr{spval[1]}. If a quadratic spectral kernal HAC estimator \citep{Andrews:1991}
+would have been used to adjust (\ref{eq:efp}), the resulting $p$-value would be somewhat
+larger with \Sexpr{spval[2]} but still clearly significant.
+
+As there is evidence for at least one break, the LWZ criterion is employed for $B = 1, 2, \dots$
+breakpoints with a minimal segment size of two years per segment. It assumes its minimum for $B = 1$
+associated with the breakpoint \Sexpr{breakdates(x$breakpoints, breaks = x$nbreaks)}, depcited
+by a vertical dashed line in both panels of Figure~\ref{fig:slovenia1}. The resulting segmented
+fitted mean (horizontal blue lines in the left panel Figure~\ref{fig:slovenia1}) shows that
+in before the break Slovenia experienced very high inflation rates but was successful in reducing
+inflation to a much lower level afterwards.
+
+This decrease in inflation is also conveyed by Figure~\ref{fig:slovenia2} that shows the
+observed histograms of inflation rates before and after the breakpoint along with the
+fitted GL distribution. This highlights that along with the decrease in mean level, the variance increases
+somewhat and -- probably more interestingly -- the distribution changes from being right-skewed to
+slightly left-skewed. This confirms that very high inflation rates that occurred in several
+months before the breakpoint could be avoided afterwards. Furthermore, Figure~\ref{fig:slovenia2}
+shows that the GL distribution fits the observed data very well, both before and after the
+breakpoint, with $p$~values from $\chi^2$ goodness-of-fit tests of
+\Sexpr{format(round(summary(x$model[[1]])$chisq.test$p.value, digits = 3), nsmall = 3)} and
+\Sexpr{format(round(summary(x$model[[2]])$chisq.test$p.value, digits = 3), nsmall = 3)}, respectively.
+
+The estimated breakpoint can be matched very well with the timing of financial reforms
+in Slovenia that severely decreased the annual growth in the M3 monetary aggregate.
+These success of these actions ensured the Slovenian participation in
+the ERM~II only a year later and the introduction of the euro two years later. 
+
 
 
 \clearpage
 \section{Results}\label{sec:results}
 
-\readme{Jesus: include p-values in table; no place left; Jesus: opening seems a
-bit confusing and obscure}
+The modeling strategy proposed in Section~\ref{sec:model} is applied to each of the
+countries included in the data set introduced in Section~\ref{sec:data}.
+Table~\ref{tab:results1} reports the estimated breakpoints along with the segment-specific
+moments (mean, variance, skewness) implied by the corresponding parameter
+estimates. Furthermore, entry dates for ERM/ERM~II and the euro are included as
+additional information. For ease of interpretation, countries with similar patterns of
+change are grouped together in Table~\ref{tab:results1} (and ordered alphabetically
+within each group).
 
-Table~\ref{tab:results1} presents the break dates and the parameter values of
-the segments as well as the dates of entry into the ERM/ERM~II and the date of
-the euro introduction. 
+If there is only a single segment, the sup$\mathit{LM}$ test was non-significant at 5\%
+level. In significant cases, the number of breakpoints was selected via the LWZ criterion
+and subsequently all parameters (breakpoints and segment-specific GL parameters) were
+estimated by ML. No HAC~correction was employed as there was only negligible autocorrelation
+in the empirical scores after inclusion of the breakpoints (if any).
+
 
 <<results-moments>>=
 ## compute moments
@@ -519,7 +564,7 @@ format_moments <- function(i, digits = 3) {
 }
 @
     
-\begin{table}[t!]
+\begin{table}[p!]
 \begin{center}
 \footnotesize
 \begin{tabular}{llrrrlll}
@@ -579,8 +624,12 @@ distribution per segment, and ERM information for all countries under investigat
 
 \subsection{The countries in detail}
 
-The first group that draws particular attention is a subgroup of the PIIGS
-(Portugal, Ireland, Italy, Greece and Spain) countries consisting of Ireland and
+\fixme{Z: I have reordered the groups in Table~1 which tries to be roughly in the order
+of joining EU/ERM/EMU. Probably the following interpretations should start with a
+very short overview of the groupings.}
+
+The first group that draws particular attention is a subgroup of the PIIGS countries
+(Portugal, Ireland, Italy, Greece, Spain) consisting of Ireland and
 Spain. Both show a break in the summer of 2008 following the financial crisis
 and the severe problems in both countries concerning the real estate situation.
 In both countries this had a strong deflationary impact, with Ireland actually
@@ -606,7 +655,7 @@ very similar to Slovenia, as its inflation dynamics too changed roughly one year
 prior to its entry into ERM~II. 
 
 Another interesting group consists -- with the exception of Austria and
-Luxembourg -- of the countries of the former DM-zone. All these countries have a
+Luxembourg -- of the countries of the former DEM-zone. All these countries have a
 very low inflation rate in both mean and variance and their inflation dynamics
 did not change. 
 
@@ -787,9 +836,22 @@ changed from the previous time point, i.e., that no breakpoint was estimated in 
 \end{center}
 \end{table}
 
-In the core-zone, we see a decrease in the lower quartil from \Sexpr{yrs[1]} to \Sexpr{yrs[4]}, with no change in the median inflation rate, which is due to the fact, that there is no break after \Sexpr{yrs[2]} for these countries; however, the interquartile range decreased by almost 20\%. The variance increased slightly (but with a 15\% decrease in interquartile range), whereas skewness stayed symmetric in the median, with almost no change in the interquartile range. 
+In the core-zone, we see a decrease in the lower quartile from \Sexpr{yrs[1]} to
+\Sexpr{yrs[4]}, with no change in the median inflation rate, which is due to the
+fact, that there is no break after \Sexpr{yrs[2]} for these countries; however,
+the interquartile range decreased by almost 20\%. The variance increased
+slightly (but with a 15\% decrease in interquartile range), whereas skewness
+stayed symmetric in the median, with almost no change in the interquartile
+range. 
 
-The other countries were successfull in decreasing all three moments, but they are still higher than the euro-zone countries. Most importantly, the interquartile range for all moments decreased considerably showing a clear convergence towards the core-zone countries.  The PIIGS countries decreased inflation rates as well with a strong change of skewness towards more negative values. The interquartile range of their inflation variance increased considerably, which is mostly due to Spain and Ireland and their strong reaction to the financial crisis.
+The other countries were successfull in decreasing all three moments, but they
+are still higher than the euro-zone countries. Most importantly, the
+interquartile range for all moments decreased considerably showing a clear
+convergence towards the core-zone countries.  The PIIGS countries decreased
+inflation rates as well with a strong change of skewness towards more negative
+values. The interquartile range of their inflation variance increased
+considerably, which is mostly due to Spain and Ireland and their strong reaction
+to the financial crisis.
 
 
 \clearpage
@@ -813,7 +875,7 @@ Our results were obtained using
 \proglang{R}~\Sexpr{paste(R.Version()[6:7], collapse = ".")} \citep{R} with the packages
 \pkg{glogis}~\Sexpr{packageDescription("glogis")["Version"]},
 \pkg{strucchange}~\Sexpr{packageDescription("strucchange")["Version"]} \citep{Zeileis+Leisch+Hornik:2002}, and
-\pkg{fxregime}~\Sexpr{packageDescription("fxregime")["Version"]} \citep{z10},
+\pkg{fxregime}~\Sexpr{packageDescription("fxregime")["Version"]} \citep{Zeileis+Shah+Patnaik:2010},
 all of which are available under the General Public License (GPL) from the
 Comprehensive \proglang{R} Archive Network (\url{http://CRAN.R-project.org/}). Package \pkg{strucchange} provides
 various techniques for inference in structural-change settings which are complemented
@@ -832,48 +894,6 @@ provided by \proglang{gretl}~1.9.5 (\citealp{gretl}, see also \citealp{Smith+Mix
 \clearpage
 
 \begin{appendix}
-
-\section{GL distribution}\label{sec:gld2}
-
-The moments of the GL distribution as given in Equation~\ref{eq:dglogis} are
-%
-\begin{eqnarray}
-\mathrm{E}(y) & = & \theta + \sigma (\gamma(\delta) - \gamma(1)) \\
-\mathrm{Var}(y)  & = & \sigma^2(\gamma'(\delta)+\gamma'(1)) \\
-\mathrm{Skew}(y) & = & \frac{\gamma''(\delta)-\gamma''(1)}{(\gamma'(\delta)+\gamma'(1))^{3/2}}
-\end{eqnarray}
-%
-where $\gamma'(\cdot)$ and $\gamma''(\cdot)$ are the first and the second
-derivatives of the digamma function, respectively. The log-likelihood is
-%
-\begin{eqnarray}
-\log f(y|\theta,\sigma, \delta) & = & \log(\delta) - \log(\sigma) - \frac{1}{\sigma} (y-\theta) - (\delta+1) \nonumber \\
-& & \times \log (1+\exp^{-\frac{y-\theta}{\sigma}}) \nonumber 
-\end{eqnarray}
-%
-The resulting score function, where the scores are the derivatives of the
-log-likelihood function, has three components $(s_{\theta}, s_{\sigma},
-s_{\delta})$, with $\tilde{y} = \exp^{-\frac{y-\theta}{\sigma}}$. These are
-employed in Equation~\ref{eq:efp} for the construction of the test statistics
-and are a means of measuring the estimation error in a maximum likelihood
-framework.
-
-
-\begin{eqnarray}
-s_{\theta}(y|\theta, \sigma, \delta) & =  &\frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \theta}   \\
-&=&  \frac{1}{\sigma} - (\delta+1)\cdot\frac{\frac{1}{\sigma}\tilde{y}}{(1+\tilde{y})}  \nonumber \\
-s_{\sigma}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \sigma}   \\
-& =&  -\frac{1}{\sigma} + \frac{1}{\sigma^2}(y-\theta) - (\delta+1) \times \frac{\frac{1}{\sigma^2}(y-\theta)\tilde{y}}{(1+\tilde{y})} \nonumber \\
-s_{\delta}(y|\theta, \sigma, \delta) & = & \frac{\delta \log f(y|\theta,\sigma, \delta)}{\delta \delta}  \\
-& =&   \frac{1}{\delta} - \log(1+\tilde{y}) \nonumber 
-\end{eqnarray}
-%
-The scores of the parameters $\phi = (\theta, \sigma, \delta)$ sum up to 0: $\sum_{t=1}^n s(y_t|\hat{\phi}) ~=~ 0$. The first order condition is given by:
-%
-\begin{eqnarray}
-\sum_{i=1}^n s(y_i|\hat{\theta}, \hat{\sigma}, \hat{\delta}) = 0
-\end{eqnarray}
-
 
 \clearpage
 \section{Data and sales periods}\label{sec:sales}
