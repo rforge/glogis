@@ -217,7 +217,7 @@ but has not yet been applied -- to the best of our knowledge -- to inflation rat
 However, it will prove to be a rather simple model that fits HICP inflation rates
 quite well.
 
-The GL distribution in the parameterization used here is defined in \citet{Abberger:2002}
+The GL distribution in the parameterization employed here is also used in \citet{Shao:2002}
 % The type~I GL distribution (also known as skew-logistic distribution), as defined in \citet{Abberger:2002}
 %\citet{johnson},
 and has the log-density function\footnote{Which is similar to the type~1 GL distribution as defined in \citet{johnson}.}
