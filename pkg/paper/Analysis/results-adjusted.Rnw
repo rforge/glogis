@@ -32,9 +32,8 @@ moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
 %% load and preprocess data
 <<data>>=
 data("hicps", package = "glogis")
-hicps <- hicps[, colnames(hicps) != "EU"]
 add_breaks <- structure(rep(0, ncol(hicps)), .Names = colnames(hicps))
-add_breaks[c("Portugal", "Spain")] <- 1
+add_breaks[c("Portugal", "Spain", "EU")] <- 1
 @
 
 %% analysis "macro" (assumes existence of "i", "hicp", and "add_breaks")
@@ -1069,6 +1068,55 @@ moments(x_bp, breaks = x_nbreaks)
 % United Kingdom
 <<>>=
 i <- 21
+nam <- colnames(hicps)[i]
+fnam <- paste(nam, ".rda", sep = "")
+@
+
+\section*{\Sexpr{nam}}
+
+<<>>=
+if(file.exists(fnam)) {
+load(fnam)
+} else {
+<<analysis>>
+}
+@
+
+\begin{verbatim}
+<<echo=FALSE, results=tex>>=
+coef(x_bp, breaks = x_nbreaks)
+@
+
+
+<<echo=FALSE, results=tex>>=
+moments(x_bp, breaks = x_nbreaks)
+@
+
+
+\end{verbatim}
+
+\begin{center}
+<<fig=TRUE, height=4, width=8>>=
+<<plot1>>
+@
+
+\setkeys{Gin}{width=0.5\textwidth}
+<<fig=TRUE, height=4.5, width=4.5>>=
+<<plot2>>
+@
+\setkeys{Gin}{width=\textwidth}
+
+<<fig=TRUE, height=4.5, width=9>>=
+<<plot3>>
+@
+\end{center}
+
+
+%-----------------------------------------------------------
+\newpage
+% EU
+<<>>=
+i <- 22
 nam <- colnames(hicps)[i]
 fnam <- paste(nam, ".rda", sep = "")
 @

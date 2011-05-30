@@ -51,6 +51,9 @@ moments <- function(object, ...) UseMethod("moments")
 moments.glogisfit <- function(object, ...) object$moments
 moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
   t(sapply(refit(object, breaks = breaks), "[[", "moments"))
+
+## convenience formatting function
+round3 <- function(x) format(round(x, digits = 3), nsmall = 3)
 @  
 
 \section{Introduction}
@@ -339,22 +342,20 @@ of \cite{bp03}, a modified Bayes information criterion \citep[LWZ, proposed by][
 is employed selecting the number of breakpoints $B$.
 
 <<analysis-results>>=
+## country names
+nam <- c(colnames(hicps), "EU")
+
 ## run analysis (for seasonally adjusted data)
 root_dir <- do.call("file.path", as.list(head(strsplit(getwd(), .Platform$file.sep)[[1]], -1)))
-if(!file.exists(file.path(root_dir, "Analysis", "Austria.rda"))) {
+if(!all(file.exists(file.path(root_dir, "Analysis", paste(nam, "rda", sep = "."))))) {
 setwd(file.path(root_dir, "Analysis"))
-Sweave("results1s.Rnw")
+Sweave("results-adjusted.Rnw")
 setwd(file.path(root_dir, "Paper"))
 }
 
-## query result file names
-fnam <- Sys.glob(file.path("..", "Analysis", "*.rda"))
-fnam_omit <- c(grep("2", fnam, fixed = TRUE), grep("glmean", fnam, fixed = TRUE))
-if(length(fnam_omit) > 0) fnam <- fnam[-fnam_omit]
-
 ## set up named results list
-results <- vector(length = length(fnam), mode = "list")
-names(results) <- sapply(strsplit(sapply(strsplit(fnam, "/", fixed = TRUE), tail, 1), ".", fixed = TRUE), head, 1)
+results <- vector(length = length(nam), mode = "list")
+names(results) <- nam
 
 ## Exchange Rate Mechanism information
 ## ERM~II, ERM~I (part of european monetary system expired in 1999-01-01 gave way to ERM II
@@ -381,7 +382,8 @@ erm <- yearmon(c(
   Slovenia = NA,
   Spain = 1986 + 5/12,
   Sweden = NA ,
-  UK = NA
+  UK = NA,
+  EU = NA
 ))
 
 erm2 <- yearmon(c(
@@ -405,7 +407,8 @@ erm2 <- yearmon(c(
   Slovenia = 2004 + 5/12,
   Spain = NA,
   Sweden = NA ,
-  UK = NA
+  UK = NA,
+  EU = NA
 ))
 
 eur <- yearmon(c(
@@ -429,11 +432,12 @@ eur <- yearmon(c(
   Slovenia = 2007,
   Spain = 1999,
   Sweden = NA ,
-  UK = NA
+  UK = NA,
+  EU = NA
 ))
 
-for(i in seq_along(fnam)) {
-  load(file.path(root_dir, "Analysis", fnam[i]))
+for(i in seq_along(nam)) {
+  load(file.path(root_dir, "Analysis", paste(nam[i], "rda", sep = ".")))
   results[[i]] <- list(
     data = x,
     model0 = x_gf,
@@ -522,8 +526,8 @@ slightly left-skewed. This confirms that very high inflation rates that occurred
 months before the breakpoint could be avoided afterwards. Furthermore, Figure~\ref{fig:slovenia2}
 shows that the GL distribution fits the observed data very well, both before and after the
 breakpoint, with $p$~values from $\chi^2$ goodness-of-fit tests of
-\Sexpr{format(round(summary(x$model[[1]])$chisq.test$p.value, digits = 3), nsmall = 3)} and
-\Sexpr{format(round(summary(x$model[[2]])$chisq.test$p.value, digits = 3), nsmall = 3)}, respectively.
+\Sexpr{round3(summary(x$model[[1]])$chisq.test$p.value)} and
+\Sexpr{round3(summary(x$model[[2]])$chisq.test$p.value)}, respectively.
 
 The estimated breakpoint can be matched very well with the timing of financial reforms
 in Slovenia that severely decreased the annual growth in the M3 monetary aggregate.
@@ -621,6 +625,13 @@ writeLines(unlist(lapply(c(20, 21), format_moments)))
 writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_moments)))
 @
 
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{European Union}} \\
+\hline
+<<moments-table6, results=tex>>=
+writeLines(unlist(lapply(22, format_moments)))
+@
+
 \end{tabular}
 
 \caption{\label{tab:results1} Estimated breakpoints, fitted moments of generalized logistic
@@ -694,22 +705,8 @@ prior to its entry into ERM~II.
 \subsection{Overview over the general trend}
 
 <<eu, echo=FALSE>>=
-## impose breaks "by hand"
-eu_breaks <- yearmon(c(1998 + 11/12, 2008 + 7/12))
-eu_seg <- 1 + (time(eu) > eu_breaks[1]) + (time(eu) > eu_breaks[2])
-library("e1071")
-eu_mom_old1 <- aggregate(eu, eu_seg, function(x) c(mean(x), var(x), skewness(x)))
-
-## better: use model-implied moments
-eu_mom_old2 <- aggregate(eu, eu_seg, function(x) moments(glogisfit(x)))
-
-## or even better: estimate breaks?
-## eu_bp <- breakpoints(glogisfit(eu), h = 24)
-## moments(eu_bp, breaks = 2)
-## replicate results "by hand"
-eu_breaks <- yearmon(c(1999 + 5/12, 2007 + 7/12))
-eu_seg <- 1 + (time(eu) > eu_breaks[1]) + (time(eu) > eu_breaks[2])
-eu_mom <- aggregate(eu, eu_seg, function(x) moments(glogisfit(x)))
+eu_breaks <- breakdates(results$EU$breakpoints, breaks = results$EU$nbreaks)
+eu_mom <- moments(results$EU$breakpoints, breaks = results$EU$nbreaks)
 @
 
 The disparity of the national inflation rates within the EMU is still an issue. Many researchers, like \citet{hofmann}  find a considerable amount of inflation
@@ -726,19 +723,20 @@ red lines depict the means.} We do see that many of these countries follow a rat
 short deflationary phase starting somewhere around the autumn of 2007 and lasting a few months. The general trend also suggests, that the inflation rates
 converged towards some common -- albeit broad -- mean level. For the inflation series of the whole EMU, as published by the \citet{oecd}, we see
 an increase in mean from
-$\Sexpr{round(eu_mom[1, 1], digits = 3)}$ (\Sexpr{start(eu)}--\Sexpr{eu_breaks[1]}) to
-$\Sexpr{round(eu_mom[2, 1], digits = 3)}$ (\Sexpr{eu_breaks[1] + 1/12}--\Sexpr{eu_breaks[2]}) with a slight decrease to
-$\Sexpr{round(eu_mom[3, 1], digits = 3)}$ (\Sexpr{eu_breaks[2] + 1/12}--\Sexpr{end(eu)}) following the financial crises.
+$\Sexpr{round3(eu_mom[1, 1])}$ (\Sexpr{start(eu)}--\Sexpr{eu_breaks[1]}) to
+$\Sexpr{round3(eu_mom[2, 1])}$ (\Sexpr{eu_breaks[1] + 1/12}--\Sexpr{eu_breaks[2]}) with a slight decrease to
+$\Sexpr{round3(eu_mom[3, 1])}$ (\Sexpr{eu_breaks[2] + 1/12}--\Sexpr{end(eu)}) following the financial crises.
 Whereas variance has increased considerably over time from
-$\Sexpr{round(eu_mom[1, 2], digits = 3)}$ over $\Sexpr{round(eu_mom[2, 2], digits = 3)}$ to $\Sexpr{round(eu_mom[3, 2], digits = 3)}$.
+$\Sexpr{round3(eu_mom[1, 2])}$ over $\Sexpr{round3(eu_mom[2, 2])}$ to $\Sexpr{round3(eu_mom[3, 2])}$.
 Regarding skewness, we witness a movement towards negative skewness from
-$\Sexpr{round(eu_mom[1, 3], digits = 3)}$ over $\Sexpr{round(eu_mom[2, 3], digits = 3)}$ to $\Sexpr{round(eu_mom[3, 3], digits = 3)}$.
+$\Sexpr{round3(eu_mom[1, 3])}$ over $\Sexpr{round3(eu_mom[2, 3])}$ to $\Sexpr{round3(eu_mom[3, 3])}$.
 
 <<glmean>>=
+glmean <- function(x) {
+  if(any(is.na(x))) NA else glogisfit(x, hessian = FALSE)$moments[1]
+}
+  
 if(!file.exists(file.path(root_dir, "Analysis", "glmean.rda"))) {
-   glmean <- function(x) {
-    if(any(is.na(x))) NA else glogisfit(x, hessian = FALSE)$moments[1]
-  }  
   hicp_glmean <- rollapply(hicps, 12, glmean)
   setwd(file.path(root_dir, "Analysis"))
   save(hicp_glmean, file = "glmean.rda")
@@ -747,6 +745,17 @@ if(!file.exists(file.path(root_dir, "Analysis", "glmean.rda"))) {
   load(file.path(root_dir, "Analysis", "glmean.rda"))
 }
 @
+
+\fixme{need to note somewhere} Rapid changes that persist only for very short amounts of time
+are not captured well. Specifically, short-lasting changes in the mean, may simply be attributed
+to increased variance. For example, the mean inflation in the 
+year before the crisis (\Sexpr{yearmon(2007 + 7/12)}--\Sexpr{yearmon(2008 + 6/12)}) was
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2007 + 7/12), end = yearmon(2008 + 6/12))))}$
+and after the crisis (\Sexpr{yearmon(2008 + 7/12)}--\Sexpr{yearmon(2009 + 6/12)}) it dropped to
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2008 + 7/12), end = yearmon(2009 + 6/12))))}$
+before rising again in the year after that (\Sexpr{yearmon(2009 + 7/12)}--\Sexpr{yearmon(2010 + 6/12)}):
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2009 + 7/12), end = yearmon(2010 + 6/12))))}$.
+
 
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}[t!]
