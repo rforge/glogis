@@ -6,7 +6,7 @@
 
 \description{
 Time series data with HICP (Harmonised Index of Consumer Prices)
-for 20 countries for 1990--2010 as provided by the OECD; and
+for 21 countries (plus EU) for 1990--2010 as provided by the OECD; and
 corresponding seasonally adjusted inflation ratios.
 }
 
@@ -18,7 +18,8 @@ corresponding seasonally adjusted inflation ratios.
 
 \format{
 Monthly multiple \code{"zooreg"} time series with \code{"yearmon"} index
-from Jan 1990 to Dec 2010 for 21 countries.
+from Jan 1990 (\code{HICP}) or Feb 1990 (\code{hicps}) to Dec 2010 for
+21 countries (plus EU).
 }
 
 \details{
