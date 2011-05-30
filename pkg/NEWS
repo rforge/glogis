@@ -1,3 +1,10 @@
+Changes in Version 0.1-0
+
+  o First official release of the package on CRAN. An accompanying
+    technical report is available from
+    http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-XX
+
+
 Changes in Version 0.0-1
 
   o Prerelease version on R-Forge.
