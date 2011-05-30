@@ -295,7 +295,7 @@ process $\mathit{efp}(t)$:
 %
 \begin{equation} \label{eq:efp}
 \mathit{efp}(t) ~=~ \hat V^{-1/2} n^{-1/2} \sum_{i = 1}^{\lfloor nt \rfloor}
-  s(y_i | \hat \phi) \quad (0 \leq t \leq 1),
+  s(y_i ~|~ \hat \phi) \quad (0 \leq t \leq 1),
 \end{equation}
 %
 where $\hat V$ is some consistent estimator of the variance of the scores. Below,
@@ -912,6 +912,10 @@ the raw monthly price indexes \citep[as provided by][]{oecd} and the seasonally 
 monthly inflation rates. The seasonal adjustment was performed in \pkg{X-12-ARIMA}~0.3
 (\citealp{X-12-ARIMA}, see also \citealp{Findley+Monsell+Bell:1998}) through the interface
 provided by \proglang{gretl}~1.9.5 (\citealp{gretl}, see also \citealp{Smith+Mixon:2006} for a review).
+
+Replication scripts for all analyses are provided within the \pkg{glogis} package: An overview
+is provided in \code{demo(package = "glogis")} and the scripts can be launched easily, e.g.,
+via \code{demo("Austria", package = "glogis")} etc.
 
 
 \bibliography{papers}
