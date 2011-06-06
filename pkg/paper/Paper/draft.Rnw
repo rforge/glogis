@@ -22,7 +22,8 @@
   a generalized logistic distribution. We find breaks in all but 4 countries.
   Overall, there is a convergence towards a lower inflation rate, but with an increase in variance and a change
   towards negative skewness.
-
+  %% avoid "we"-constructs
+  %% "adopt" better than "assume"
 }
 
 \Keywords{inflation rate, structural break, EMU, generalized logistic distribution}
@@ -105,7 +106,7 @@ long run inflation dynamics, as it changes considerably over the time of the
 analysis. This trend would be all but invisible using a normal distribution.  
 
 \fixme{comment on results here} Overall, we find four periods during which structural breaks
-happened. Two of them in the 90s (early and late), another one in the early 2000s, and the last period covers the financial crisis. There is also a 
+happened. Two of them in the 1990s (early and late), another one in the early 2000s, and the last period covers the financial crisis. There is also a 
 tendency towards a lower mean inflation rate, combined with a decreasing difference between
 individual inflation rates.
 
@@ -450,7 +451,7 @@ spval <- ifelse(spval < 0.001, "$< 0.001$", format(round(spval, digits = 4), nsm
 
 To illustrate the proposed strategy, the case of Slovenia is considered. After a period of
 relative instability following the independence from Yugoslavia, Slovenia was
-successfull in realigning its economy and introduced a number of reforms leading
+successful in realigning its economy and introduced a number of reforms leading
 to a stable growth in recent years. The good economic performance made it
 possible for Slovenia to enter the ERM~II in June~2004 and later on to introduce
 the euro in January~2007. The seasonally adjusted inflation series for Slovenia encompasses
@@ -503,7 +504,6 @@ fitted mean (horizontal blue lines in the left panel Figure~\ref{fig:slovenia1})
 in before the break Slovenia experienced very high inflation rates but was successful in reducing
 inflation to a much lower level afterwards.
 
-\clearpage
 This decrease in inflation is also conveyed by Figure~\ref{fig:slovenia2} that shows the
 observed histograms of inflation rates before and after the breakpoint along with the
 fitted GL distribution. This highlights that along with the decrease in mean level, the variance increases
@@ -567,17 +567,29 @@ others <- c(3, 4, 5, 10, 15, 17, 18, 20, 21)
 piigs <- c(9, 11, 12, 16, 19)
 @
 
-\readme{questions and challenges} The aim of this paper is to test for structural breaks in the dynamics of the inflation rates. Making use of the method developed in Section~\ref{sec:model},  the effect of the EMU upon national inflation rates can be investigated. Apart from the countries of the euro--zone, the inflation dynamics of the other European countries are also of interest. 
-This issue is closely related with the question about the convergence of the national inflation rates of the EMU members towards some common mean. Many researchers, like \citet{hofmann}  find a considerable amount of inflation differentials in parts of the sample.\readme{perhaps skip this one??} \citet{cap} estimate short-run and steady-state inflation uncertainty in 12 EMU countries and find a considerable degree of heterogeneity in terms of average inflation and its degree of persistence. 
+To investigate the effects of the EMU on national inflation rates, the
+techniques expounded in Section~\ref{sec:model} are employed to
+uncover changes in the dynamics of European inflation rates. The inflation
+dynamics within countries from the euro-zone (but also other European
+countries) is closely related with the question about the convergence
+of the national inflation rates of the EMU members towards some common mean.
+Many researchers provide evidence against convergence among European countries, e.g.,
+\citet{hofmann} find considerable amounts of inflation differentials and
+\citet{cap} describe rather strong heterogeneity among 12~EMU countries, both
+in terms of average inflation and its degree of persistence. 
 
-\readme{methods, approach} To explore these issues, we make use of three different approaches. First, in Section~\ref{sec:bpresults}, the estimation technique proposed in Section~\ref{sec:model} is applied to each of the countries included in the data set introduced in Section~\ref{sec:data}. Table~\ref{tab:results1} reports the estimated breakpoints along with the segment-specific moments (mean, variance, skewness) implied by the corresponding parameter
-estimates. Furthermore, entry dates for ERM/ERM~II and the euro are included as additional information. For ease of interpretation, countries with similar patterns of
-change are grouped together and ordered alphabetically within each group.
-If there is only a single segment, the sup$\mathit{LM}$ test was non-significant at the 5\% level. In significant cases, the number of breakpoints was selected via the LWZ criterion and subsequently all parameters (breakpoints and segment-specific GL parameters) were estimated by ML. No HAC~correction was employed as there was only negligible autocorrelation in the empirical scores after inclusion of the breakpoints (if any).
+To explore the question of convergence, we proceed in two steps:
+First, in Section~\ref{sec:bpresults}, the estimation technique proposed
+in Section~\ref{sec:model} is applied to each of the countries included in
+the data set (see Section~\ref{sec:data}). Second, Section~\ref{sec:aggregate}
+aggregates the results from each individual country to reveal different
+potential convergence patterns over time within three groups of countries:
+core-euro (\Sexpr{paste(colnames(hicps)[euro], collapse = ", ")}),
+PIIGS  (\Sexpr{paste(colnames(hicps)[piigs], collapse = ", ")}), and the
+rest.
 
-Section~\ref{sec:aggregate} deals with the convergence issue. Table~\ref{tab:results2} gives an overview over the data aggregated into three different country groups: the core--euro countries (Austria, Belgium, Finland, France, Germany, Luxembourg, and Netherlands), the PIIGS countries (Portugal, Ireland, Italy, Greece, and Spain), and the other countries. This is done by showing mean, variance, and skewness over time and taking possible break points in the data into account. 
-
-Finally, Figure~\ref{fig:glmean} in Section~\ref{sec:fcrisis}, depicts the inflation rates and a rolling mean estimation. This is another way of investigating into a possible convergence pattern of national inflation rates and is especially useful to depict the influence of the financial crisis. 
+Finally, Section~\ref{sec:fcrisis} focuses on the question of changes
+in the inflation dynamics during the 2008/2009 financial crisis.
 
 
 <<results-moments>>=
@@ -651,7 +663,7 @@ writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_moments)))
 @
 
 \noalign{\medskip}
-\multicolumn{8}{l}{\emph{Euro--area}} \\
+\multicolumn{8}{l}{\emph{Euro area}} \\
 \hline
 <<moments-table6, results=tex>>=
 writeLines(unlist(lapply(22, format_moments)))
@@ -666,65 +678,76 @@ distribution per segment, and ERM information for all countries under investigat
 
 
 
-\subsection{Breakpoint estimation results}\label{sec:bpresults}
+\subsection{Inflation dynamics on a national level}\label{sec:bpresults}
 
-\readme{changed to: 1) individual countries (table 1), 2) EU (table 1), 3) groups of countries (table 2), 4) crisis (fig.3)}
-For Table~\ref{tab:results1}, we grouped the countries according to either a
+As a first step towards the investigation of inflation convergence, the
+structural breaks in the inflation dynamics within each countries are
+investigated using the methods introduced in Section~\ref{sec:model}.
+Table~\ref{tab:results1} reports the estimated breakpoints along with the
+segment-specific moments (mean, variance, skewness) implied by the corresponding
+parameter estimates. Furthermore, entry dates for ERM/ERM~II and the euro are
+included as additional information. For ease of interpretation, countries with
+similar patterns of change are grouped together and ordered alphabetically
+within each group. If there is only a single segment, the sup$\mathit{LM}$ test
+was non-significant at the 5\% level. In significant cases, the number of
+breakpoints was selected via the LWZ criterion and subsequently all parameters
+(breakpoints and segment-specific GL parameters) were estimated by ML. No
+HAC~correction was employed as there was only negligible autocorrelation in the
+empirical scores after inclusion of the breakpoints (if any).
+In Table~\ref{tab:results1} the countries are grouped according to either a
 similar timing of the changes in inflation dynamics or according to economic similarities, 
 as in the case of the former communist countries in Eastern Europe.
 
-The first group that draws particular attention consists -- with the exception of Austria and
-Luxembourg -- of the countries of the former DEM-zone. All these countries had and still have 
-a very low inflation rate in terms of both mean and variance and their inflation dynamics
-did not change. This does make economic sense since the ECB is modeled after 
-the Deutsche Bundesbank and the ECB did not -- until recently -- much diverge from the 
-monetary policy of the former. Thus the EMU did have no effect since the policies in these countries were
-already much in line with Germany and thus the ECB. 
+The first group that draws particular attention consists of the former
+DEM (Deutsche Mark) zone countries, with the exception of Austria and
+Luxembourg. All these countries had and still have a very low inflation rate,
+both in terms of mean and variance, and their inflation dynamics
+did not change significantly. This is plausible from an economic point of view
+since the European central bank (ECB) is modeled after the Deutsche Bundesbank and the ECB did not
+-- until recently -- diverge much from the monetary policy of the former. Thus,
+the EMU did have no effect on inflation dynamics since the policies in
+these countries were already much in line with Germany and hence the ECB. 
 
 Austria, Finland, and France adjusted to the requirements of the EMU during the
 first phase of convergence. In these countries,
 the result of the adjustment process was a lower inflation rate and an overall
 decrease in the variance. 
 
-The next group consists of three of the PIIGS  countries and Luxembourg. Greece and
+The next group consists of three of the PIIGS countries and Luxembourg. Greece and
 Portugal adjusted to the ERM shortly before or after its introduction.
-Italy was successfull in reducing its inflation rate, whereas Luxembourg
-experienced a doubling of its former -- very low -- inflation rate with the
-variance rising by a factor of almost 14 with a strong shift in skewness towards the
+Italy was successful in reducing its inflation rate, whereas Luxembourg
+experienced a strong increase in its formerly very low inflation rate, both
+in terms of mean and variances, also associated with a shift in skewness towards the
 left. Apart from Luxembourg, the countries that had a structural break during the second 
-phase of convergence were also successfull in reducing mean inflation rates. In this group, as well
-as in the previous, the EMU adjustment led to a lower mean inflation rate.
+phase of convergence were also successful in reducing mean inflation rates.
+After the changes in this group, all countries have rather similar mean inflation
+rates, closer to the levels of the previous two groups.
 
-The forth subgroup consists of two of the PIIGS  countries, namely Ireland and Spain.  
-There is a break in both countries in the summer of  2008  following the financial crisis and the severe 
-problems concerning the real estate situation. In Ireland as well as in Spain, this  
-had a strong deflationary impact, with  deflation in Ireland over an extended period of time. 
-In Spain, which was affected by a housing bubble of  
-roughly the same size as Ireland,  the housing prices did not adjust so abruptly and  
-in such a degree. 
-
-%This deflationary  trend, which for a time affected all countries,  
-%can be seen in Figure~\ref{fig:glmean},  which depicts a rolling mean estimation,  
-%where the mean is calculated using the first  moment of a fitted GL distribution.  
-%There is evidence of a decline in mean inflation,  which returns to its previous 
-%path roughly a year later. 
+The fourth subgroup consists of two of the PIIGS countries, namely Ireland and Spain.  
+There is a break in both countries in the summer of 2008 that captures the effects of
+the financial crisis and the severe problems concerning the real estate situation.
+In both countries, this had a strong deflationary impact, with deflation in Ireland
+over an extended period of time. In Spain, which was affected by a housing bubble of  
+roughly the same size as Ireland, the housing prices did not adjust so abruptly and  
+so strongly.
 
 The next group consists of two countries that, after a very short participation in the
-ERM, decided not to be part of it and in that way also not to participate in the EMU, i.e. the United Kingdom and Sweden. Both show a clear
-break in the early 90s. These can be traced back to economic crisis, the currency
-crisis of the United Kingdom cumulating into the ``Black Wednesday'' in 1992 and
-the banking crisis in Sweden during the early 90s. 
+ERM, decided not to be part of it and hence also not to participate in the EMU:
+the United Kingdom and Sweden. Both show clear breaks in the early 1990s which can be
+traced back to economic crises: the currency crisis of the United Kingdom cumulating
+into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
+1990s. 
 
 The last group consists of the Eastern European countries: Czech Republic,
 Estonia, Hungary, Poland, Slovakia, and Slovenia. In almost all of these
 countries, the mean and the variance of their inflation rates declined in the
-later part of the 90s. Czech Republic, Estonia and Hungary experienced a break in 1997/1998. This is a result
-of these countries efforts to curb in inflation by decreasing the growth of the money 
-supply and indicates the time when they actually overcame the biggest
-transitionally shocks on their way towards free market economies. In Poland, this took two more
-years. Slovakia and Slovenia are special cases: for once, they started with lower mean
-inflation values and on the other hand, their inflation dynamics  both changed roughly one year
-prior to their entry into the ERM~II.
+late 1990s or early 2000s. Czech Republic, Estonia and Hungary experienced a break in 1997/1998
+resulting from efforts to curb in inflation by decreasing the growth of the money 
+supply. The timing of the break thus indicates the timing of the biggest
+transitionally shocks on the way towards free market economies. In Poland, this
+transition took two more years. Slovakia and Slovenia are somewhat different: On one hand,
+they started with lower mean inflation rates and on the other hand, their inflation dynamics
+both changed roughly one year prior to their entry into the ERM~II.
 
 <<glmean>>=
 glmean <- function(x) {
@@ -746,11 +769,14 @@ eu_breaks <- breakdates(results$EU$breakpoints, breaks = results$EU$nbreaks)
 eu_mom <- moments(results$EU$breakpoints, breaks = results$EU$nbreaks)
 @
 
-In the case of the inflation rate of the euro--area, we witness three different regimes. One until 
-1999 with both a low mean and variance, the next shortly after the beginning of the third and final stage of
-monetary integration, accompanied with a significant increase in the mean. The overheating of the economy that
-culminated in the financial crisis shows itself in a big increase in variance and a lower mean inflation, reflecting
-the negative inflation rates is some euro--area countries. 
+Finally, the inflation rates for the whole euro area \fixme{Is EU euro area or European union?},
+as provided by the OECD, are considered and three different regimes are found: (1)~until 
+1999 with both a low mean and variance, (2)~the third and final stage of monetary integration,
+accompanied with a significant increase in the mean, (3)~a period encompassing
+the overheating of the economy that culminated in the financial crisis, showing a big increase
+in variance and a lower mean inflation.
+
+\fixme{some concluding remarks about the EU level bridging the current gap to the next subsection}
 
 %There is an increase in mean from
 %$\Sexpr{round3(eu_mom[1, 1])}$ (\Sexpr{start(eu)}--\Sexpr{eu_breaks[1]}) to
@@ -759,7 +785,6 @@ the negative inflation rates is some euro--area countries.
 %
 
 
-\clearpage
 \subsection{Convergence on an aggregate level}\label{sec:aggregate}
 
 \begin{table}[t!]
@@ -797,14 +822,18 @@ changed from the previous time point, i.e., that no breakpoint was estimated in 
 \end{center}
 \end{table}
 
+\fixme{intro needed}
+
+\fixme{also ``zoom out'' more, a big picture needs to be established}
+
 Table~\ref{tab:results2} presents lower quartile,
 median, and upper quartile (25\%, 50\%, 75\% percentiles) of the first three moments of the
 inflation series in January \Sexpr{yrs[1]}, \Sexpr{yrs[2]}, \Sexpr{yrs[3]} and \Sexpr{yrs[4]}. The countries are grouped
 into the ``core'' of the eurozone, the PIIGS countries  and all the others. For this, we took account of possible
 breaks in the moments.  
 
-The time periods are chosen according to four fundamental change periods. Namely, the early 90s, with breaks in
-Austria, Finland, France, Sweden, and UK. The late 90s, with breaks in Greece, Italy, Luxembourg, Portugal, Czech Republic,
+The time periods are chosen according to four fundamental change periods. Namely, the early 1990s, with breaks in
+Austria, Finland, France, Sweden, and UK. The late 1990s, with breaks in Greece, Italy, Luxembourg, Portugal, Czech Republic,
 Estonia, and Hungary. And also the period after the second phase of convergence, with breaks in the early 2000s (Poland, Slovakia, and Slovenia)
 and the two countries with the most visible effect of the financial crisis (Ireland and Spain). 
 
@@ -820,7 +849,7 @@ in \Sexpr{yrs[4]}. The interquartile range did not change much too. Median skewn
 from highly positive to negative values. This is mostly due to the changes associated with the financial crisis, that was
 responsible for deflationary shocks. The interquartile range of skewness decreased considerably.
 
-The other countries were successfull in decreasing all three moments from \Sexpr{yrs[1]} to \Sexpr{yrs[3]}. Still, their median
+The other countries were successful in decreasing all three moments from \Sexpr{yrs[1]} to \Sexpr{yrs[3]}. Still, their median
 inflation rate is higher than those of the core countries. Also, the interquartile range of the mean decreased considerably. 
 Contrary to the euro--zone and the PIIGS countries, variance decreased also, both in terms of the median value and the
 interquartile range. The skewness decreased as well, as did the interquartile range of the skewness parameter.
@@ -829,7 +858,7 @@ In context of the convergence issue, we find that, with the interquartile range 
 evidence of a convergence towards some common mean inflation rate in the countries of our sample, both within the subgroups and the three groups put together.
 This is also visible in the median values, that  diverge much less than at the beginning in \Sexpr{yrs[1]}.
 
-\clearpage
+
 \subsection{The influence of the financial crisis}\label{sec:fcrisis}
 
 
@@ -843,25 +872,51 @@ This is also visible in the median values, that  diverge much less than at the b
     xlab = "Time", ylab = "Monthly inflation rates")
   for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
 @
-\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from rolling GL fits (red)
-over time for all countries, with a window size of 12 months}
+\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
+12-month rolling GL fits (red) over time for all countries.}
 \end{center}
 \end{figure}
 \setkeys{Gin}{width=\textwidth}
 
-Another way to address the convergence behavior of the inflation rates and the influence of the financial crisis is a graphical representation, as in Figure~\ref{fig:glmean}. It depicts the inflation rates and a rolling mean estimation, where the mean is calculated using the first moment of a fitted GL distribution. The financial crises and the short deflationary phase starting  around the autumn of 2007 and lasting a few months is clearly visible. It is outlined by a strong increase in mean inflation during the boom years of 2007/2008 accompanied by an equally strong deflation following the bust. However, the level of mean inflation did not change much, as the inflation rates seem to have returned to their prior path. The inflation series of the euro--area conveys the same message. 
-With regard to the financial crisis, this shows that for low frequency data, like inflation, rapid changes
-that persist only for a very short period of time
-are not captured well. Specifically, short-lasting changes in the mean may simply be attributed
-to increased variance. For example, the mean inflation of the euro--area in the 
+The results from the previous sections convey that the financial
+crisis of 2008/9 did not have a significant effect on the inflation dynamics
+in most of the European countries (except Ireland and Spain).
+This may be somewhat surprising and is not enitrely correct. In fact,
+there is a rather clear effect but as it is very short-lived and not
+persistent it is not picked up by the structural break techniques.
+
+More specifically, the mean inflation of the euro area \fixme{see above} from a GL fit in the 
 year before the crisis (\Sexpr{yearmon(2007 + 7/12)}--\Sexpr{yearmon(2008 + 6/12)}) was
 $\Sexpr{round3(glmean(window(eu, start = yearmon(2007 + 7/12), end = yearmon(2008 + 6/12))))}$
 and after the crisis (\Sexpr{yearmon(2008 + 7/12)}--\Sexpr{yearmon(2009 + 6/12)}) it dropped to
 $\Sexpr{round3(glmean(window(eu, start = yearmon(2008 + 7/12), end = yearmon(2009 + 6/12))))}$
 before rising again in the following year  (\Sexpr{yearmon(2009 + 7/12)}--\Sexpr{yearmon(2010 + 6/12)}):
 $\Sexpr{round3(glmean(window(eu, start = yearmon(2009 + 7/12), end = yearmon(2010 + 6/12))))}$.
-The general trend also suggests	 that the inflation rates converged towards some common -- albeit broad -- mean level. 
-There is still some visible difference in the inflation rates, but the mean estimates are moving closer, albeit in a rather broad band. So contrary to \citet{palomba}, who find that the degree of similarity in short--run inflation dynamics is still weak, we find evidence of convergence within the countries in the sample.
+Another way to bring out this pattern in a graphical way is
+Figure~\ref{fig:glmean}. It depicts the inflation rates (in gray) and a 12-month rolling mean (in red),
+calculated again as the first moment of a fitted GL distribution.
+The strong increase in mean inflation during the boom years of 2007/2008
+accompanied by an equally strong deflation following the burst of the bubble
+is clearly visible for most countries. However, the level of mean inflation
+did not change persistently, as the inflation rates seem to have returned to
+their prior path, conveying the same message as the inflation series of the
+euro area.
+
+As for the structural break methods adopted in the previous sections,
+this means that such rapid and non-persistent effects in the mean level
+are not picked up from low frequency data, like inflation rates. Instead,
+they may simply be attributed to increased variance. 
+
+Apart from bringing out more details about the short-term crisis effects,
+Figure~\ref{fig:glmean} also provides an alternative view on the
+long-range convergence behavior of the inflation rates studied in the
+previous sections. Over the 1990s and early 2000s, there is a clear
+general trend towards some common -- albeit broad -- mean level. 
+There is still some visible difference in the inflation rates, but the mean
+estimates are moving closer in a rather broad band. So contrary to
+\citet{palomba}, who find that the degree of similarity in short-run inflation
+dynamics is still weak, we find evidence of convergence within the countries in
+the sample.
 
 
 
@@ -929,7 +984,6 @@ via \code{demo("Austria", package = "glogis")} etc.
 
 \begin{appendix}
 
-\clearpage
 \section{Data and sales periods}\label{sec:sales}
 
 In addition to Germany, Portugal, Belgium, Italy, Luxembourg, and Spain, there
