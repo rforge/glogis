@@ -879,7 +879,7 @@ This is also visible in the median values, that  diverge much less than at the b
 \setkeys{Gin}{width=\textwidth}
 
 The results from the previous sections convey that the financial
-crisis of 2008/9 did not have a significant effect on the inflation dynamics
+crisis of 2008/2009 did not have a significant effect on the inflation dynamics
 in most of the European countries (except Ireland and Spain).
 This may be somewhat surprising and is not enitrely correct. In fact,
 there is a rather clear effect but as it is very short-lived and not
