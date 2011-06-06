@@ -84,6 +84,17 @@
   inherits from \code{"gbreakpointsfull"}.
 }
 
+\references{
+  Windberger T, Zeileis A (2011). Structural Breaks in Inflation Dynamics within
+  the European Monetary Union. Working Paper 2011-XX. Working Papers in Economics and Statistics,
+  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-XX}
+
+  Zeileis A, Shah A, Patnaik I (2010). Testing, Monitoring, and Dating Structural
+  Changes in Exchange Rate Regimes. \emph{Computational Statistics and Data Analysis},
+  \bold{54}(6), 1696--1706. \url{http://dx.doi.org/10.1016/j.csda.2009.12.005}.
+}
+
 \seealso{\code{\link{glogisfit}}, \code{\link[fxregime]{fxregimes}}, \code{\link[strucchange]{breakpoints}}}
 
 \examples{

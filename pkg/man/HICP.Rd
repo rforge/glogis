@@ -44,6 +44,11 @@ Organisation for Economic Co-operation and Development (OECD)
 \references{
   Wikipedia (2010). "Harmonised Index of Consumer Prices -- Wikipedia, The Free Encyclopedia."
   \url{http://en.wikipedia.org/wiki/Harmonised_Index_of_Consumer_Prices}, accessed 2010-06-10.
+
+  Windberger T, Zeileis A (2011). Structural Breaks in Inflation Dynamics within
+  the European Monetary Union. Working Paper 2011-XX. Working Papers in Economics and Statistics,
+  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-XX}
 }
 
 \examples{
