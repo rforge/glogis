@@ -12,8 +12,14 @@
 
 \title{Structural Breaks in Inflation Dynamics within the European Monetary Union}
 
-\author{Thomas Windberger\\Universit\"at Innsbruck \And
-        Achim Zeileis\\Universit\"at Innsbruck}
+%\author{Thomas Windberger\\Universit\"at Innsbruck \And
+%        Achim Zeileis\\Universit\"at Innsbruck}
+\author{\hfill Thomas Windberger$^a$ \hfill Achim Zeileis$^b$\thanks{Correspondence
+to: Achim Zeileis, Department of Statistics,  Universit\"at Innsbruck,
+Universit\"atsstra{\ss}e 15, 6020 Innsbruck, Austria. Tel: +43/512/507-7103. Fax: +43/512/507-2851.
+E-mail: \email{Achim.Zeileis@R-project.org}} \hfill \hfill \\
+{\small \it $^a$ Department of Statistics, Universit\"at Innsbruck, Austria} \\
+{\small \it $^b$ Department of Statistics, Universit\"at Innsbruck, Austria}}
 \Plainauthor{Thomas Windberger, Achim Zeileis}
 
 \renewcommand{\abstractname}{Summary}
@@ -34,8 +40,8 @@
   Universit\"atsstra{\ss}e 15\\
   A-6020 Innsbruck, Austria\\
   E-mail: \email{Thomas.Windberger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org} \\
-  Telephone: +43/ 512/ 507 - 7103 \\
-  Fax: 43/ 512/ 507 - 2851 \\
+  Telephone: +43/12/507-7103 \\
+  Fax: +43/512/507-2851 \\
 }
 
 
@@ -467,6 +473,36 @@ the euro in January~2007. The seasonally adjusted inflation series for Slovenia 
 the time from \Sexpr{start(x$data)} to \Sexpr{end(x$data)} and is depicted in the left
 panel of Figure~\ref{fig:slovenia1}.
 
+\begin{figure}[t!]
+<<slovenia-plots1, fig=TRUE, height=4.2, width=9.6>>=
+par(mfrow = c(1, 2))
+plot(x$data, main = "", ylab = "Monthly inflation rate (in percent)", xlab = "Time")
+lines(x$breakpoints, breaks = x$nbreaks)
+lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
+if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks))
+plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics")
+lines(x$breakpoints, breaks = x$nbreakss)
+@
+\caption{\label{fig:slovenia1} Inflation rate series for Slovenia
+with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
+from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
+with sequence of $\mathit{LM}$~statistics,
+critical value at 5\% level (horizontal red line line), and estimated breakpoint (vertical dashed line).}
+
+<<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
+par(mfrow = c(1, 2))
+for(i in 1:2) plot(x$model[[i]], moments = TRUE,
+  xlim = c(-1.5, 2.2), ylim = c(0, 1.3),
+  breaks = seq(-1.5, 2, by = 0.25),
+  xlab = paste(names(x$model)[i], "\n", "Goodness-of-fit p-value: ",
+    format.pval(summary(x$model[[i]])$chisq.test$p.value, digits = 4),
+    sep = ""))
+@
+\caption{\label{fig:slovenia2} Histogramm of observed monthly inflation rates in
+Slovenia for \Sexpr{names(x$model)[1]} (left) and \Sexpr{names(x$model)[1]} (right),
+along with fitted generalized logistic probability density function, associated
+moments, and $\chi^2$ goodness-of-fit test.}
+\end{figure}
 
 Assuming a single stable set of parmaters (\ref{eq:h0}) is  not valid, as the
 sequence of $\mathit{LM}$~statistics (see right panel of Figure~\ref{fig:slovenia1}) clearly
@@ -591,7 +627,69 @@ format_moments <- function(i, digits = 3) {
 }
 @
     
+\begin{table}[p!]
+\begin{center}
+\footnotesize
+\begin{tabular}{llrrrlll}
+\hline
+Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & Euro \\
+\hline
 
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{No change}} \\
+\hline
+<<moments-table1, results=tex>>=
+writeLines(unlist(lapply(c(2, 4, 8, 14), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Phase~1 convergence}} \\
+\hline
+<<moments-table2, results=tex>>=
+writeLines(unlist(lapply(c(1, 6, 7), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Phase~2 convergence}} \\
+\hline
+<<moments-table3, results=tex>>=
+writeLines(unlist(lapply(c(9, 12, 13, 16), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Financial crisis}} \\
+\hline
+<<moments-table4, results=tex>>=
+writeLines(unlist(lapply(c(11, 19), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Non-euro}} \\
+\hline
+<<moments-table5, results=tex>>=
+writeLines(unlist(lapply(c(20, 21), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Eastern countries}} \\
+\hline
+<<moments-table6, results=tex>>=
+writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Euro area}} \\
+\hline
+<<moments-table6, results=tex>>=
+writeLines(unlist(lapply(22, format_moments)))
+@
+
+\end{tabular}
+
+\caption{\label{tab:results1} Estimated breakpoints, fitted moments of generalized logistic
+distribution per segment, and ERM information for all countries under investigation.}
+\end{center}
+\end{table}
 
 
 \subsection{Inflation dynamics on a national level}\label{sec:bpresults}
@@ -711,8 +809,42 @@ In any case, the EU series as a whole -- which is already an aggregate -- does s
 %$\Sexpr{round3(eu_mom[3, 1])}$ (\Sexpr{eu_breaks[2] + 1/12}--\Sexpr{end(eu)}) shortly before the financial crises.
 %
 
-\clearpage
 \subsection{Convergence on an aggregate level}\label{sec:aggregate}
+
+\begin{table}[t!]
+\begin{center}
+\begin{tabular}{llrrrr}
+\hline
+Moment & Quartile & \Sexpr{yrs[1]} & \Sexpr{yrs[2]} & \Sexpr{yrs[3]} & \Sexpr{yrs[4]}\\
+\hline
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Core euro}} \\
+\hline
+<<cross-country-table1, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(euro, yearmon(yrs)), columns = 1:2))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{PIIGS}} \\
+\hline
+<<cross-country-table2, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(piigs, yearmon(yrs)), columns = c(1:2, 4)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Other}} \\
+\hline
+<<cross-country-table3, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(others, yearmon(yrs)), columns = c(1, 3)))
+@
+
+\end{tabular}
+\caption{\label{tab:results2} Aggregation of estimated moments from Table~\ref{tab:results1} across countries in
+January~\Sexpr{yrs[1]}, \Sexpr{yrs[2]}, \Sexpr{yrs[3]}, and \Sexpr{yrs[4]}. Dots signal that the moments have not
+changed from the previous time point, i.e., that no breakpoint was estimated in the corresponding time period.}
+\end{center}
+\end{table}
 
 \fixme{intro needed}
 
@@ -765,6 +897,21 @@ crisis with its ``up--down--up'' turn (as depicted in Figure~\ref{fig:glmean}) l
 
 \subsection{The influence of the financial crisis}\label{sec:fcrisis}
 
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}[t!]
+\begin{center}
+<<glmean-plot, fig=TRUE, height=5, width=7.5>>=
+  gray_red <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0), alpha = 0.3)
+  gray_red1 <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0))
+  plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
+    xlab = "Time", ylab = "Monthly inflation rates")
+  for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
+@
+\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
+12-month rolling GL fits (red) over time for all countries.}
+\end{center}
+\end{figure}
+\setkeys{Gin}{width=\textwidth}
 
 
 The results from the previous sections convey that the financial
@@ -875,62 +1022,9 @@ January 2000 for Belgium,  while Italy and Spain introduced them in January 2001
 \clearpage
 \section{Graphs}
 
-
-\begin{figure}[htp!]
-<<slovenia-plots1, fig=TRUE, height=4.2, width=9.6>>=
-par(mfrow = c(1, 2))
-plot(x$data, main = "", ylab = "Monthly inflation rate (in percent)", xlab = "Time")
-lines(x$breakpoints, breaks = x$nbreaks)
-lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
-if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks))
-plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics")
-lines(x$breakpoints, breaks = x$nbreakss)
-@
-\caption{\label{fig:slovenia1} Inflation rate series for Slovenia
-with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
-from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
-with sequence of $\mathit{LM}$~statistics,
-critical value at 5\% level (horizontal red line line), and estimated breakpoint (vertical dashed line).}
-\end{figure}
-
-
-\clearpage
-
-\begin{figure}[t!]
-<<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
-par(mfrow = c(1, 2))
-for(i in 1:2) plot(x$model[[i]], moments = TRUE,
-  xlim = c(-1.5, 2.2), ylim = c(0, 1.3),
-  breaks = seq(-1.5, 2, by = 0.25),
-  xlab = paste(names(x$model)[i], "\n", "Goodness-of-fit p-value: ",
-    format.pval(summary(x$model[[i]])$chisq.test$p.value, digits = 4),
-    sep = ""))
-@
-\caption{\label{fig:slovenia2} Histogramm of observed monthly inflation rates in
-Slovenia for \Sexpr{names(x$model)[1]} (left) and \Sexpr{names(x$model)[1]} (right),
-along with fitted generalized logistic probability density function, associated
-moments, and $\chi^2$ goodness-of-fit test.}
-\end{figure}
-
-\clearpage
-\begin{figure}[t!]
-\begin{center}
-<<glmean-plot, fig=TRUE, height=5, width=7.5>>=
-  gray_red <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0), alpha = 0.3)
-  gray_red1 <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0))
-  plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
-    xlab = "Time", ylab = "Monthly inflation rates")
-  for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
-@
-\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
-12-month rolling GL fits (red) over time for all countries.}
-\end{center}
-\end{figure}
-
-\clearpage
-
 Figures~\ref{fig:nochange}--\ref{fig:eastern} depict the data underlying the results
 in Section~\ref{sec:results} along with the GL-based means from Table~\ref{tab:results1}.
+
 
 <<graphs-code>>=
 get_data <- function(i) {
@@ -957,21 +1051,15 @@ get_xyplot <- function(i) {
 }
 @
 
-
-\begin{figure}[htp!]
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}[p!]
 \begin{center}
 <<graphs-nochange, fig=TRUE, height=6.3, width=7.5>>=
 trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(2, 4, 8, 14)))
 @
 \caption{\label{fig:nochange} No change.}
-\end{center}
-\end{figure}
 
-\clearpage
-
-\begin{figure}[p!]
-\begin{center}
 <<graphs-phase1, fig=TRUE, height=4.9, width=7.5>>=
 trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(1, 6, 7)))
@@ -980,9 +1068,6 @@ print(get_xyplot(c(1, 6, 7)))
 \end{center}
 \end{figure}
 
-
-\clearpage
-
 \begin{figure}[p!]
 \begin{center}
 <<graphs-phase2, fig=TRUE, height=6.3, width=7.5>>=
@@ -990,12 +1075,7 @@ trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(9, 12, 13, 16)))
 @
 \caption{\label{fig:phase2} Phase~2 convergence.}
-\end{center}
-\end{figure}
 
-\clearpage
-\begin{figure}[p!]
-\begin{center}
 <<graphs-crisis, fig=TRUE, height=3.5, width=7.5>>=
 trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(11, 19)))
@@ -1004,7 +1084,6 @@ print(get_xyplot(c(11, 19)))
 \end{center}
 \end{figure}
 
-\clearpage
 \begin{figure}[p!]
 \begin{center}
 <<graphs-noneuro, fig=TRUE, height=3.5, width=7.5>>=
@@ -1012,12 +1091,7 @@ trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(20, 21)))
 @
 \caption{\label{fig:noneuro} Non-euro.}
-\end{center}
-\end{figure}
 
-\clearpage
-\begin{figure}[p!]
-\begin{center}
 <<graphs-eastern, fig=TRUE, height=9.1, width=7.5>>=
 trellis.par.set(theme = standard.theme(color = FALSE))
 print(get_xyplot(c(3, 5, 10, 15, 17, 18)))
@@ -1025,112 +1099,6 @@ print(get_xyplot(c(3, 5, 10, 15, 17, 18)))
 \caption{\label{fig:eastern} Eastern countries.}
 \end{center}
 \end{figure}
-
-
-
-\clearpage
-\section{Tables}
-
-
-\begin{table}[t!]
-\begin{center}
-\footnotesize
-\begin{tabular}{llrrrlll}
-\hline
-Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & Euro \\
-\hline
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{No change}} \\
-\hline
-<<moments-table1, results=tex>>=
-writeLines(unlist(lapply(c(2, 4, 8, 14), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Phase~1 convergence}} \\
-\hline
-<<moments-table2, results=tex>>=
-writeLines(unlist(lapply(c(1, 6, 7), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Phase~2 convergence}} \\
-\hline
-<<moments-table3, results=tex>>=
-writeLines(unlist(lapply(c(9, 12, 13, 16), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Financial crisis}} \\
-\hline
-<<moments-table4, results=tex>>=
-writeLines(unlist(lapply(c(11, 19), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Non-euro}} \\
-\hline
-<<moments-table5, results=tex>>=
-writeLines(unlist(lapply(c(20, 21), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Eastern countries}} \\
-\hline
-<<moments-table6, results=tex>>=
-writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_moments)))
-@
-
-\noalign{\medskip}
-\multicolumn{8}{l}{\emph{Euro area}} \\
-\hline
-<<moments-table6, results=tex>>=
-writeLines(unlist(lapply(22, format_moments)))
-@
-
-\end{tabular}
-
-\caption{\label{tab:results1} Estimated breakpoints, fitted moments of generalized logistic
-distribution per segment, and ERM information for all countries under investigation.}
-\end{center}
-\end{table}
-
-\clearpage
-\begin{table}[t!]
-\begin{center}
-\begin{tabular}{llrrrr}
-\hline
-Moment & Quartile & \Sexpr{yrs[1]} & \Sexpr{yrs[2]} & \Sexpr{yrs[3]} & \Sexpr{yrs[4]}\\
-\hline
-
-\noalign{\medskip}
-\multicolumn{6}{l}{\emph{Core euro}} \\
-\hline
-<<cross-country-table1, echo=FALSE, results=tex>>=
-writeLines(format_cross_country(cross_country_moments(euro, yearmon(yrs)), columns = 1:2))
-@
-
-\noalign{\medskip}
-\multicolumn{6}{l}{\emph{PIIGS}} \\
-\hline
-<<cross-country-table2, echo=FALSE, results=tex>>=
-writeLines(format_cross_country(cross_country_moments(piigs, yearmon(yrs)), columns = c(1:2, 4)))
-@
-
-\noalign{\medskip}
-\multicolumn{6}{l}{\emph{Other}} \\
-\hline
-<<cross-country-table3, echo=FALSE, results=tex>>=
-writeLines(format_cross_country(cross_country_moments(others, yearmon(yrs)), columns = c(1, 3)))
-@
-
-\end{tabular}
-\caption{\label{tab:results2} Aggregation of estimated moments from Table~\ref{tab:results1} across countries in
-January~\Sexpr{yrs[1]}, \Sexpr{yrs[2]}, \Sexpr{yrs[3]}, and \Sexpr{yrs[4]}. Dots signal that the moments have not
-changed from the previous time point, i.e., that no breakpoint was estimated in the corresponding time period.}
-\end{center}
-\end{table}
 
 
 \end{appendix}
