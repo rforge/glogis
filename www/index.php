@@ -41,7 +41,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <h3>Thomas Windberger, Achim Zeileis</h3>
 
 <p>To assess the effects of the EMU on inflation rate dynamics of
-  its member states, the inflation rate series for 21~European countries
+  its member states, the inflation rate series for 21 European countries
   are investigated for structural changes. To capture changes in mean,
   variance, and skewness of inflation rates, a generalized logistic
   model is adopted and complemented with structural break tests and
