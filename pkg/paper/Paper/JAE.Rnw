@@ -1,0 +1,1081 @@
+\documentclass[10pt,a4paper,twoside]{article}
+
+%% additional packages
+\usepackage{amsfonts,amstext,amsmath,a4wide,graphicx,color,thumbpdf}
+\usepackage{hyperref}
+\newcommand{\argmax}{\operatorname{argmax}\displaylimits}
+
+%% need no \usepackage{Sweave}
+\setkeys{Gin}{width=\textwidth}
+\SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, keep.source=TRUE}
+
+%% BibTeX settings
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{jae}
+\bibpunct{(}{)}{,}{a}{,}{,}
+\newcommand{\doi}[1]{\href{http://dx.doi.org/#1}{\normalfont\texttt{doi:#1}}}
+
+%% markup commands for code/software
+\let\code=\texttt
+\let\pkg=\textbf
+\let\proglang=\textsf
+\newcommand{\file}[1]{`\code{#1}'}
+\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+
+%% paragraph formatting
+\renewcommand{\baselinestretch}{1.52}
+
+%% mimic JAE style
+\renewcommand{\section}{\secdef \mysec \mysecnn}
+\newcommand{\mysec}[2][default]{\vspace{1.7\baselineskip}%
+  \pdfbookmark[1]{#1}{Section.#1}%
+  \refstepcounter{section}%
+  \centerline{\large \thesection. \uppercase{#1}} \vspace{.5\baselineskip}}
+\newcommand{\mysecnn}[1]{\vspace{1.7\baselineskip}%
+  \centerline{\large #1} \vspace{.5\baselineskip}}
+\renewcommand{\abstractname}{\normalfont SUMMARY}
+\renewcommand{\refname}{REFERENCES}
+\renewcommand{\thetable}{\Roman{table}}
+
+%% page header (and currently no footer)
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\thispagestyle{plain}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[CE]{{\normalsize \uppercase{T.~Windberger and A.~Zeileis}}}
+\fancyhead[CO]{{\normalsize \uppercase{Structural Breaks in Inflation Dynamics within the EMU}}} 
+% \fancyfoot[LO,LE]{\small Copyright {\copyright} 20XX John Wiley \& Sons, Ltd.}
+\fancypagestyle{plain}{
+\fancyhf{}
+% \fancyfoot[LO,LE]{\small This is a preprint of an article published in %
+%   \textit{Journal of Applied Econometrics}, \textbf{XX}(X), XXX--XXX. \\%
+%   Copyright {\copyright} 20XX John Wiley \& Sons, Ltd. \doi{10.1002/jae.XXXX} }
+}
+
+%% title information
+\title{\bf Structural Breaks in Inflation Dynamics within the European Monetary Union}
+\author{\hfill Thomas Windberger \hfill Achim Zeileis\thanks{Correspondence
+to: Achim Zeileis, Department of Statistics,  Universit\"at Innsbruck,
+Universit\"atsstr.~15, A-6020 Innsbruck, Austria. Tel: +43/512/507-7103. Fax: +43/512/507-2851.
+E-mail: \email{Achim.Zeileis@R-project.org}} \hfill \hfill \\
+{\small \it Department of Statistics, Universit\"at Innsbruck, Austria}}
+\date{}
+
+% hyperref setup
+\definecolor{Red}{rgb}{0.5,0,0}
+\definecolor{Blue}{rgb}{0,0,0.5}
+\hypersetup{%
+  pdftitle = {Structural Breaks in Inflation Dynamics within the European Monetary Union},
+  pdfsubject = {},
+  pdfkeywords = {inflation rate, structural break, EMU, generalized logistic distribution},
+  pdfauthor = {Thomas Windberger, Achim Zeileis},
+  %% change colorlinks to false for pretty printing
+  colorlinks = {true},
+  linkcolor = {Blue},
+  citecolor = {Blue},
+  urlcolor = {Red},
+  hyperindex = {true},
+  linktocpage = {true},
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  To assess the effects of the EMU on inflation rate dynamics of
+  its member states, the inflation rate series for 21~European countries
+  are investigated for structural changes. To capture changes in mean,
+  variance, and skewness of inflation rates, a generalized logistic
+  model is adopted and complemented with structural break tests and
+  breakpoint estimation techniques. These reveal considerable differences
+  in the patterns of inflation dynamics and the structural changes
+  therein. Overall, there is a convergence towards a lower mean inflation rate
+  with reduced skewness, but it is accompanied by an increase in variance.
+\end{abstract}
+
+\noindent {\bf Keywords:} inflation rate, structural break, EMU, generalized logistic distribution.
+
+
+<<preliminaries>>=
+## locale settings
+if(Sys.getlocale() != "C") Sys.setlocale("LC_TIME", "English")
+
+## packages
+library("glogis")
+library("fxregime")
+
+## additional moment method
+moments <- function(object, ...) UseMethod("moments")
+moments.glogisfit <- function(object, ...) object$moments
+moments.breakpoints.glogisfit <- function(object, breaks = NULL, ...)
+  t(sapply(refit(object, breaks = breaks), "[[", "moments"))
+
+## convenience formatting function
+round3 <- function(x) format(round(x, digits = 3), nsmall = 3)
+@  
+
+\section{Introduction}
+
+Since the beginning of the European Union (EU), the topic of a common currency
+was a controversial issue. Although the Economic and Monetary Union (EMU) is now
+a fact, the discussion about the economic effects of the euro is far from being
+settled. The controversial topics range from the question of whether or not the
+eurozone is indeed an optimal currency area \citep[as developed in][]{Mundell:1961},
+all the way to the very survival of the euro in light of
+the budgetary problems of some of its member states. The effects of monetary
+unions on a number of macroeconomic indicators, with inflation being of increased
+importance, is at the center of an ongoing debate. This
+concerns the issue of short-run and steady-state inflation uncertainty -- in relation
+to inflation expectations -- as dealt with in \citet{cap}, or the degree of
+similarity of short-run dynamic properties of the inflation rates in EU
+countries, which is the topic of the investigation by \citet{palomba}. 
+Throughout the literature, there is still a considerable degree of uncertainty
+as to what extent the introduction of the euro, or monetary unions in general,
+affects the inflation rate. 
+
+As the way towards the EMU essentially consisted of three stages (I:~1990--1994,
+a phase of liberalization; II: 1995--1998, a phase of convergence; III: 1999--2001,
+a transition period ending with the replacement of the national currencies by the euro),
+it seems natural to ask whether this transition was accompanied by structural changes
+in the inflation dynamics in the different European countries. Furthermore, a
+possible fourth stage is the continuing integration of new member states, mostly
+former communist countries. Typically, changes in the mean level of the
+inflation rates attract the widest interest, but there are also reasons for investigating
+changes in higher moments, such as variance and skewness. \citet{emerson} emphasize that
+a high inflation rate is usually also more variable and uncertain and thus
+causes more relative price variability, leading to a less
+efficient price mechanism. Furthermore, \cite{jaro} finds a positive correlation
+between the level and the standard deviation of inflation.
+
+%% From an economic point of view, a very volatile inflation rate will 
+%% likely  contribute to greater macroeconomic instability. In the literature,
+%% there is no consensus about the effects of higher  inflation volatility on the
+%% inflation rate. \citet{grier} find no evidence that higher inflation
+%% uncertainty raises the average inflation rate -- at least in the case of the
+%% USA. Naturally, an efficient price mechanism will
+%% benefit from inflation rates that do not diverge too much from the expectations.
+
+%% Any new state that wants to join the EMU is first obliged to fulfill the
+%% Maastricht criteria, which, besides setting rules for government debts and
+%% interest rates, also requires the participation in the ERM~II (Exchange Rate
+%% Mechanism~II) for two years, while the exchange rates towards the euro are not
+%% allowed to cross the nominal band.
+
+Therefore, a thorough investigation of the evolution of the inflation dynamics
+within a country over time requires assessment not only of the mean level, but
+also of higher moments. Hence, we contribute to this field of research by
+developing a new method for testing for structural breaks based on a generalized
+logistic (GL) distribution. This provides flexible modeling of means, variances,
+and skewness, while also allowing for fat tails. Structural breaks are tested
+using score-based tests \citep{Andrews:1993,Zeileis:2005} and breakpoints are estimated
+by extending the least squares approach of \cite{bp03} to (quasi-)maximum likelihood
+estimation of GL distributions \citep[similar in spirit to the Gaussian model
+employed by][]{Zeileis+Shah+Patnaik:2010}.
+
+The empirical results show that there are different patterns and timings of
+structural breaks in the inflation dynamics of different groups of countries.
+Inflation rates in the core euro area did not change significantly after
+completion of the first convergence stage, yielding low mean and variance.
+The Southern euro area member states (and Ireland), on the other hand, managed
+to decrease the mean level of inflation in the mid-1990s, but at the price
+of higher volatility. Finally, the Eastern European countries reduced both mean
+and variance on their way towards joining the EMU. Generally, the inflation rates
+converged from very different distributions at the beginning of the sample to
+rather similar patterns at the end of the 2000s. Skewness also plays an
+important role in this convergence: Some Southern and Eastern countries
+have clear breaks from right-skewed to roughly symmetric inflation rates,
+signaling a reduction of size and frequency of outlying high inflation rates.
+
+The  remainder of this paper is
+structured as follows: Section~\ref{sec:data} briefly presents the data,
+Section~\ref{sec:model} introduces the model and the estimation techniques used,
+%% Section~\ref{sec:slovenia} illustrates our approach using Slovenia as an example, 
+Section~\ref{sec:results} discusses the empirical results, and
+Section~\ref{sec:conclusion} concludes. 
+
+
+\section{Data}\label{sec:data}
+
+<<data>>=
+data("hicps", package = "glogis")
+eu <- na.omit(hicps[, "EU"])
+## do not include EU for figures
+hicps <- hicps[, colnames(hicps) != "EU"]
+@
+
+All empirical analyses are based on seasonally adjusted inflation rates (in percent)
+for \Sexpr{ncol(hicps)}~countries
+(\Sexpr{gsub("UK", "United Kingdom", gsub("CzechRep", "Czech Rep", paste(colnames(hicps), collapse = ", "), fixed = TRUE), fixed = TRUE)})
+in the time period from the early or mid-1990s to the end of 2010.
+The original data source are seasonally unadjusted HICP series provided by the
+\citet{oecd} from January~1990 (if available) to December~2010, that were transformed
+to inflation rates using log-returns and subsequent seasonal adjustment
+via X-12-ARIMA \citep{Findley+Monsell+Bell:1998}.
+
+The countries in this sample can be divided into three different groups: (1)~euro
+countries -- Austria, Belgium, Estonia, France, Finland, Germany, Greece,
+Ireland, Italy, Luxembourg, Netherlands, Portugal, Slovakia, Slovenia,
+Spain; (2)~EU members not participating in the ERM~II -- Czech Republic,
+Hungary, Poland, United Kingdom, Sweden; (3)~Denmark which stands on its own as a
+member of the EU and the ERM~II, but not yet of the EMU. 
+Latvia, Lithuania, Bulgaria, Romania are excluded due to data scarcity.
+Cyprus, and Malta are not included since they are very small economies. 
+%% and are also not members of the OECD
+
+Seasonal adjustment is necessary due to the harmonization of the treatment
+of sales prices\footnote{Inclusion of sales prices in the HICP was demanded by
+a Commission regulation \citep[see][for details]{eurlex}.} in the HICP, resulting in
+changes of the seasonal inflation patterns over time within several countries
+and also between the countries. See \citet{pltm} for a detailed discussion.
+
+
+\section{Model}\label{sec:model}
+
+The goal of the modeling strategy, that is subsequently introduced, is the
+following: detection of structural changes in the distributional properties of
+the inflation rates over time, e.g., as potentially caused by interventions.
+However, unlike many standard least squares approaches \citep[such as][]{bp03},
+not only changes in the mean level should be addressed, but also changes in
+variance and potential skewness.
+
+Hence, a likelihood-based model is adopted that can also incorporate stylized
+facts for return data, such as heavy tails and skewness. Here, the seasonally
+adjusted returns $y_i$ ($i = 1, \dots, n$) are assumed to come from a
+generalized logistic (GL) distribution \citep[see][]{johnson} with
+three-dimensional parameter $\phi_i = (\theta_i, \sigma_i, \delta_i)^\top$ for
+location~$\theta_i$, scale~$\sigma_i$, and shape~$\delta_i$ at time $i$. Structural change
+techniques are then employed to check whether the parameter vector $\phi_i$
+remains constant over time and, if that is not the case, when and how the
+parameters change. This framework allows to trace breaks in the
+evolution of mean, variance, and skewness of the inflation series which may
+possibly be linked to underlying regime changes, e.g., in monetary policy.
+
+For estimation of the parameters, a (quasi-)maximum likelihood framework is
+adopted and the observations are assumed to be (approximately) independent,
+i.e., potential autocorrelation is treated as a nuisance parameter and not
+explicitly incorporated in the model. The motivation for this is to focus on the
+shifts in mean, variance, and skewness -- and it turns out to be a useful model
+for the data under investigation because only negligible amounts of residual
+autocorrelation remain after incorporation of the structural breaks. If the
+focus of the analysis were the dynamics in the autocorrelation, higher frequency
+data would be required, e.g., in order to apply techniques such as those
+expounded by \citet{andreou}.\footnote{For example, it would be conceivable to
+obtain high-frequency data for certain years from the Billion Prices Project of
+the \citet{bpp}; however, this is not pursued here.} 
+
+In the following, details are provided about (1)~the GL distribution and its properties,
+(2)~how it can be estimated (under parameter stability), (3)~how parameter stability
+can be assessed, and (4)~how breakpoints can be estimated in the presence of parameter
+instability.
+
+
+\subsection{Generalized logistic distribution}\label{sec:gld}
+
+The logistic distribution is often used in econometrics in the
+context of income and growth models due to its fatter tails compared to the 
+normal distribution -- it has also been applied to the modeling of expected
+inflation rates by \citet{batchelor}. Its generalization -- which additionally
+allows for asymmetries -- has been applied to analyze extreme risks in the context of stock markets \citep[e.g., by][]{tolikas}
+but has not yet been applied -- to the best of our knowledge -- to inflation rates.
+However, it will prove to be a rather simple model that fits HICP inflation rates
+quite well.
+
+The GL distribution employed here corresponds to the type~1 GL distribution 
+from \citet{johnson}, using the parametrization and inference as in \citet{Shao:2002}. It 
+has the log-density function
+%
+\begin{eqnarray}
+%% f(y ~|~ \theta, \sigma, \delta) & = &
+%% \frac{\frac{\delta}{\sigma} \cdot \exp\{-\frac{y - \theta}{\sigma}\}}{(1+\exp\{-\frac{y - \theta}{\sigma}\})^{(\delta+1)}} 
+\ell(y ~|~ \theta, \sigma, \delta) & = & \log(\delta) - \log(\sigma) - \frac{y - \theta}{\sigma} -
+                                         (\delta + 1) \cdot \log\left(1 + \exp\left\{-\frac{y - \theta}{\sigma}\right\}\right)
+\label{eq:dglogis}
+\end{eqnarray}
+%
+with location~$\theta$, scale~$\sigma > 0$, and shape~$\delta > 0$. For $\delta = 1$ the
+distribution simplifies to the logistic distribution, for $\delta < 1$ or $> 1$ it is
+left- or right-skewed, respectively. The corresponding first three moments are
+%
+\begin{eqnarray}
+\mathrm{E}(y) & = & \theta + \sigma (\gamma(\delta) - \gamma(1)) \\
+\mathrm{Var}(y)  & = & \sigma^2(\gamma'(\delta)+\gamma'(1)) \\
+\mathrm{Skew}(y) & = & \frac{\gamma''(\delta)-\gamma''(1)}{(\gamma'(\delta)+\gamma'(1))^{3/2}}
+\end{eqnarray}
+%
+where $\gamma(\cdot)$, $\gamma'(\cdot)$, and $\gamma''(\cdot)$ are the digamma function and its
+first and second derivative, respectively.
+
+The corresponding score function, i.e., the derivative of the log-density with respect
+to the parameter vector, is given by
+%
+\begin{equation}
+s(y ~|~ \phi) ~=~ \frac{\partial \ell(y ~|~ \phi)}{\partial \phi}  ~=~ \left(
+  \begin{gathered}
+    \frac{1}{\sigma} - \frac{(\delta + 1) \tilde{y}}{\sigma (1 + \tilde{y})} \\
+    \left\{ \frac{1}{\sigma} - \frac{(\delta + 1) \tilde{y}}{\sigma (1 + \tilde{y})} \right\} \cdot \frac{y - \theta}{\sigma} -\frac{1}{\sigma} \\
+    \frac{1}{\delta} - \log(1 + \tilde{y})
+  \end{gathered} \right)
+\end{equation}
+%
+where $\phi = (\theta, \sigma, \delta)^\top$ and
+$\tilde{y} = \exp\{- (y - \theta)/\sigma\}$.
+
+
+\subsection{Estimation}
+
+Under the assumption that $y_i \sim \mathit{GL}(\theta, \sigma, \delta)$
+for $i = 1, \dots, n$ independently -- i.e., are independent realizations from
+a GL distribution with parameter vector $\phi = (\theta, \sigma, \delta)^\top$ --
+the parameters can be estimated as usual by maximum likelihood (ML):
+$\hat \phi ~=~ \argmax_\phi \sum_{i = 1}^n \ell(y_i | \phi)$. The corresponding
+first order condition is $\sum_{i = 1}^n s(y_i | \hat \phi) = 0$.
+
+To guard the inference against potential misspecification, e.g., autocorrelation or
+misspecification of higher moments of the distribution, one can treat $\hat \phi$
+as the quasi-maximum-likelihood (QML) estimator and adjust the inference by using
+heteroskedasticity and autocorrelation consistent (HAC) covariance matrix
+estimators \citep[see e.g.,][]{Andrews:1991}.
+
+If the parameters are potentially varying over time --
+$y_i \sim \mathit{GL}(\theta_i, \sigma_i, \delta_i)$ -- then $\hat \phi$ is the (Q)ML
+estimator under the null hypothesis of parameter stability
+%
+\begin{equation} \label{eq:h0}
+  H_0:~ \phi_i ~=~ \phi_0 \quad (i = 1, \dots, n)
+\end{equation}
+%
+which should be tested against the alternative $H_1$ that at least one of the
+parameters changes over time.
+
+\subsection{Test for structural change}
+
+The null hypothesis of parameter stability (\ref{eq:h0}) can be assessed using the empirical
+scores $s(y_i | \hat \phi)$ as measures of model deviation \citep{Zeileis+Hornik:2007} from the
+model fit under $H_0$. Systematic deviations over time from the full sample estimates $\hat \phi$
+can then be captured by cumulative sums of the empirical scores in an empirical fluctuation
+process $\mathit{efp}(t)$:
+%
+\begin{equation} \label{eq:efp}
+\mathit{efp}(t) ~=~ \hat V^{-1/2} n^{-1/2} \sum_{i = 1}^{\lfloor nt \rfloor}
+  s(y_i ~|~ \hat \phi) \quad (0 \leq t \leq 1),
+\end{equation}
+%
+where $\hat V$ is some consistent estimator of the variance of the scores. Below,
+we use the outer product of gradients $s(y_i | \hat \phi)$ to estimate $\hat V$.
+Alternatively, HAC estimators could be used leading to the same qualitative
+results for the data under investigation.
+
+As usual in structural change analysis, a functional central limit theorem holds for
+$\mathit{efp}(\cdot)$, which converges to a 3-dimensional Brownian
+bridge: $\mathit{efp}(\cdot) ~\overset{d}{\rightarrow}~ W^0(\cdot)$. Based on
+this, various types of test statistics can be computed
+(see \citealp{Zeileis:2005} for details). In the following, the 
+sup$\mathit{LM}$ test of \cite{Andrews:1993} is employed, which performs particularly
+well for single shift alternatives and if several of the three distribution
+parameters change simultaneously. The test statistic with 10\% trimming is given by
+%
+\begin{eqnarray}
+\sup_{t \in [0.1, 0.9]} \frac{\Vert \mathit{efp}(t) \Vert_2^2}{t(1-t)} \nonumber
+\end{eqnarray}
+%
+and the appropriate $p$~values can be computed from the corresponding
+limiting distribution -- with $\mathit{efp}(t)$ replaced by $W^0(t)$.
+
+
+\subsection{Breakpoint estimation}
+
+If the null hypothesis of parameter stability (\ref{eq:h0}) is rejected, a natural
+strategy is to assume that there are $B$ breakpoints with stable parameters within
+each of the resulting segments. \cite{bp03} have established a rigorous inference
+framework in this situation for least squares estimation which has been extended by
+\cite{Zeileis+Shah+Patnaik:2010} to (Q)ML estimation. Here, we follow the same ideas
+and maximize the full segmented log-likelihood
+%
+\begin{equation*}
+  \sum_{b = 1}^{B+1} \sum_{i = \tau_b + 1}^{\tau_b} \ell(y_i ~|~ \phi^{(b)})
+\end{equation*}
+%
+for joint estimation of the breakpoints $\tau_1, \dots, \tau_B$ and the segment-specific
+GL parameters $\phi^{(b)}$ ($b = 1, \dots, B + 1$). Following the recommendations
+of \cite{bp03}, a modified Bayes information criterion \citep[LWZ, proposed by][]{liu}
+is employed selecting the number of breakpoints $B$.
+
+<<analysis-results>>=
+## country names
+nam <- c(colnames(hicps), "EU")
+
+## run analysis (for seasonally adjusted data)
+root_dir <- do.call("file.path", as.list(head(strsplit(getwd(), .Platform$file.sep)[[1]], -1)))
+if(!all(file.exists(file.path(root_dir, "Analysis", paste(nam, "rda", sep = "."))))) {
+setwd(file.path(root_dir, "Analysis"))
+Sweave("results-adjusted.Rnw")
+setwd(file.path(root_dir, "Paper"))
+}
+
+## set up named results list
+results <- vector(length = length(nam), mode = "list")
+names(results) <- nam
+
+erm <- yearmon(c(
+  Austria = 1995,
+  Belgium = 1979 + 2/12,
+  CzechRepubic = NA, 
+  Denmark = 1979 + 2/12,
+  Estonia = NA,
+  Finland = 1996 + 9/12,
+  France = 1979 + 2/12,
+  Germany = 1979 + 2/12,
+  Greece = 1998 + 2/12,
+  Hungary = NA,
+  Ireland = 1979 + 2/12,
+  Italy = 1979 + 2/12,
+  Luxembourg = 1979 + 2/12,
+  Netherlands = 1979 + 2/12,
+  Poland = NA,
+  Portugal = 1992 + 3/12,
+  Slovakia = NA,
+  Slovenia = NA,
+  Spain = 1986 + 5/12,
+  Sweden = NA ,
+  UK = NA,
+  EU = NA
+))
+
+erm2 <- yearmon(c(
+  Austria = NA,
+  Belgium = NA,
+  CzechRepubic = NA, 
+  Denmark = 1999,
+  Estonia = 2004 + 5/12,
+  Finland = NA,
+  France = NA,
+  Germany = NA,
+  Greece = 1999,
+  Hungary = NA,
+  Ireland = NA,
+  Italy = NA,
+  Luxembourg = NA,
+  Netherlands = NA,
+  Poland = NA,
+  Portugal = NA,
+  Slovakia = 2005 + 10/12,
+  Slovenia = 2004 + 5/12,
+  Spain = NA,
+  Sweden = NA ,
+  UK = NA,
+  EU = NA
+))
+
+eur <- yearmon(c(
+  Austria = 1999,
+  Belgium = 1999,
+  CzechRepubic = NA, 
+  Denmark = NA,
+  Estonia = 2011,
+  Finland = 1999,
+  France = 1999,
+  Germany = 1999,
+  Greece = 2001,
+  Hungary = NA,
+  Ireland = 1999,
+  Italy = 1999,
+  Luxembourg = 1999,
+  Netherlands = 1999,
+  Poland = NA,
+  Portugal = 1999,
+  Slovakia = 2009,
+  Slovenia = 2007,
+  Spain = 1999,
+  Sweden = NA ,
+  UK = NA,
+  EU = NA
+))
+
+for(i in seq_along(nam)) {
+  load(file.path(root_dir, "Analysis", paste(nam[i], "rda", sep = ".")))
+  results[[i]] <- list(
+    data = x,
+    model0 = x_gf,
+    efp = x_efp,
+    nbreaks = x_nbreaks,
+    breakpoints = x_bp,
+    model = x_rf,
+    erm = erm[i],
+    erm2 = erm2[i],
+    eur = eur[i])
+}
+@
+
+
+\subsection{An example: Slovenia}\label{sec:slovenia}
+
+<<slovenia>>=
+x <- results$Slovenia
+x$efp2 <- gefp(x$model0, fit = NULL, vcov = kernHAC)
+spval <- c(sctest(x$efp, functional = supLM(0.1))$p.value,
+  sctest(x$efp2, functional = supLM(0.1))$p.value)
+spval <- ifelse(spval < 0.001, "$< 0.001$", format(round(spval, digits = 4), nsmall = 4))
+@
+
+To illustrate the proposed strategy, the case of Slovenia is considered. After a period of
+relative instability following the independence from Yugoslavia, Slovenia was
+successful in realigning its economy and introduced a number of reforms leading
+to stable growth in recent years. The good economic performance made it
+possible for Slovenia to enter the ERM~II in June~2004 and later on to introduce
+the euro in January~2007. The seasonally adjusted inflation series for Slovenia encompasses
+the time from \Sexpr{start(x$data)} to \Sexpr{end(x$data)} and is depicted in the left
+panel of Figure~\ref{fig:slovenia1}.
+
+\begin{figure}[t!]
+<<slovenia-plots1, fig=TRUE, height=4.2, width=9.6>>=
+par(mfrow = c(1, 2))
+plot(x$data, main = "", ylab = "Monthly inflation rate (in percent)", xlab = "Time")
+lines(x$breakpoints, breaks = x$nbreaks)
+lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
+if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks))
+plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics")
+lines(x$breakpoints, breaks = x$nbreakss)
+@
+\caption{\label{fig:slovenia1} Inflation rate series for Slovenia
+with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
+from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
+with sequence of $\mathit{LM}$~statistics,
+critical value at 5\% level (horizontal red line), and estimated breakpoint (vertical dashed line).}
+
+<<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
+par(mfrow = c(1, 2))
+for(i in 1:2) plot(x$model[[i]], moments = TRUE,
+  xlim = c(-1.5, 2.2), ylim = c(0, 1.3),
+  breaks = seq(-1.5, 2, by = 0.25),
+  xlab = paste(names(x$model)[i], "\n", "Goodness-of-fit p-value: ",
+    format.pval(summary(x$model[[i]])$chisq.test$p.value, digits = 4),
+    sep = ""))
+@
+\caption{\label{fig:slovenia2} Histogram of observed monthly inflation rates in
+Slovenia for \Sexpr{names(x$model)[1]} (left) and \Sexpr{names(x$model)[1]} (right),
+along with fitted generalized logistic probability density function, associated
+moments, and $\chi^2$ goodness-of-fit test.}
+\end{figure}
+
+Assuming a single stable set of parameters as in (\ref{eq:h0}) is  not valid, since the
+sequence of $\mathit{LM}$~statistics (see right panel of Figure~\ref{fig:slovenia1}) clearly
+exceeds its 5\% critical value (red horizontal line), leading to a highly significant
+$p$-value \Sexpr{spval[1]}. If a quadratic spectral kernel HAC estimator \citep{Andrews:1991}
+would have been used to adjust (\ref{eq:efp}), the resulting $p$-value would be somewhat
+larger with \Sexpr{spval[2]} but still clearly significant.
+
+As there is evidence for at least one break, the LWZ criterion is employed for $B = 1, 2, \dots$
+breakpoints with a minimal segment size of two years per segment. It assumes its minimum for $B = 1$
+associated with the breakpoint \Sexpr{breakdates(x$breakpoints, breaks = x$nbreaks)}, depicted
+by a vertical dashed line in both panels of Figure~\ref{fig:slovenia1}. The resulting segmented
+fitted mean (horizontal blue lines in the left panel Figure~\ref{fig:slovenia1}) shows that
+before the break, Slovenia experienced very high inflation rates but was successful in reducing
+inflation to a much lower level afterwards.
+
+This decrease in inflation is also conveyed by Figure~\ref{fig:slovenia2} that shows the
+observed histograms of inflation rates before and after the breakpoint along with the
+fitted GL distribution. This highlights that along with the decrease in mean level, the variance increases
+somewhat and -- probably more interestingly -- the distribution changes from being right-skewed to
+slightly left-skewed. This confirms that very high inflation rates that occurred in several
+months before the breakpoint could be avoided afterwards. Furthermore, Figure~\ref{fig:slovenia2}
+shows that the GL distribution fits the observed data very well, both before and after the
+breakpoint, with $p$~values from $\chi^2$ goodness-of-fit tests of
+\Sexpr{round3(summary(x$model[[1]])$chisq.test$p.value)} and
+\Sexpr{round3(summary(x$model[[2]])$chisq.test$p.value)}, respectively.
+
+The estimated breakpoint can be matched very well with the timing of financial reforms
+in Slovenia that severely decreased the annual growth in the M3 monetary aggregate.
+The success of these actions ensured the Slovenian participation in
+the ERM~II only a year later and the introduction of the euro two years afterwards. 
+
+
+\section{Results}\label{sec:results}
+
+<<cross-country, echo=FALSE, results=hide>>=
+cross_country_moments <- function(countries, date,
+  probs = c(0.25, 0.5, 0.75))
+{
+  ret <- mat.or.vec(9, length(date)) 
+  for(jj in 1:length(date)) {
+    rval <- sapply(countries, function(country) {
+      nb <- results[[country]]$nbreaks 
+      m <- t(sapply(results[[country]]$model, moments)) 
+      bd <- if(nb < 1) { 
+        end(results[[country]]$data) 
+      } else {
+        breakdates(results[[country]]$breakpoints, breaks = nb) 
+      }
+      m[sum(as.yearmon(date[jj]) > bd) + 1, ] 
+    })
+    v1 <- apply(rval, 1, quantile, probs = probs)
+    ret[1:3, jj] <- v1[,1] 
+    ret[4:6, jj] <- v1[,2] 
+    ret[7:9, jj] <- v1[,3]  
+  }
+  return(ret)
+}
+
+format_cross_country <- function(x, digits = 3, columns = 1:NCOL(x)) {
+  rval <- format(round(x, digits = digits), nsmall = digits)
+  for(i in which(!(1:NCOL(rval) %in% columns))) rval[, i] <- c(rep("", 4), "\\cdots", rep("", 4))
+  rval <- cbind("", "", matrix(paste("$", rval, "$", sep=""), ncol = 4))
+  rval[, 1] <- c("Mean", "", "", "Variance", "", "", "Skewness", "", "")
+  rval[, 2] <- rep(c("Lower", "Median", "Upper"), 3)
+  rval <- apply(rval, 1, paste, collapse = " & ")
+  rval <- paste(rval, "\\\\")
+  rval[length(rval)] <- paste(rval[length(rval)], "\\hline")
+  return(rval)
+}
+
+yrs <- c(1994, 1998, 2007, 2010)
+euro <- c(1, 2, 6, 7, 8, 13, 14)
+others <- c(3, 4, 5, 10, 15, 17, 18, 20, 21)
+piigs <- c(9, 11, 12, 16, 19)
+@
+
+To investigate the effects of the EMU on national inflation rates, the
+techniques expounded in Section~\ref{sec:model} are employed to
+uncover changes in the dynamics of European inflation rates. The inflation
+dynamics within countries from the euro-zone (but also other European
+countries) is closely related with the question about the convergence
+of the national inflation rates of the EMU members towards some common mean.
+Many researchers provide evidence against convergence among European countries, e.g.,
+\citet{hofmann} find considerable amounts of inflation differentials and
+\citet{cap} describe rather strong heterogeneity among 12~EMU countries, both
+in terms of average inflation and its degree of persistence. 
+
+To explore the question of convergence, we proceed in two steps:
+First, in Section~\ref{sec:bpresults}, the estimation technique proposed
+in Section~\ref{sec:model} is applied to each of the countries included in
+the data set (see Section~\ref{sec:data}). Second, Section~\ref{sec:aggregate}
+aggregates the results from each individual country to reveal different
+potential convergence patterns over time within three groups of countries:
+core-euro (\Sexpr{paste(colnames(hicps)[euro], collapse = ", ")}),
+PIIGS  (\Sexpr{paste(colnames(hicps)[piigs[c(4, 2, 3, 1, 5)]], collapse = ", ")}), and the
+other countries (\Sexpr{paste(gsub("CzechRepublic", "Czech Republic", colnames(hicps))[others], collapse = ", ")}).
+
+Finally, Section~\ref{sec:fcrisis} focuses on the question of changes
+in the inflation dynamics during the 2008/2009 financial crisis.
+
+
+<<results-moments>>=
+## compute moments
+mom <- lapply(results, function(obj) t(sapply(obj$model, moments)))
+names(mom)[names(mom) == "CzechRepublic"] <- "Czech Rep."
+
+## LaTeX formatting
+format_moments <- function(i, digits = 3) {
+  rval <- format(round(mom[[i]], digits = digits), nsmall = digits)
+  rval <- cbind("", rownames(rval), matrix(paste("$", rval, "$", sep = ""), ncol = 3), "", "", "")
+  rval[1,1] <- if(is.character(i)) i else names(mom)[i]
+  rval[1,6] <- if(is.na(results[[i]]$erm)) "--" else format(results[[i]]$erm)
+  rval[1,7] <- if(is.na(results[[i]]$erm2)) "--" else format(results[[i]]$erm2)
+  rval[1,8] <- if(is.na(results[[i]]$eur)) "--" else format(results[[i]]$eur)
+  rval <- apply(rval, 1, paste, collapse = " & ")
+  rval <- paste(rval, "\\\\")
+  rval[length(rval)] <- paste(rval[length(rval)], "\\hline")
+  return(rval)
+}
+@
+    
+\renewcommand{\baselinestretch}{1.15}
+\begin{table}[p!]
+\begin{center}
+\footnotesize
+\begin{tabular}{llrrrlll}
+\hline
+Country & Segment & Mean & Variance & Skewness & ERM & ERM~II & Euro \\
+\hline
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{No change}} \\
+\hline
+<<moments-table1, results=tex>>=
+writeLines(unlist(lapply(c(2, 4, 8, 14), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Phase~1 convergence}} \\
+\hline
+<<moments-table2, results=tex>>=
+writeLines(unlist(lapply(c(1, 6, 7), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Phase~2 convergence}} \\
+\hline
+<<moments-table3, results=tex>>=
+writeLines(unlist(lapply(c(9, 12, 13, 16), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Financial crisis}} \\
+\hline
+<<moments-table4, results=tex>>=
+writeLines(unlist(lapply(c(11, 19), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Non-euro}} \\
+\hline
+<<moments-table5, results=tex>>=
+writeLines(unlist(lapply(c(20, 21), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Eastern countries}} \\
+\hline
+<<moments-table6, results=tex>>=
+writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_moments)))
+@
+
+\noalign{\medskip}
+\multicolumn{8}{l}{\emph{Euro area}} \\
+\hline
+<<moments-table6, results=tex>>=
+writeLines(unlist(lapply(22, format_moments)))
+@
+
+\end{tabular}
+
+\caption{\label{tab:results1} Estimated breakpoints, fitted moments of generalized logistic
+distribution per segment, and ERM information for all countries under investigation.}
+\end{center}
+\end{table}
+\renewcommand{\baselinestretch}{1.52}
+
+
+\subsection{Inflation dynamics on a national level}\label{sec:bpresults}
+
+As a first step towards the investigation of inflation convergence, the
+structural breaks in the inflation dynamics within each country are
+investigated using the methods introduced in Section~\ref{sec:model}.
+Table~\ref{tab:results1} reports the estimated breakpoints along with the
+segment-specific moments (mean, variance, skewness) implied by the corresponding
+parameter estimates. Furthermore, entry dates for ERM/ERM~II and the euro are
+included as additional information. For ease of interpretation, countries with
+similar patterns of change are grouped together and ordered alphabetically
+within each group. If there is only a single segment, the sup$\mathit{LM}$ test
+was non-significant at the 5\% level. In significant cases, the number of
+breakpoints was selected via the LWZ criterion and subsequently all parameters
+(breakpoints and segment-specific GL parameters) were estimated by ML. No
+HAC~correction was employed as there was only negligible autocorrelation in the
+empirical scores after inclusion of the breakpoints (if any).
+In Table~\ref{tab:results1} the countries are grouped according to either a
+similar timing of the changes in inflation dynamics or according to economic similarities, 
+as in the case of the former communist countries in Eastern Europe.
+
+The first group that draws particular attention consists of the former
+DEM (Deutsche Mark) zone countries, with the exception of Austria and
+Luxembourg. All these countries had and still have a very low inflation rate,
+both in terms of mean and variance, and their inflation dynamics
+did not change significantly. This is plausible from an economic point of view
+since the European central bank (ECB) is modeled after the Deutsche Bundesbank and the ECB did not
+-- until recently -- diverge much from the monetary policy of the former. Thus,
+the EMU did have no effect on inflation dynamics since the policies in
+these countries were already much in line with Germany and hence the ECB. 
+
+%% source for DM zone: http://ec.europa.eu/economy_finance/publications/publication6730_de.pdf
+
+Austria, Finland, and France adjusted to the requirements of the EMU during the
+first phase of convergence. In these countries,
+the result of the adjustment process was a lower inflation rate and an overall
+decrease in the variance. 
+
+The next group consists of three of the PIIGS countries and Luxembourg. Greece and
+Portugal adjusted to the ERM shortly before or after its introduction.
+Italy was successful in reducing its inflation rate, whereas Luxembourg
+experienced a strong increase in its formerly very low inflation rate, both
+in terms of mean and variance, also associated with a shift in skewness towards the
+left. Apart from Luxembourg, the countries that had a structural break during the second 
+phase of convergence were also successful in reducing mean inflation rates.
+After the changes in this group, all countries have rather similar mean inflation
+rates, which are closer to the levels of the previous two groups.
+
+The fourth subgroup consists of two of the PIIGS countries, namely Ireland and Spain.  
+There is a break in both countries in the summer of 2008 that captures the effects of
+the financial crisis and the severe problems concerning the real estate situation.
+In both countries, this had a strong deflationary impact, with deflation in Ireland
+over an extended period of time. In Spain, which was affected by a housing bubble of  
+roughly the same size as Ireland, the housing prices did not adjust so abruptly and  
+so strongly.
+
+The next group consists of two countries that, after a very short participation in the
+ERM, decided not to be part of it and hence also not to participate in the EMU:
+the United Kingdom and Sweden. Both show clear breaks in the early 1990s which can be
+traced back to economic crises: the currency crisis of the United Kingdom cumulating
+into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
+1990s. 
+
+The last group consists of the Eastern European countries: Czech Republic,
+Estonia, Hungary, Poland, Slovakia, and Slovenia. In almost all of these
+countries, the mean and the variance of their inflation rates declined in the
+late 1990s or early 2000s. Czech Republic, Estonia and Hungary experienced a break in 1997/1998
+resulting from efforts to curb in inflation by decreasing the growth of the money 
+supply. The timing of the break thus indicates the date when the the biggest
+transitionally shocks on the way towards free market economies have been overcome. In Poland, this
+transition took two more years. Slovakia and Slovenia are somewhat different: On the one hand,
+they started with lower mean inflation rates and on the other hand, their inflation dynamics
+both changed roughly one year prior to their entry into the ERM~II.
+
+<<glmean>>=
+glmean <- function(x) {
+  if(any(is.na(x))) NA else glogisfit(x, hessian = FALSE)$moments[1]
+}
+  
+if(!file.exists(file.path(root_dir, "Analysis", "glmean.rda"))) {
+  hicp_glmean <- rollapply(hicps, 12, glmean)
+  setwd(file.path(root_dir, "Analysis"))
+  save(hicp_glmean, file = "glmean.rda")
+  setwd(file.path(root_dir, "Paper"))
+} else {
+  load(file.path(root_dir, "Analysis", "glmean.rda"))
+}
+@
+
+<<eu, echo=FALSE>>=
+eu_breaks <- breakdates(results$EU$breakpoints, breaks = results$EU$nbreaks)
+eu_mom <- moments(results$EU$breakpoints, breaks = results$EU$nbreaks)
+@
+
+Finally, the inflation rates for the whole euro area\footnote{This is the
+euro area 17~countries series as provided by the \citet{oecd},
+starting in \Sexpr{start(eu) - 1/12}. It is calculated as a weighted average of the HICPs
+of now seventeen euro countries.} are considered and
+three different regimes are found: (1)~until 1999 with both a low mean and
+variance, (2)~the third and final stage of monetary integration, accompanied
+by a significant increase in the mean, (3)~a period encompassing the
+overheating of the economy and its culmination in the financial crisis, showing a
+large increase in variance and a lower mean inflation.
+
+\subsection{Convergence on an aggregate level}\label{sec:aggregate}
+
+\renewcommand{\baselinestretch}{1.15}
+\begin{table}[t!]
+\begin{center}
+\begin{tabular}{llrrrr}
+\hline
+Moment & Quartile & \Sexpr{yrs[1]} & \Sexpr{yrs[2]} & \Sexpr{yrs[3]} & \Sexpr{yrs[4]}\\
+\hline
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Core euro}} \\
+\hline
+<<cross-country-table1, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(euro, yearmon(yrs)), columns = 1:2))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{PIIGS}} \\
+\hline
+<<cross-country-table2, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(piigs, yearmon(yrs)), columns = c(1:2, 4)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Other}} \\
+\hline
+<<cross-country-table3, echo=FALSE, results=tex>>=
+writeLines(format_cross_country(cross_country_moments(others, yearmon(yrs)), columns = c(1, 3)))
+@
+
+\end{tabular}
+\caption{\label{tab:results2} Aggregation of estimated moments from Table~\ref{tab:results1} across countries in
+Jan~\Sexpr{yrs[1]}, \Sexpr{yrs[2]}, \Sexpr{yrs[3]}, and \Sexpr{yrs[4]}. Dots signal that the moments have not
+changed from the previous time point, i.e., that no breakpoint was estimated in the corresponding time period.}
+\end{center}
+\end{table}
+\renewcommand{\baselinestretch}{1.52}
+
+
+Given the results above for the individual countries, a natural question is
+whether there is convergence on an aggregate level and, if so, which pattern it
+follows. Hence, we aggregate the results from Table~\ref{tab:results1} for the
+individual countries into three groups and at four time points to reflect the
+general dynamics of European inflation rates during the time period of interest.
+The groups have been selected based on prior expectations (i.e., not based on
+the breakpoints estimation results) as the ``core'' of the euro zone, the PIIGS countries,
+and the rest. Similarly, the time points have been chosen as to fall ``between''
+times where transitions in one or more groups of countries could be expected:
+Jan~\Sexpr{yrs[1]} during stage~I on the way towards the EMU, Jan~\Sexpr{yrs[2]}
+during stage~II, Jan~\Sexpr{yrs[3]} after transition into the EMU but before the
+financial crisis, and Jan~\Sexpr{yrs[4]} after the crisis. The result of these
+considerations is presented in Table~\ref{tab:results2} which extracts the three
+moments for each country from Table~\ref{tab:results1} at the indicated time
+points and aggregates them within the group. Lower quartile, median, and upper
+quartile (25\%, 50\%, 75\% percentiles) are provided to assess both changes in
+location and spread across countries.
+
+For the core euro countries, there are only changes from stage~I to stage~II
+because after \Sexpr{yrs[2]} no breaks have been detected. The changes in this
+first phase did not affect mean inflation much, while variance increased
+slightly (in both quartiles) and skewness decreased somewhat (from slightly
+right- to slightly left-skewed). The heterogeneity (assessed by the
+interquartile range) declined for all three moments of the inflation rates.
+This reflects that the monetary policies of the corresponding countries were
+already closely connected prior to stage~I and now even moved somewhat closer
+together.
+
+For the PIIGS countries, changes occurred from \Sexpr{yrs[1]} to
+\Sexpr{yrs[2]} and then again during the crisis, before \Sexpr{yrs[4]}.
+In the first phase, mean inflation was almost halved, accompanied by a
+doubling of variance and a change from clearly right-skewed to approximately
+symmetric. The latter reflects that the occurrence of shocks with high inflation
+rates have been successfully reduced. Moreover, the changes in the PIIGS
+countries between \Sexpr{yrs[3]} and \Sexpr{yrs[4]} lead to a further
+decrease in mean inflation and associated skewness which are both caused by
+several extremely low inflation rates during the time
+following the crisis.
+
+The other countries do not exhibit any significant breakpoints during the
+mid-1990s, but many changes occur in the transition period from \Sexpr{yrs[2]}
+to \Sexpr{yrs[3]}, encompassing both the completion of transformation from
+planned to free market economies and the intended entry into the EMU.
+During this time, the countries were successful in
+decreasing all three moments of their inflation distributions while
+simultaneously decreasing the heterogeneity (as captured by the corresponding
+interquartile ranges) across countries. Before the transition, all three
+moments were extremely large compared to the other two groups, while afterwards
+all moments are much closer to those of the other groups. In Jan~\Sexpr{yrs[3]},
+mean inflation is in between the levels for the core euro and PIIGS countries,
+variance is still slightly higher, and skewness is not too far away from symmetry.
+
+In context of the convergence issue, we find that up to \Sexpr{yrs[3]}
+the inflation dynamics of all three groups of countries become much
+more similar, both within and across groups. The interquartile ranges
+of the means decline and become tighter for all groups and there appears to
+be convergence towards some common mean inflation rate in the
+countries of our sample. Variances also move more closely together, corresponding
+to an increase for the core euro and PIIGS countries but a clear decrease
+for the others. Right-skewness (and thus large outlying inflation rates)
+has been reduced for all three groups of countries but to a different extent.
+Thus, while ending in similar inflation dynamics, the timing and patterns of
+changes in this convergence process are rather different across
+the three groups, depending on the different starting situations of the
+countries.
+
+
+\subsection{The influence of the financial crisis}\label{sec:fcrisis}
+
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure}[t!]
+\begin{center}
+<<glmean-plot, fig=TRUE, height=5, width=7.5>>=
+  gray_red <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0), alpha = 0.3)
+  gray_red1 <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0))
+  plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
+    xlab = "Time", ylab = "Monthly inflation rates")
+  for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
+@
+\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
+12-month rolling GL fits (red) over time for all countries.}
+\end{center}
+\end{figure}
+\setkeys{Gin}{width=\textwidth}
+
+
+The results from the previous sections convey that the financial
+crisis of 2008/2009 did not have a significant effect on the inflation dynamics
+in most of the European countries (except Ireland and Spain).
+This may be somewhat surprising and is not entirely correct. In fact,
+there is a rather clear effect, but as it is very short-lived and not
+persistent, it is not picked up by the structural break techniques.
+
+More specifically, the mean inflation of the euro area  from a GL fit in the 
+year before the crisis (\Sexpr{yearmon(2007 + 7/12)}--\Sexpr{yearmon(2008 + 6/12)}) was
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2007 + 7/12), end = yearmon(2008 + 6/12))))}$
+and after the crisis (\Sexpr{yearmon(2008 + 7/12)}--\Sexpr{yearmon(2009 + 6/12)}) it dropped to
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2008 + 7/12), end = yearmon(2009 + 6/12))))}$
+before rising again in the following year  (\Sexpr{yearmon(2009 + 7/12)}--\Sexpr{yearmon(2010 + 6/12)}):
+$\Sexpr{round3(glmean(window(eu, start = yearmon(2009 + 7/12), end = yearmon(2010 + 6/12))))}$.
+One way to bring out this pattern in graphically is
+Figure~\ref{fig:glmean}. It depicts the inflation rates (in gray) and a 12-month rolling mean (in red),
+calculated again as the first moment of a fitted GL distribution.
+The strong increase in mean inflation during the boom years of 2007/2008
+accompanied by an equally strong deflation following the burst of the bubble
+is clearly visible for most countries. However, the level of mean inflation
+did not change persistently, as the inflation rates seem to have returned to
+their prior path, conveying the same message as the inflation series of the
+euro area.
+
+As for the structural break methods adopted in the previous sections,
+this means that such rapid and non-persistent effects in the mean level
+are not picked up from low frequency data, like inflation rates. Instead,
+they may simply be attributed to increased variance. 
+
+Apart from bringing out more details about the short-term crisis effects,
+Figure~\ref{fig:glmean} also provides an alternative view on the
+long-range convergence behavior of the inflation rates studied in the
+previous sections. Over the 1990s and early 2000s, there is a clear
+general trend towards some common -- albeit broad -- mean level. 
+There is still some visible difference in the inflation rates, but the mean
+estimates are moving closer in a rather broad band. So contrary to
+\citet{palomba}, who find that the degree of similarity in short-run inflation
+dynamics is still weak, we find evidence of convergence within the countries in
+the sample.
+
+
+\section{Conclusion}\label{sec:conclusion}
+
+
+To assess changes in the dynamics of the inflation rates of a number of European countries
+-- both within and outside the EMU -- a new method for estimating structural breaks in
+inflation rates is proposed. The method allows to test for changes in mean, variance,
+and skewness of inflation rate series by adopting a (quasi-)likelihood model based on the generalized
+logistic (GL) distribution. Thus, unlike normally distributed models, this approach
+can deal with fat tails and (potentially changing) skewness.
+
+The empirical results suggest that a GL distribution is appropriate for modeling seasonally 
+adjusted inflation rate series and is able to uncover important changes in all three moments.
+Towards the end of the 2000s, before the financial crisis, our results broadly confirm
+convergence hypotheses, since the first three moments from all countries in our sample
+move closer together.
+Especially the changes in skewness -- caused by a reduction of size and frequency of outlying high inflation
+rates in some countries -- might have gone unnoticed with traditional structural change techniques,
+leading to potentially misleading conclusions concerning the dynamics. 
+
+At the beginning of the sample, many PIIGS and Eastern countries did have very high inflation
+rates, while for the core euro countries, convergence was already achieved in the mid-1990s.
+The PIIGS countries lowered their inflation rates considerably in preparation to the adoption
+of the euro. The Eastern European countries lowered their high initial inflation level in the
+late 1990s or early 2000s, prior to the entry into the ERM~II. They clearly benefited from the
+monetary discipline that is demanded for those countries who want to join the EMU. 
+
+\section*{COMPUTATIONAL DETAILS}
+
+Our results were obtained using 
+\proglang{R}~\Sexpr{paste(R.Version()[6:7], collapse = ".")} \citep{R} with the packages
+\pkg{glogis}~\Sexpr{packageDescription("glogis")["Version"]},
+\pkg{strucchange}~\Sexpr{packageDescription("strucchange")["Version"]} \citep{Zeileis+Leisch+Hornik:2002}, and
+\pkg{fxregime}~\Sexpr{packageDescription("fxregime")["Version"]} \citep{Zeileis+Shah+Patnaik:2010},
+all of which are available under the General Public License (GPL) from the
+Comprehensive \proglang{R} Archive Network (\url{http://CRAN.R-project.org/}). Package \pkg{strucchange} provides
+various techniques for inference in structural-change settings which are complemented
+with additional maximum-likelihood-based methods by \pkg{fxregime}. Inference for the
+generalized logistic model (that can be combined with \pkg{strucchange}/\pkg{fxregime})
+is implemented in the new package \pkg{glogis} that also contains the data used, both
+the raw monthly price indexes \citep[as provided by][]{oecd} and the seasonally adjusted
+monthly inflation rates. The seasonal adjustment was performed in \pkg{X-12-ARIMA}~0.3
+(\citealp{X-12-ARIMA}, see also \citealp{Findley+Monsell+Bell:1998}) through the interface
+provided by \proglang{gretl}~1.9.5 (\citealp{gretl}, see also \citealp{Smith+Mixon:2006} for a review).
+
+Replication scripts for all analyses are provided within the \pkg{glogis} package: An overview
+is provided in \code{demo(package = "glogis")} and the scripts can be launched easily, e.g.,
+via\linebreak \code{demo("Austria", package = "glogis")} etc.
+
+
+%% \section*{Acknowledgments}
+%% 
+%% We are grateful to Jesus Crespo Cuaresma for comments and discussions about
+%% an earlier version of the manuscript, and also to the participants of the workshop
+%% of the Research Platform ``Empirical and Experimental Economics'' for stimulating discussions,
+%% leading to substantial improvements of the paper.
+
+
+\bibliography{glogis}
+
+\end{document}

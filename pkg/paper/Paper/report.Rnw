@@ -1,5 +1,5 @@
 \documentclass[nojss]{jss}
-\usepackage{amsfonts,amstext,amsmath}
+\usepackage{amsfonts,amstext,amsmath,thumbpdf}
 \newcommand{\argmax}{\operatorname{argmax}\displaylimits}
 
 %% need no \usepackage{Sweave}
@@ -21,7 +21,6 @@
 %% {\small \it Department of Statistics, Universit\"at Innsbruck, Austria}}
 \Plainauthor{Thomas Windberger, Achim Zeileis}
 
-\renewcommand{\abstractname}{Summary}
 \Abstract{
   To assess the effects of the EMU on inflation rate dynamics of
   its member states, the inflation rate series for 21~European countries
@@ -1021,7 +1020,7 @@ of the Research Platform ``Empirical and Experimental Economics'' for stimulatin
 leading to substantial improvements of the paper.
 
 
-\bibliography{papers}
+\bibliography{glogis}
 
 \end{document}
 \SweaveOpts{eval=FALSE}
