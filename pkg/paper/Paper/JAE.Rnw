@@ -556,7 +556,7 @@ for(i in 1:2) plot(x$model[[i]], moments = TRUE,
     sep = ""))
 @
 \caption{\label{fig:slovenia2} Histogram of observed monthly inflation rates in
-Slovenia for \Sexpr{names(x$model)[1]} (left) and \Sexpr{names(x$model)[1]} (right),
+Slovenia for \Sexpr{names(x$model)[1]} (left) and \Sexpr{names(x$model)[2]} (right),
 along with fitted generalized logistic probability density function, associated
 moments, and $\chi^2$ goodness-of-fit test.}
 \end{figure}
@@ -572,7 +572,7 @@ As there is evidence for at least one break, the LWZ criterion is employed for $
 breakpoints with a minimal segment size of two years per segment. It assumes its minimum for $B = 1$
 associated with the breakpoint \Sexpr{breakdates(x$breakpoints, breaks = x$nbreaks)}, depicted
 by a vertical dashed line in both panels of Figure~\ref{fig:slovenia1}. The resulting segmented
-fitted mean (horizontal blue lines in the left panel Figure~\ref{fig:slovenia1}) shows that
+fitted mean (horizontal blue lines in the left panel of Figure~\ref{fig:slovenia1}) shows that
 before the break, Slovenia experienced very high inflation rates but was successful in reducing
 inflation to a much lower level afterwards.
 
@@ -814,7 +814,7 @@ into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the
 The last group consists of the Eastern European countries: Czech Republic,
 Estonia, Hungary, Poland, Slovakia, and Slovenia. In almost all of these
 countries, the mean and the variance of their inflation rates declined in the
-late 1990s or early 2000s. Czech Republic, Estonia and Hungary experienced a break in 1997/1998
+late 1990s or early 2000s. Czech Republic, Estonia, and Hungary experienced a break in 1997/1998
 resulting from efforts to curb in inflation by decreasing the growth of the money 
 supply. The timing of the break thus indicates the date when the the biggest
 transitionally shocks on the way towards free market economies have been overcome. In Poland, this
@@ -933,7 +933,7 @@ following the crisis.
 
 The other countries do not exhibit any significant breakpoints during the
 mid-1990s, but many changes occur in the transition period from \Sexpr{yrs[2]}
-to \Sexpr{yrs[3]}, encompassing both the completion of transformation from
+to \Sexpr{yrs[3]}, encompassing both the completion of the transformation from
 planned to free market economies and the intended entry into the EMU.
 During this time, the countries were successful in
 decreasing all three moments of their inflation distributions while
@@ -992,7 +992,7 @@ and after the crisis (\Sexpr{yearmon(2008 + 7/12)}--\Sexpr{yearmon(2009 + 6/12)}
 $\Sexpr{round3(glmean(window(eu, start = yearmon(2008 + 7/12), end = yearmon(2009 + 6/12))))}$
 before rising again in the following year  (\Sexpr{yearmon(2009 + 7/12)}--\Sexpr{yearmon(2010 + 6/12)}):
 $\Sexpr{round3(glmean(window(eu, start = yearmon(2009 + 7/12), end = yearmon(2010 + 6/12))))}$.
-One way to bring out this pattern in graphically is
+One way to bring out this pattern graphically is
 Figure~\ref{fig:glmean}. It depicts the inflation rates (in gray) and a 12-month rolling mean (in red),
 calculated again as the first moment of a fitted GL distribution.
 The strong increase in mean inflation during the boom years of 2007/2008
@@ -1058,7 +1058,7 @@ various techniques for inference in structural-change settings which are complem
 with additional maximum-likelihood-based methods by \pkg{fxregime}. Inference for the
 generalized logistic model (that can be combined with \pkg{strucchange}/\pkg{fxregime})
 is implemented in the new package \pkg{glogis} that also contains the data used, both
-the raw monthly price indexes \citep[as provided by][]{oecd} and the seasonally adjusted
+the raw monthly price indexes \citep[as provided by the][]{oecd} and the seasonally adjusted
 monthly inflation rates. The seasonal adjustment was performed in \pkg{X-12-ARIMA}~0.3
 (\citealp{X-12-ARIMA}, see also \citealp{Findley+Monsell+Bell:1998}) through the interface
 provided by \proglang{gretl}~1.9.5 (\citealp{gretl}, see also \citealp{Smith+Mixon:2006} for a review).
