@@ -1,91 +1,18 @@
-\documentclass[10pt,a4paper,twoside]{article}
-
-%% additional packages
-\usepackage{amsfonts,amstext,amsmath,a4wide,graphicx,color,thumbpdf}
-\usepackage{hyperref}
+\documentclass[nojss]{jss}
+\usepackage{amsfonts,amstext,amsmath,thumbpdf}
 \newcommand{\argmax}{\operatorname{argmax}\displaylimits}
 
 %% need no \usepackage{Sweave}
 \setkeys{Gin}{width=\textwidth}
 \SweaveOpts{engine=R, eps=FALSE, echo=FALSE, results=hide, keep.source=TRUE}
 
-%% BibTeX settings
-\usepackage[authoryear,round]{natbib}
-\bibliographystyle{jae}
-\bibpunct{(}{)}{,}{a}{,}{,}
-\newcommand{\doi}[1]{\href{http://dx.doi.org/#1}{\normalfont\texttt{doi:#1}}}
+\title{Structural Breaks in Inflation Dynamics within the European Monetary Union}
 
-%% markup commands for code/software
-\let\code=\texttt
-\let\pkg=\textbf
-\let\proglang=\textsf
-\newcommand{\file}[1]{`\code{#1}'}
-\newcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+\author{Thomas Windberger\\Universit\"at Innsbruck \And
+        Achim Zeileis\\Universit\"at Innsbruck}
+\Plainauthor{Thomas Windberger, Achim Zeileis}
 
-%% paragraph formatting
-\renewcommand{\baselinestretch}{1.52}
-
-%% mimic JAE style
-\renewcommand{\section}{\secdef \mysec \mysecnn}
-\newcommand{\mysec}[2][default]{\vspace{1.7\baselineskip}%
-  \pdfbookmark[1]{#1}{Section.#1}%
-  \refstepcounter{section}%
-  \centerline{\large \thesection. \uppercase{#1}} \vspace{.5\baselineskip}}
-\newcommand{\mysecnn}[1]{\vspace{1.7\baselineskip}%
-  \centerline{\large #1} \vspace{.5\baselineskip}}
-\renewcommand{\abstractname}{\normalfont SUMMARY}
-\renewcommand{\refname}{REFERENCES}
-\renewcommand{\thetable}{\Roman{table}}
-
-%% page header (and currently no footer)
-\usepackage{fancyhdr}
-\setlength{\headheight}{15pt}
-\renewcommand{\headrulewidth}{0pt}
-\pagestyle{fancy}
-\thispagestyle{plain}
-\fancyhf{}
-\fancyhead[LE,RO]{\thepage}
-\fancyhead[CE]{{\normalsize \uppercase{T.~Windberger and A.~Zeileis}}}
-\fancyhead[CO]{{\normalsize \uppercase{Structural Breaks in Inflation Dynamics within the EMU}}} 
-% \fancyfoot[LO,LE]{\small Copyright {\copyright} 20XX John Wiley \& Sons, Ltd.}
-\fancypagestyle{plain}{
-\fancyhf{}
-% \fancyfoot[LO,LE]{\small This is a preprint of an article published in %
-%   \textit{Journal of Applied Econometrics}, \textbf{XX}(X), XXX--XXX. \\%
-%   Copyright {\copyright} 20XX John Wiley \& Sons, Ltd. \doi{10.1002/jae.XXXX} }
-}
-
-%% title information
-\title{\bf Structural Breaks in Inflation Dynamics within the European Monetary Union}
-\author{\hfill Thomas Windberger \hfill Achim Zeileis\thanks{Correspondence
-to: Achim Zeileis, Department of Statistics,  Universit\"at Innsbruck,
-Universit\"atsstr.~15, A-6020 Innsbruck, Austria. Tel: +43/512/507-7103. Fax: +43/512/507-2851.
-E-mail: \email{Achim.Zeileis@R-project.org}} \hfill \hfill \\
-{\small \it Department of Statistics, Universit\"at Innsbruck, Austria}}
-\date{}
-
-% hyperref setup
-\definecolor{Red}{rgb}{0.5,0,0}
-\definecolor{Blue}{rgb}{0,0,0.5}
-\hypersetup{%
-  pdftitle = {Structural Breaks in Inflation Dynamics within the European Monetary Union},
-  pdfsubject = {},
-  pdfkeywords = {inflation rate, structural break, EMU, generalized logistic distribution},
-  pdfauthor = {Thomas Windberger, Achim Zeileis},
-  %% change colorlinks to false for pretty printing
-  colorlinks = {true},
-  linkcolor = {Blue},
-  citecolor = {Blue},
-  urlcolor = {Red},
-  hyperindex = {true},
-  linktocpage = {true},
-}
-
-\begin{document}
-
-\maketitle
-
-\begin{abstract}
+\Abstract{
   To assess the effects of the EMU on inflation rate dynamics of
   its member states, the inflation rate series for 21~European countries
   are investigated for structural changes. To capture changes in mean,
@@ -95,10 +22,23 @@ E-mail: \email{Achim.Zeileis@R-project.org}} \hfill \hfill \\
   in the patterns of inflation dynamics and the structural changes
   therein. Overall, there is a convergence towards a lower mean inflation rate
   with reduced skewness, but it is accompanied by an increase in variance.
-\end{abstract}
+}
 
-\noindent {\bf Keywords:} inflation rate, structural break, EMU, generalized logistic distribution.
+\Keywords{inflation rate, structural break, EMU, generalized logistic distribution}
 
+\Address{
+  Thomas Windberger, Achim Zeileis\\
+  Department of Statistics\\
+  Faculty of Economics and Statistics\\
+  Universit\"at Innsbruck\\
+  Universit\"atsstra{\ss}e 15\\
+  6020 Innsbruck, Austria\\
+  E-mail: \email{Thomas.Windberger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org} \\
+  Telephone: +43/12/507-7103 \\
+  Fax: +43/512/507-2851 \\
+}
+
+\begin{document}
 
 <<preliminaries>>=
 ## locale settings
@@ -501,6 +441,7 @@ for(i in seq_along(nam)) {
     data = x,
     model0 = x_gf,
     efp = x_efp,
+    efp_hac = gefp(x_gf, fit = NULL, vcov = vcovHAC), #FIXME# added in revision for EmpEc, should be moved to 'Analysis'
     nbreaks = x_nbreaks,
     breakpoints = x_bp,
     model = x_rf,
@@ -682,9 +623,8 @@ format_moments <- function(i, digits = 3) {
 }
 @
     
-\renewcommand{\baselinestretch}{1.15}
 \begin{table}[p!]
-\begin{center}
+\centering
 \footnotesize
 \begin{tabular}{llrrrlll}
 \hline
@@ -744,9 +684,97 @@ writeLines(unlist(lapply(22, format_moments)))
 
 \caption{\label{tab:results1} Estimated breakpoints, fitted moments of generalized logistic
 distribution per segment, and ERM information for all countries under investigation.}
-\end{center}
 \end{table}
-\renewcommand{\baselinestretch}{1.52}
+
+
+<<results-diagnostics>>=
+names(results)[names(results) == "CzechRepublic"] <- "Czech Rep."
+format_diag <- function(i, digits = 3) {
+  pround <- function(x) ifelse(abs(x) < 0.001, "$< 0.001$",
+    paste("$", format(round(x, digits = digits), nsmall = digits), "$", sep = ""))
+  
+  rval <- cbind("", "", names(results[[i]]$model), "", "", "")
+  n <- NROW(rval)
+  if(n <= 1) rval <- rbind(rval, "")
+  
+  rval[1,   1] <- if(is.character(i)) i else names(results)[i]
+  rval[1,   2] <- pround(sctest(results[[i]]$efp,     functional = supLM(0.1))$p.value)
+  rval[2,   2] <- pround(sctest(results[[i]]$efp_hac, functional = supLM(0.1))$p.value)
+  rval[1:n, 4] <- pround(sapply(results[[i]]$model, function(obj) summary(obj)$chisq.test$p.value))
+  rval[1:n, 5] <- pround(sapply(results[[i]]$model, function(obj) acf(obj$x, plot = FALSE)$acf[2]))
+  rval[1:n, 6] <- pround(sapply(results[[i]]$model, function(obj) Box.test(obj$x, type = "Ljung-Box")$p.value))
+
+  rval <- apply(rval, 1, paste, collapse = " & ")
+  rval <- paste(rval, "\\\\")
+  rval[length(rval)] <- paste(rval[length(rval)], "\\hline")
+  return(rval)
+}
+@
+    
+\begin{table}[p!]
+\centering
+\footnotesize
+\begin{tabular}{lrlrrr}
+\hline
+Country & sup$\mathit{LM}$ (standard/HAC) & Segment & $\chi^2$ GOF & AR(1) & Ljung-Box \\
+\hline
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{No change}} \\
+\hline
+<<diagnostics-table1, results=tex>>=
+writeLines(unlist(lapply(c(2, 4, 8, 14), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Phase~1 convergence}} \\
+\hline
+<<diagnostics-table2, results=tex>>=
+writeLines(unlist(lapply(c(1, 6, 7), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Phase~2 convergence}} \\
+\hline
+<<diagnostics-table3, results=tex>>=
+writeLines(unlist(lapply(c(9, 12, 13, 16), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Financial crisis}} \\
+\hline
+<<diagnostics-table4, results=tex>>=
+writeLines(unlist(lapply(c(11, 19), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Non-euro}} \\
+\hline
+<<diagnostics-table5, results=tex>>=
+writeLines(unlist(lapply(c(20, 21), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Eastern countries}} \\
+\hline
+<<diagnostics-table6, results=tex>>=
+writeLines(unlist(lapply(c(3, 5, 10, 15, 17, 18), format_diag)))
+@
+
+\noalign{\medskip}
+\multicolumn{6}{l}{\emph{Euro area}} \\
+\hline
+<<diagnostics-table6, results=tex>>=
+writeLines(unlist(lapply(22, format_diag)))
+@
+
+\end{tabular}
+
+\caption{\label{tab:diag} Diagnostics for model fits in each country. Two sup$\mathit{LM}$ test $p$~values
+  of the full-sample model with and without HAC correction and segment-specific assessments of the model
+  fit: $\chi^2$ goodness-of-fit (GOF) $p$~value; autocorrelation at lag~1; Ljung-Box $p$~value.}
+\end{table}
+
 
 
 \subsection{Inflation dynamics on a national level}\label{sec:bpresults}
@@ -854,9 +882,8 @@ large increase in variance and a lower mean inflation.
 
 \subsection{Convergence on an aggregate level}\label{sec:aggregate}
 
-\renewcommand{\baselinestretch}{1.15}
 \begin{table}[t!]
-\begin{center}
+\centering
 \begin{tabular}{llrrrr}
 \hline
 Moment & Quartile & \Sexpr{yrs[1]} & \Sexpr{yrs[2]} & \Sexpr{yrs[3]} & \Sexpr{yrs[4]}\\
@@ -887,9 +914,7 @@ writeLines(format_cross_country(cross_country_moments(others, yearmon(yrs)), col
 \caption{\label{tab:results2} Aggregation of estimated moments from Table~\ref{tab:results1} across countries in
 Jan~\Sexpr{yrs[1]}, \Sexpr{yrs[2]}, \Sexpr{yrs[3]}, and \Sexpr{yrs[4]}. Dots signal that the moments have not
 changed from the previous time point, i.e., that no breakpoint was estimated in the corresponding time period.}
-\end{center}
 \end{table}
-\renewcommand{\baselinestretch}{1.52}
 
 
 Given the results above for the individual countries, a natural question is
@@ -963,7 +988,7 @@ countries.
 
 \setkeys{Gin}{width=0.8\textwidth}
 \begin{figure}[t!]
-\begin{center}
+\centering
 <<glmean-plot, fig=TRUE, height=5, width=7.5>>=
   gray_red <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0), alpha = 0.3)
   gray_red1 <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0))
@@ -973,7 +998,6 @@ countries.
 @
 \caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
 12-month rolling GL fits (red) over time for all countries.}
-\end{center}
 \end{figure}
 \setkeys{Gin}{width=\textwidth}
 
@@ -1045,7 +1069,7 @@ of the euro. The Eastern European countries lowered their high initial inflation
 late 1990s or early 2000s, prior to the entry into the ERM~II. They clearly benefited from the
 monetary discipline that is demanded for those countries who want to join the EMU. 
 
-\section*{COMPUTATIONAL DETAILS}
+\section*{Computational details}
 
 Our results were obtained using 
 \proglang{R}~\Sexpr{paste(R.Version()[6:7], collapse = ".")} \citep{R} with the packages
