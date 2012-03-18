@@ -147,7 +147,7 @@ eu <- na.omit(hicps[, "EU"])
 hicps <- hicps[, colnames(hicps) != "EU"]
 @
 
-All empirical analyses are based on seasonally adjusted inflation rates (in percent)
+All empirical analyses are based on seasonally adjusted monthly inflation rates (in percent)
 for \Sexpr{ncol(hicps)}~countries
 (\Sexpr{gsub("UK", "United Kingdom", gsub("CzechRep", "Czech Rep", paste(colnames(hicps), collapse = ", "), fixed = TRUE), fixed = TRUE)})
 in the time period from the early or mid-1990s to the end of 2010.
@@ -599,8 +599,8 @@ core-euro (\Sexpr{paste(colnames(hicps)[euro], collapse = ", ")}),
 PIIGS  (\Sexpr{paste(colnames(hicps)[piigs[c(4, 2, 3, 1, 5)]], collapse = ", ")}), and the
 other countries (\Sexpr{paste(gsub("CzechRepublic", "Czech Republic", colnames(hicps))[others], collapse = ", ")}).
 
-Finally, Section~\ref{sec:fcrisis} focuses on the question of changes
-in the inflation dynamics during the 2008/2009 financial crisis.
+Section~\ref{sec:fcrisis} focuses on the question of changes
+in the inflation dynamics during the 2008/2009 financial crisis. Finally, the model fit and related issues will be discussed in Section~\ref{sec:fit}
 
 
 <<results-moments>>=
@@ -790,10 +790,12 @@ similar patterns of change are grouped together and ordered alphabetically
 within each group. If there is only a single segment, the sup$\mathit{LM}$ test
 was non-significant at the 5\% level. In significant cases, the number of
 breakpoints was selected via the LWZ criterion and subsequently all parameters
-(breakpoints and segment-specific GL parameters) were estimated by ML. No
-HAC~correction was employed as there was only negligible autocorrelation in the
-empirical scores after inclusion of the breakpoints (if any).
-In Table~\ref{tab:results1} the countries are grouped according to either a
+(breakpoints and segment-specific GL parameters) were estimated by ML. 
+The $p$~values from the sup$\mathit{LM}$ test with and without HAC correction are reported in Table~\ref{tab:diag} 
+along with further diagnostics for each of the fitted segments concerning goodness of fit and autocorrelation. 
+As autocorrelation was very low in most of the segments (typically below 0.4 and non-significant, with a few exceptions), 
+we focus on the results from the analysis without HAC correction but point out if there are noteworthy deviations. 
+In both Table~\ref{tab:results1} and~\ref{tab:diag} the countries are grouped  according to either a
 similar timing of the changes in inflation dynamics or according to economic similarities, 
 as in the case of the former communist countries in Eastern Europe.
 
@@ -805,12 +807,15 @@ did not change significantly. This is plausible from an economic point of view
 since the European central bank (ECB) is modeled after the Deutsche Bundesbank and the ECB did not
 -- until recently -- diverge much from the monetary policy of the former. Thus,
 the EMU did have no effect on inflation dynamics since the policies in
-these countries were already much in line with Germany and hence the ECB. 
+these countries were already much in line with Germany and hence the ECB. Table~\ref{tab:diag} does not 
+suggest any problems in this segment.
 
 %% source for DM zone: http://ec.europa.eu/economy_finance/publications/publication6730_de.pdf
 
 Austria, Finland, and France adjusted to the requirements of the EMU during the
-first phase of convergence. In these countries,
+first phase of convergence. However, with HAC correction, the very short segment of France would not be
+segregated, thereby suggesting that France belongs to the group of countries which did not change at all.
+In these countries,
 the result of the adjustment process was a lower inflation rate and an overall
 decrease in the variance. 
 
@@ -822,13 +827,16 @@ in terms of mean and variance, also associated with a shift in skewness towards 
 left. Apart from Luxembourg, the countries that had a structural break during the second 
 phase of convergence were also successful in reducing mean inflation rates.
 After the changes in this group, all countries have rather similar mean inflation
-rates, which are closer to the levels of the previous two groups.
+rates, which are closer to the levels of the previous two groups. The diagnostics for model fits in 
+this group are unproblematic.
+
 
 The fourth subgroup consists of two of the PIIGS countries, namely Ireland and Spain.  
 There is a break in both countries in the summer of 2008 that captures the effects of
 the financial crisis and the severe problems concerning the real estate situation.
 In both countries, this had a strong deflationary impact, with deflation in Ireland
-over an extended period of time. In Spain, which was affected by a housing bubble of  
+over an extended period of time. For the middle segment of Spain, the Ljung-box shows that not all
+of the autocorrelation has been captured. In Spain, which was affected by a housing bubble of  
 roughly the same size as Ireland, the housing prices did not adjust so abruptly and  
 so strongly.
 
@@ -837,18 +845,25 @@ ERM, decided not to be part of it and hence also not to participate in the EMU:
 the United Kingdom and Sweden. Both show clear breaks in the early 1990s which can be
 traced back to economic crises: the currency crisis of the United Kingdom cumulating
 into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
-1990s. 
+1990s. With regard to the last segment for both countries, the Ljung-box suggests that the data 
+in this segment is independently distributed. Anyhow, the HAC correction would also suggest two breaks 
+for both series.
 
 The last group consists of the Eastern European countries: Czech Republic,
 Estonia, Hungary, Poland, Slovakia, and Slovenia. In almost all of these
 countries, the mean and the variance of their inflation rates declined in the
-late 1990s or early 2000s. Czech Republic, Estonia, and Hungary experienced a break in 1997/1998
+late 1990s or early 2000s. For Estonia and Slovakia, the $\chi^2$ goodness-of-fit suggests that the generalized logistic distribution
+might not be the most suitable distribution for this purpose. Also, compared to other country groups, the 
+Eastern European group shows the highest occurrence of non-captured autocorrelation. Nevertheless, compared to other 
+inflation rates, these series show the most dynamic behaviour.
+
+Czech Republic, Estonia, and Hungary experienced a break in 1997/1998
 resulting from efforts to curb in inflation by decreasing the growth of the money 
 supply. The timing of the break thus indicates the date when the the biggest
 transitionally shocks on the way towards free market economies have been overcome. In Poland, this
 transition took two more years. Slovakia and Slovenia are somewhat different: On the one hand,
 they started with lower mean inflation rates and on the other hand, their inflation dynamics
-both changed roughly one year prior to their entry into the ERM~II.
+both changed roughly one year prior to their entry into the ERM~II. 
 
 <<glmean>>=
 glmean <- function(x) {
@@ -1041,6 +1056,7 @@ estimates are moving closer in a rather broad band. So contrary to
 \citet{palomba}, who find that the degree of similarity in short-run inflation
 dynamics is still weak, we find evidence of convergence within the countries in
 the sample.
+
 
 
 \section{Conclusion}\label{sec:conclusion}
