@@ -476,20 +476,23 @@ panel of Figure~\ref{fig:slovenia1}.
 par(mfrow = c(1, 2))
 plot(x$data, main = "", ylab = "Monthly inflation rate (in percent)", xlab = "Time")
 lines(x$breakpoints, breaks = x$nbreaks)
-lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), col = 4)
+lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), lwd = 2)
 if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks))
-plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics")
+
+plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics", ylim = c(0, 40), boundary = FALSE)
+abline(h = supLM(0.1)$computeCritval(0.05, 3), col = "darkgray", lwd = 1.5)
 lines(x$breakpoints, breaks = x$nbreakss)
 @
 \caption{\label{fig:slovenia1} Inflation rate series for Slovenia
 with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
 from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
 with sequence of $\mathit{LM}$~statistics,
-critical value at 5\% level (horizontal red line), and estimated breakpoint (vertical dashed line).}
+critical value at 5\% level (horizontal gray line), and estimated breakpoint (vertical dashed line).}
 
 <<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
 par(mfrow = c(1, 2))
 for(i in 1:2) plot(x$model[[i]], moments = TRUE,
+  col = "black", lwd = 1.5,
   xlim = c(-1.5, 2.2), ylim = c(0, 1.3),
   breaks = seq(-1.5, 2, by = 0.25),
   xlab = paste(names(x$model)[i], "\n", "Goodness-of-fit p-value: ",
@@ -837,14 +840,14 @@ In both countries, this had a strong deflationary impact, with deflation in Irel
 over an extended period of time. In Spain, which was affected by a housing bubble of  
 roughly the same size as Ireland, the housing prices did not adjust so abruptly and  
 so strongly.  The model fit diagnostics appear to be reasonable except for the middle
-segment of Spain, where the Ljung-box shows that not all of the autocorrelation has been captured.
+segment of Spain, where the Ljung-Box test shows that not all of the autocorrelation has been captured.
 
 The next group consists of two countries that, after a very short participation in the
 ERM, decided not to be part of it and hence also not to participate in the EMU:
 the United Kingdom and Sweden. Both show clear breaks in the early 1990s which can be
 traced back to economic crises: the currency crisis of the United Kingdom cumulating
 into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
-1990s. With regard to the last segment for both countries, the Ljung-box suggests that 
+1990s. With regard to the last segment for both countries, the Ljung-Box test suggests that 
 the autocorrelation, albeit low around 0.16, is significant. However, both the standard
 and the HAC-corrected sup$\mathit{LM}$ lead to highly significant evidence for structural
 breaks.
@@ -1007,14 +1010,14 @@ countries.
 \begin{figure}[t!]
 \centering
 <<glmean-plot, fig=TRUE, height=5, width=7.5>>=
-  gray_red <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0), alpha = 0.3)
-  gray_red1 <- rgb(c(0.2, 0.8), c(0.2, 0), c(0.2, 0))
-  plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
-    xlab = "Time", ylab = "Monthly inflation rates")
-  for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
+gray_red <- rgb(c(0.2, 0.8), c(0.2, 0.0), c(0.2, 0.0), alpha = 0.3)
+gray_red <- rgb(c(0.2, 0.0), c(0.2, 0.0), c(0.2, 0.0), alpha = c(0.3, 0.5)) ## actually gray-darkgray now
+plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
+  xlab = "Time", ylab = "Monthly inflation rates")
+for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
 @
-\caption{\label{fig:glmean} Observed monthly inflation rates (gray) and estimated means from
-12-month rolling GL fits (red) over time for all countries.}
+\caption{\label{fig:glmean} Observed monthly inflation rates (light gray) and estimated means from
+12-month rolling GL fits (dark red) over time for all countries.}
 \end{figure}
 \setkeys{Gin}{width=\textwidth}
 
