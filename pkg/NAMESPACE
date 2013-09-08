@@ -1,7 +1,6 @@
 import("graphics", "stats")
 
-importFrom("sandwich", "estfun")
-importFrom("sandwich", "bread")
+importFrom("sandwich", "estfun", "bread")
 importFrom("zoo", "index")
 
 export(
