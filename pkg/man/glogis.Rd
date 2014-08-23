@@ -5,8 +5,6 @@
 \alias{rglogis}
 \alias{sglogis}
 
-\encoding{latin1}
-
 \title{The Generalized Logistic Distribution (Type I: Skew-Logitic)}
 
 \description{
@@ -69,10 +67,8 @@ sglogis(x, location = 0, scale = 1, shape = 1)
   Shao Q (2002). Maximum Likelihood Estimation for Generalised Logistic Distributions.
   \emph{Communications in Statistics -- Theory and Methods}, \bold{31}(10), 1687--1700.
 
-  Windberger T, Zeileis A (2011). Structural Breaks in Inflation Dynamics within
-  the European Monetary Union. Working Paper 2011-12. Working Papers in Economics and Statistics,
-  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-12}
+  Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
+    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
 }
 
 \examples{

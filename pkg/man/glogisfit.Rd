@@ -16,8 +16,6 @@
 \alias{summary.glogisfit}
 \alias{vcov.glogisfit}
 
-\encoding{latin1}
-
 \title{Fitting the Generalized Logistic Distribution}
 
 \description{
@@ -133,10 +131,8 @@ glogisfit(x, \dots)
   Shao Q (2002). Maximum Likelihood Estimation for Generalised Logistic Distributions.
   \emph{Communications in Statistics -- Theory and Methods}, \bold{31}(10), 1687--1700.
 
-  Windberger T, Zeileis A (2011). Structural Breaks in Inflation Dynamics within
-  the European Monetary Union. Working Paper 2011-12. Working Papers in Economics and Statistics,
-  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-12}
+  Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
+    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
 }
 
 \seealso{\code{\link{dglogis}}, \code{\link{dlogis}}, \code{\link{breakpoints.glogisfit}}}

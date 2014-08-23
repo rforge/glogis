@@ -17,7 +17,7 @@ breakpoints.glogisfit <- function(obj, h = 0.15, breaks = NULL, ic = "LWZ", hpc 
 }
 
 refit.breakpoints.glogisfit <- function(object, ...) {
-  bf <- breakfactor(object, ...)
+  bf <- strucchange::breakfactor(object, ...)
   rval <- tapply(object$null$x, bf, glogisfit, fixed = object$null$fixed)
   names(rval) <- paste(tapply(format(object$index), bf, head, 1), "--",
     tapply(format(object$index), bf, tail, 1), sep = "")
@@ -25,7 +25,7 @@ refit.breakpoints.glogisfit <- function(object, ...) {
 }
 
 coef.breakpoints.glogisfit <- function(object, log = TRUE, ...) {
-  rf <- refit(object, ...)
+  rf <- fxregime::refit(object, ...)
   t(sapply(rf, coef, log = log))
 }
 
@@ -33,9 +33,9 @@ fitted.breakpoints.glogisfit <- function(object,
   type = c("mean", "variance", "skewness"), ...)
 {
   type <- as.vector(sapply(type, match.arg, choices = c("mean", "variance", "skewness")))
-  rf <- refit(object, ...)
+  rf <- fxregime::refit(object, ...)
   mom <- t(sapply(rf, "[[", "moments"))
-  rval <- mom[breakfactor(object, ...), type]
+  rval <- mom[strucchange::breakfactor(object, ...), type]
   if(inherits(object$null$x, "zoo")) rval <- zoo(rval, time(object$null$x))
   if(inherits(object$null$x, "ts")) rval <- ts(rval, start = start(object$null$x), frequency = frequency(object$null$x))
   return(rval)
@@ -53,7 +53,7 @@ confint.breakpoints.glogisfit <- function(object, parm = NULL, level = 0.95, bre
     if(!is.null(parm)) breaks <- parm
 
   ## extract estimates
-  bp <- breakpoints(object, breaks = breaks)$breakpoints
+  bp <- strucchange::breakpoints(object, breaks = breaks)$breakpoints
   if(any(is.na(bp))) stop("cannot compute confidence interval when `breaks = 0'")
   
   ## set up intervals
@@ -63,14 +63,14 @@ confint.breakpoints.glogisfit <- function(object, parm = NULL, level = 0.95, bre
   bp <- c(0, bp, object$nobs)
 
   ## fitted models
-  rf <- refit(object, breaks = breaks)
+  rf <- fxregime::refit(object, breaks = breaks)
   cf <- lapply(rf, coef)
   Q <- lapply(rf, function(x) solve(bread(x)))
   Omega <- if(is.null(meat.)) Q else lapply(rf, meat.)
 
   ## utility functions
   myfun <- function(x, level = 0.975, xi = 1, phi1 = 1, phi2 = 1)
-    (pargmaxV(x, xi = xi, phi1 = phi1, phi2 = phi2) - level)
+    (strucchange::pargmaxV(x, xi = xi, phi1 = phi1, phi2 = phi2) - level)
   myprod <- function(delta, mat) as.vector(crossprod(delta, mat) %*% delta)
 
   ## loop over breaks
@@ -86,7 +86,7 @@ confint.breakpoints.glogisfit <- function(object, parm = NULL, level = 0.95, bre
     phi1 <- sqrt(Oprod1/Qprod1)
     phi2 <- sqrt(Oprod2/Qprod2)
  
-    p0 <- pargmaxV(0, phi1 = phi1, phi2 = phi2, xi = xi)
+    p0 <- strucchange::pargmaxV(0, phi1 = phi1, phi2 = phi2, xi = xi)
     if(is.nan(p0) || p0 < a2 || p0 > (1-a2)) {
       warning(paste("Confidence interval", as.integer(i),
         "cannot be computed: P(argmax V <= 0) =", round(p0, digits = 4)))
@@ -94,8 +94,8 @@ confint.breakpoints.glogisfit <- function(object, parm = NULL, level = 0.95, bre
       lower[i-1] <- NA
     } else {
       ub <- lb <- 0
-      while(pargmaxV(ub, phi1 = phi1, phi2 = phi2, xi = xi) < (1 - a2)) ub <- ub + 1000
-      while(pargmaxV(lb, phi1 = phi1, phi2 = phi2, xi = xi) > a2) lb <- lb - 1000
+      while(strucchange::pargmaxV(ub, phi1 = phi1, phi2 = phi2, xi = xi) < (1 - a2)) ub <- ub + 1000
+      while(strucchange::pargmaxV(lb, phi1 = phi1, phi2 = phi2, xi = xi) > a2) lb <- lb - 1000
 
       upper[i] <- uniroot(myfun, c(0, ub), level = (1-a2), xi = xi, phi1 = phi1, phi2 = phi2)$root
       lower[i] <- uniroot(myfun, c(lb, 0), level = a2, xi = xi, phi1 = phi1, phi2 = phi2)$root
@@ -135,14 +135,14 @@ print.confint.breakpoints.glogisfit <- function(x, ...)
   cat("\nBreakpoints at observation number:\n")
   print(x$confint, quote = FALSE)
   cat("\nCorresponding to breakdates:\n")
-  print(breakdates(x), quote = FALSE)
+  print(strucchange::breakdates(x), quote = FALSE)
 }
 
 lines.confint.breakpoints.glogisfit <- function(x, col = 2, angle = 90, length = 0.05,
   code = 3, at = NULL, breakpoints = TRUE, ...)
 {
   nbp <- nrow(x$confint)
-  x <- breakdates(x)
+  x <- strucchange::breakdates(x)
   if(breakpoints) abline(v = x[,2], lty = 2)
   if(is.null(at)) {
     at <- par("usr")[3:4]

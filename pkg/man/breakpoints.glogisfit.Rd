@@ -10,8 +10,6 @@
 \alias{print.confint.breakpoints.glogisfit}
 \alias{lines.confint.breakpoints.glogisfit}
 
-\encoding{latin1}
-
 \title{Segmented Fitting of the Generalized Logistic Distribution}
 
 \description{
@@ -87,10 +85,8 @@
 }
 
 \references{
-  Windberger T, Zeileis A (2011). Structural Breaks in Inflation Dynamics within
-  the European Monetary Union. Working Paper 2011-12. Working Papers in Economics and Statistics,
-  Research Platform Empirical and Experimental Economics, Universität Innsbruck.
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2011-12}
+  Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
+    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
 
   Zeileis A, Shah A, Patnaik I (2010). Testing, Monitoring, and Dating Structural
   Changes in Exchange Rate Regimes. \emph{Computational Statistics and Data Analysis},

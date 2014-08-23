@@ -1,3 +1,11 @@
+Changes in Version 0.1-1
+
+  o The accompanying paper has been accepted for publication in the
+    journal Eastern European Economics.
+    
+  o The Depends/Imports/Suggests have been streamlined.
+
+
 Changes in Version 0.1-0
 
   o First official release of the package on CRAN. An accompanying
