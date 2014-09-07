@@ -27,16 +27,16 @@ citEntry(entry = "Article",
 		   as.person("Achim Zeileis")),
   journal      = "Eastern European Economics",
   year         = "2014",
-  note         = "Forthcoming",
-#  volume       = "VV",
-#  number       = "II",
-#  pages        = "1--n",
-#  doi	       = "1234/56789",
+  volume       = "52",
+  number       = "3",
+  pages        = "67--89",
+  doi	       = "10.2753/EEE0012-8775520304",
   
   textVersion  = 
   paste("Thomas Windberger, Achim Zeileis (2014).", 
 	"Structural Breaks in Inflation Dynamics within the European Monetary Union.",
- 	"Eastern European Economics, forthcoming."),
+ 	"Eastern European Economics, 52(3), 67-89.",
+	"doi:10.2753/EEE0012-8775520304"),
 	
   header       = "If you use maximum likelihood inference for the generalized logistic distribution, please cite:"
 )

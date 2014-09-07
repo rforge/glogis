@@ -1,4 +1,4 @@
-\documentclass[nojss]{jss}
+\documentclass[nojss,noheadings]{jss}
 \usepackage{amsfonts,amstext,amsmath,thumbpdf}
 \newcommand{\argmax}{\operatorname{argmax}\displaylimits}
 
@@ -33,9 +33,27 @@
   Universit\"at Innsbruck\\
   Universit\"atsstra{\ss}e 15\\
   6020 Innsbruck, Austria\\
-  E-mail: \email{Thomas.Windberger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org} \\
-  Telephone: +43/12/507-7103 \\
-  Fax: +43/512/507-2851 \\
+  E-mail: \email{Achim.Zeileis@R-project.org} \\
+  URL: \url{http://eeecon.uibk.ac.at/~zeileis/}
+}
+
+%% publication info and copyright notice
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\renewcommand{\headrulewidth}{0pt}
+\pagestyle{fancy}
+\thispagestyle{plain}
+\fancyhf{}
+\fancyhead[RO,LE]{\thepage}
+\fancyhead[CO]{\textit{\normalsize Thomas Windberger, Achim Zeileis}}
+\fancyhead[CE]{\textit{\normalsize Structural Breaks in Inflation Dynamics within the European Monetary Union}}
+\fancyfoot[LO,LE]{\small Copyright {\copyright} 2014 M.E. Sharpe, Inc.}
+\fancypagestyle{plain}{
+\fancyhf{}
+\fancyfoot[LO,LE]{\small This is a preprint of an article published in \textit{Eastern European Economics}, \textbf{52}(3), 67--89.
+  \doi{10.2753/EEE0012-8775520304}.
+  Copyright~{\copyright} 2014 M.E. Sharpe, Inc.
+  }
 }
 
 \begin{document}
@@ -294,8 +312,8 @@ parameters changes over time.
 \subsection{Test for structural change}
 
 The null hypothesis of parameter stability (\ref{eq:h0}) can be assessed using the empirical
-scores $s(y_i | \hat \phi)$ as measures of model deviation \citep{Zeileis+Hornik:2007} from the
-model fit under $H_0$. Systematic deviations over time from the full sample estimates $\hat \phi$
+scores $s(y_i | \hat \phi)$ as measures of model deviation from the model fit under $H_0$
+\citep[as in][]{Zeileis+Hornik:2007}. Systematic deviations over time from the full sample estimates $\hat \phi$
 can then be captured by cumulative sums of the empirical scores in an empirical fluctuation
 process $\mathit{efp}(t)$:
 %
@@ -477,17 +495,21 @@ par(mfrow = c(1, 2))
 plot(x$data, main = "", ylab = "Monthly inflation rate (in percent)", xlab = "Time")
 lines(x$breakpoints, breaks = x$nbreaks)
 lines(fitted(x$breakpoints, breaks = x$nbreaks, type = "mean"), lwd = 2)
-if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks))
+if(x$nbreaks > 0) lines(confint(x$breakpoints, breaks = x$nbreaks), col = "darkgray")
 
 plot(x$efp, functional = supLM(0.1), main = "", ylab = "LM statistics", ylim = c(0, 40), boundary = FALSE)
 abline(h = supLM(0.1)$computeCritval(0.05, 3), col = "darkgray", lwd = 1.5)
 lines(x$breakpoints, breaks = x$nbreakss)
 @
-\caption{\label{fig:slovenia1} Inflation rate series for Slovenia
-with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)}), associated confidence interval, and fitted mean
-from generalized logistic distribution (left). Corresponding sup$\mathit{LM}$ test (right)
-with sequence of $\mathit{LM}$~statistics,
-critical value at 5\% level (horizontal gray line), and estimated breakpoint (vertical dashed line).}
+\caption{\label{fig:slovenia1} 
+  Inflation rate series for Slovenia with breakpoint estimate (\Sexpr{breakdates(x$breakpoints)})
+  and associated sequence of LM statistics
+  Left: Inflation rate series with breakpoint estimate (vertical dashed line),
+  associated confidence interval (gray, at the bottom), and fitted mean from generalized
+  logistic distribution (bold horizontal lines). Right: Corresponding sup$\mathit{LM}$ test
+  with sequence of LM statistics, critical value at 5\% level (horizontal gray
+  line), and estimated breakpoint (vertical dashed line).
+}
 
 <<slovenia-plots2, fig=TRUE, height=4.2, width=9.6>>=
 par(mfrow = c(1, 2))
@@ -516,7 +538,7 @@ As there is evidence for at least one break, the LWZ criterion is employed for $
 breakpoints with a minimal segment size of two years per segment. It assumes its minimum for $B = 1$
 associated with the breakpoint \Sexpr{breakdates(x$breakpoints, breaks = x$nbreaks)}, depicted
 by a vertical dashed line in both panels of Figure~\ref{fig:slovenia1}. The resulting segmented
-fitted mean (horizontal blue lines in the left panel of Figure~\ref{fig:slovenia1}) shows that
+fitted mean (horizontal bold lines in the left panel of Figure~\ref{fig:slovenia1}) shows that
 before the break, Slovenia experienced very high inflation rates but was successful in reducing
 inflation to a much lower level afterwards.
 
@@ -815,7 +837,7 @@ suggest any problems in this group of countries.
 
 %% source for DM zone: http://ec.europa.eu/economy_finance/publications/publication6730_de.pdf
 
-Austria, Finland, and France adjusted to the requirements of the EMU during the
+The second group of countries, Austria, Finland, and France, adjusted to the requirements of the EMU during the
 first phase of convergence. In these countries, the result of the adjustment process
 was a lower inflation rate and an overall decrease in the variance.
 Additionally, if a HAC correction is used, the change for France would be nonsignificant,
@@ -842,11 +864,11 @@ roughly the same size as Ireland, the housing prices did not adjust so abruptly 
 so strongly.  The model fit diagnostics appear to be reasonable except for the middle
 segment of Spain, where the Ljung-Box test shows that not all of the autocorrelation has been captured.
 
-The next group consists of two countries that, after a very short participation in the
+The fifth group consists of two countries that, after a very short participation in the
 ERM, decided not to be part of it and hence also not to participate in the EMU:
 the United Kingdom and Sweden. Both show clear breaks in the early 1990s which can be
 traced back to economic crises: the currency crisis of the United Kingdom cumulating
-into the ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
+in ``Black Wednesday'' in 1992 and the banking crisis in Sweden during the early
 1990s. With regard to the last segment for both countries, the Ljung-Box test suggests that 
 the autocorrelation, albeit low around 0.16, is significant. However, both the standard
 and the HAC-corrected sup$\mathit{LM}$ lead to highly significant evidence for structural
@@ -891,9 +913,9 @@ eu_mom <- moments(results$EU$breakpoints, breaks = results$EU$nbreaks)
 @
 
 Finally, the inflation rates for the whole euro area\footnote{This is the
-euro area 17~countries series as provided by the \citet{oecd},
+EU17 series as provided by the \citet{oecd},
 starting in \Sexpr{start(eu) - 1/12}. It is calculated as a weighted average of the HICPs
-of now seventeen euro countries.} are considered and
+of the then seventeen euro countries.} are considered and
 three different regimes are found: (1)~until 1999 with both a low mean and
 variance, (2)~the third and final stage of monetary integration, accompanied
 by a significant increase in the mean, (3)~a period encompassing the
@@ -1011,7 +1033,7 @@ countries.
 \centering
 <<glmean-plot, fig=TRUE, height=5, width=7.5>>=
 gray_red <- rgb(c(0.2, 0.8), c(0.2, 0.0), c(0.2, 0.0), alpha = 0.3)
-gray_red <- rgb(c(0.2, 0.0), c(0.2, 0.0), c(0.2, 0.0), alpha = c(0.3, 0.5)) ## actually gray-darkgray now
+gray_red <- rgb(c(0.2, 0.0), c(0.2, 0.0), c(0.2, 0.0), alpha = c(0.2, 0.5)) ## actually gray-darkgray now
 plot(hicps, plot.type = "single", lwd = 1.5, col = gray_red[1],
   xlab = "Time", ylab = "Monthly inflation rates")
 for(i in 1:ncol(hicps)) lines(hicp_glmean[,i], lwd = 1.5, col = gray_red[2])
@@ -1093,10 +1115,13 @@ monetary discipline that is demanded for those countries who want to join the EM
 \section*{Computational details}
 
 Our results were obtained using 
-\proglang{R}~\Sexpr{paste(R.Version()[6:7], collapse = ".")} \citep{R} with the packages
-\pkg{glogis}~\Sexpr{packageDescription("glogis")["Version"]},
-\pkg{strucchange}~\Sexpr{packageDescription("strucchange")["Version"]} \citep{Zeileis+Leisch+Hornik:2002}, and
-\pkg{fxregime}~\Sexpr{packageDescription("fxregime")["Version"]} \citep{Zeileis+Shah+Patnaik:2010},
+\proglang{R}~3.0.0 %\Sexpr{paste(R.Version()[6:7], collapse = ".")}
+\citep{R} with the packages
+\pkg{glogis}~0.1-0, %\Sexpr{packageDescription("glogis")["Version"]},
+\pkg{strucchange}~1.4-7 %\Sexpr{packageDescription("strucchange")["Version"]}
+\citep{Zeileis+Leisch+Hornik:2002}, and
+\pkg{fxregime}~1.0-2 %\Sexpr{packageDescription("fxregime")["Version"]}
+\citep{Zeileis+Shah+Patnaik:2010},
 all of which are available under the General Public License (GPL) from the
 Comprehensive \proglang{R} Archive Network (\url{http://CRAN.R-project.org/}). Package \pkg{strucchange} provides
 various techniques for inference in structural-change settings which are complemented
