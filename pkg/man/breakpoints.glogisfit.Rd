@@ -86,7 +86,7 @@
 
 \references{
   Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
-    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
+    European Monetary Union. \emph{Eastern European Economics}, \bold{52}(3), 66--88.
 
   Zeileis A, Shah A, Patnaik I (2010). Testing, Monitoring, and Dating Structural
   Changes in Exchange Rate Regimes. \emph{Computational Statistics and Data Analysis},
@@ -104,7 +104,7 @@ x <- zoo(x, yearmon(seq(2000, by = 1/12, length = 100)))
 ## full sample estimation
 gf <- glogisfit(x)
 
-if(require("fxregime")) {
+if(require("strucchange")) {
 
 ## structural change testing
 gf_scus <- gefp(gf, fit = NULL)
@@ -113,6 +113,7 @@ plot(gf_scus, functional = meanL2BB)
 sctest(gf_scus)
 sctest(gf_scus, functional = meanL2BB)
 
+\donttest{
 ## breakpoint estimation
 gf_bp <- breakpoints(gf)
 plot(gf_bp)
@@ -126,6 +127,7 @@ plot(x)
 lines(gf_bp)
 lines(fitted(gf_bp, type = "mean"), col = 4)
 lines(confint(gf_bp))
+}
 }
 }
 

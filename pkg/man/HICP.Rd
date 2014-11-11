@@ -46,7 +46,7 @@ Organisation for Economic Co-operation and Development (OECD)
   \url{http://en.wikipedia.org/wiki/Harmonised_Index_of_Consumer_Prices}, accessed 2010-06-10.
 
   Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
-    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
+    European Monetary Union. \emph{Eastern European Economics}, \bold{52}(3), 66--88.
 }
 
 \examples{

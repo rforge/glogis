@@ -1,6 +1,7 @@
-Changes in Version 0.1-2
+Changes in Version 1.0-0
 
-  o The Eastern European Economics paper has been published.
+  o The Eastern European Economics paper has been published, see
+    citation("glogis")
     
   o Further streamlinging of Depends/Imports.
 

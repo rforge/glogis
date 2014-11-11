@@ -132,7 +132,7 @@ glogisfit(x, \dots)
   \emph{Communications in Statistics -- Theory and Methods}, \bold{31}(10), 1687--1700.
 
   Windberger T, Zeileis A (2014). Structural Breaks in Inflation Dynamics within the
-    European Monetary Union. \emph{Eastern European Economics}, forthcoming.
+    European Monetary Union. \emph{Eastern European Economics}, \bold{52}(3), 66--88.
 }
 
 \seealso{\code{\link{dglogis}}, \code{\link{dlogis}}, \code{\link{breakpoints.glogisfit}}}
