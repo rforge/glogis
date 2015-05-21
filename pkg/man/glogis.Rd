@@ -48,7 +48,7 @@ sglogis(x, location = 0, scale = 1, shape = 1)
   The generalized logistic distribution with \code{location} \eqn{= \mu}{= m},
   \code{scale} \eqn{= \sigma}{= s}, and \code{shape} \eqn{= \gamma}{= g} has distribution function
   \deqn{
-    F(x) = \frac{1}{(1 + e^{-(x-\mu)/\sigma})^\gamma)}%
+    F(x) = \frac{1}{(1 + e^{-(x-\mu)/\sigma})^\gamma}%
   }{F(x) = 1 / (1 + exp(-(x-m)/s))^g}.
 
   The mean is given by \code{location + (digamma(shape) - digamma(1)) * scale}, the variance by
