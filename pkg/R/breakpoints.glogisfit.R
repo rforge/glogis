@@ -18,8 +18,8 @@ breakpoints.glogisfit <- function(obj, h = 0.15, breaks = NULL, ic = "LWZ", hpc 
 refit.breakpoints.glogisfit <- function(object, ...) {
   bf <- strucchange::breakfactor(object, ...)
   rval <- tapply(object$null$x, bf, glogisfit, fixed = object$null$fixed)
-  names(rval) <- paste(tapply(format(object$index), bf, head, 1), "--",
-    tapply(format(object$index), bf, tail, 1), sep = "")
+  names(rval) <- paste(tapply(format(object$index), bf, "[", 1), "--",
+    tapply(format(object$index), bf, function(x) x[length(x)]), sep = "")
   return(rval)
 }
 
