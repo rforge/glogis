@@ -1,3 +1,8 @@
+Changes in Version 1.0-1
+
+  o Small improvements for R CMD check.
+
+
 Changes in Version 1.0-0
 
   o The Eastern European Economics paper has been published, see
