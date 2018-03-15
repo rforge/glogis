@@ -9,13 +9,16 @@ export(
   "qglogis",
   "rglogis",
   "sglogis",
+  
   "glogisfit",
   "glogisfit.default",
-  "breakpoints.glogisfit",
+
+  "breakpoints.glogisfit",  
   "refit.breakpoints.glogisfit",
   "breakdates.confint.breakpoints.glogisfit"
 )
 
+S3method("glogisfit", "default")
 S3method("glogisfit", "formula")
 
 S3method("bread", "glogisfit")
