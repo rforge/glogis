@@ -11,14 +11,14 @@ citEntry(entry = "Manual",
 	                     as.person("Thomas Windberger")),
          year = year,
          note = note,
-         url = "http://CRAN.R-project.org/package=glogis",
+         url = "https://CRAN.R-project.org/package=glogis",
 
          textVersion =
          paste("Achim Zeileis, Thomas Windberger",
    	       sprintf("(%s).", year),	 
                "glogis: Fitting and Testing Generalized Logistic Distributions.",
 	       paste(note, ".", sep = ""),
-               "URL http://CRAN.R-project.org/package=glogis")
+               "URL https://CRAN.R-project.org/package=glogis")
 )
 
 citEntry(entry = "Article",
